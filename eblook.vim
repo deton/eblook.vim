@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.26 2003/06/14 13:47:24 deton Exp $
+" Revision: $Id: eblook.vim,v 1.27 2003/12/06 04:27:50 deton Exp $
 
 scriptencoding cp932
 
@@ -230,7 +230,7 @@ function! s:Search(key)
     endif
     silent echo 'select ' . dname
     silent echo 'set prompt "eblook-' . dname . '> "'
-    silent echo 'search ' . a:key . "\n"
+    silent echo 'search "' . a:key . "\"\n"
     let i = i + 1
   endwhile
   redir END
