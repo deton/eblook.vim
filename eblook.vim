@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.8 2003/06/04 14:21:42 deton Exp $
+" Revision: $Id: eblook.vim,v 1.9 2003/06/05 11:43:27 deton Exp $
 
 scriptencoding cp932
 
@@ -79,13 +79,13 @@ endfunction
 function! s:Search(key)
   call s:OpenBuffer(s:entrybufname)
   execute 'redir! >' . s:cmdfile
-  let prev_book_param = ''
+  let prev_book = ''
   let i = 1
   while exists("g:eblook_dict{i}_name")
     let dname = g:eblook_dict{i}_name
-    if exists("g:eblook_dict{i}_book_param") && g:eblook_dict{i}_book_param !=# prev_book_param
-      silent echo 'book ' . g:eblook_dict{i}_book_param
-      let prev_book_param = g:eblook_dict{i}_book_param
+    if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
+      silent echo 'book ' . g:eblook_dict{i}_book
+      let prev_book = g:eblook_dict{i}_book
     endif
     silent echo 'select ' . dname
     silent echo 'set prompt "eblook-' . dname . '> "'
@@ -155,8 +155,8 @@ function! s:GetContent(in_entry_buf)
     let b:dictid = did
   endif
   execute 'redir! >' . s:cmdfile
-  if exists("g:eblook_dict{b:dictid}_book_param")
-    silent echo 'book ' . g:eblook_dict{b:dictid}_book_param
+  if exists("g:eblook_dict{b:dictid}_book")
+    silent echo 'book ' . g:eblook_dict{b:dictid}_book
   endif
   silent echo 'select ' . g:eblook_dict{b:dictid}_name
   silent echo 'content ' . pos . "\n"
