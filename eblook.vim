@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.27 2003/12/06 04:27:50 deton Exp $
+" Revision: $Id: eblook.vim,v 1.28 2004/06/26 09:49:52 deton Exp $
 
 scriptencoding cp932
 
@@ -91,6 +91,13 @@ scriptencoding cp932
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 "
+"    'eblookprg'
+"       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
+"
+"    'eblookenc'
+"       eblookプログラムの出力を読み込むときのエンコーディング。
+"       設定可能な値は|'encoding'|参照。省略値: &encoding
+"
 "    'mapleader'
 "       キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
 "       CTRL-Kを指定する場合の例:
@@ -107,6 +114,16 @@ endif
 " 保持しておく過去の検索バッファ数の上限
 if !exists('eblook_history_max')
   let eblook_history_max = 10
+endif
+
+" eblookプログラムの名前
+if !exists('eblookprg')
+  let eblookprg = 'eblook'
+endif
+
+" eblookプログラムの出力を読み込むときのエンコーディング
+if !exists('eblookenc')
+  let eblookenc = &encoding
 endif
 
 command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
@@ -215,26 +232,9 @@ function! s:Search(key)
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
   call s:NewBuffers()
-  execute 'redir! >' . s:cmdfile
-  let prev_book = ''
-  let i = 1
-  while exists("g:eblook_dict{i}_name")
-    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
-      let i = i + 1
-      continue
-    endif
-    let dname = g:eblook_dict{i}_name
-    if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
-      silent echo 'book ' . g:eblook_dict{i}_book
-      let prev_book = g:eblook_dict{i}_book
-    endif
-    silent echo 'select ' . dname
-    silent echo 'set prompt "eblook-' . dname . '> "'
-    silent echo 'search "' . a:key . "\"\n"
-    let i = i + 1
-  endwhile
-  redir END
-  silent execute 'read! ++enc=' . &enc . ' eblook < ' . s:cmdfile
+  call s:RedirSearchCommand(a:key)
+  " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" < "' . s:cmdfile . '"'
 
   silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook.*> \(eblook.*> \)/\1/g
@@ -242,7 +242,7 @@ function! s:Search(key)
   while exists("g:eblook_dict{i}_name")
     let dname = g:eblook_dict{i}_name
     let title = g:eblook_dict{i}_title
-    silent! execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . title . "\t"
+    silent! execute ':1/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
   silent! :%s/eblook.*> //g
@@ -260,6 +260,29 @@ function! s:Search(key)
       redraw | echomsg 'eblook-vim: 何も見つかりませんでした: <' . a:key . '>'
     endif
   endif
+endfunction
+
+" eblookブログラムにリダイレクトするための検索コマンドファイルを作成する
+function! s:RedirSearchCommand(key)
+  execute 'redir! >' . s:cmdfile
+  let prev_book = ''
+  let i = 1
+  while exists("g:eblook_dict{i}_name")
+    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+      let i = i + 1
+      continue
+    endif
+    let dname = g:eblook_dict{i}_name
+    if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
+      silent echo 'book ' . g:eblook_dict{i}_book
+      let prev_book = g:eblook_dict{i}_book
+    endif
+    silent echo 'select ' . dname
+    silent echo 'set prompt "eblook-' . i . '> "'
+    silent echo 'search "' . a:key . "\"\n"
+    let i = i + 1
+  endwhile
+  redir END
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
@@ -323,7 +346,7 @@ function! s:GetContent()
   silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
   redir END
-  silent execute 'read! ++enc=' . &enc . ' eblook < ' . s:cmdfile
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" < "' . s:cmdfile . '"'
 
   silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook> //g
@@ -372,7 +395,7 @@ function! s:FollowReference(refid)
   endif
   let dnum = b:dictnum
   let save_line = line('.')
-  let save_col = col('.')
+  let save_col = virtcol('.')
   " ggでバッファ先頭に移動してからsearch()で検索すると、
   " バッファ冒頭の検索対象文字列にヒットしないので、末尾からwrap aroundして検索
   normal! G$
