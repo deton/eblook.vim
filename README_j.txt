@@ -1,8 +1,8 @@
 eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
-							     Version: 1.0
-							     Date: 2003-6-15
+							     Version: 1.0.1
+							     Date: 2003-12-06
 
-解説
+概要
   eblook.vimは、`eblook'プログラムを使って、
   EPWING/電子ブック辞書の検索を行うプラグインスクリプトです。
 
@@ -25,13 +25,20 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblook.vim          'runtimepath'/plugin  プラグインスクリプト本体
   eblook.txt          'runtimepath'/doc     スクリプトの説明書
 
-  'runtimepath'や$VIMで示されるディレクトリは、Vim上で
-  :echo &runtimepath や :echo $VIM を実行することで確認できます。
+  'runtimepath'で示されるディレクトリは、Vim上で
+  :echo &runtimepath を実行することで確認できます。
 
 使い方
   eblook.txtを参照してください。
 
+更新履歴
+  - 1.0.1 (2003-12-06)
+   - スペースを含む単語(de facto等)の検索ができなかったバグを修正。
+
+  - 1.0 (2003-06-15)
+    最初のリリース。
+
 -- 
 木原 英人 / KIHARA, Hideto / deton@m1.interq.or.jp
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.2 2003/06/15 02:31:42 deton Exp $
+$Id: README_j.txt,v 1.3 2003/12/06 04:29:46 deton Exp $
