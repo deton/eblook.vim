@@ -215,6 +215,13 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 
+'eblookprg'					*'eblookprg'*
+  スクリプトから呼び出すeblookプログラムの名前。省略値: eblook
+
+'eblookenc'					*'eblookenc'*
+  eblookプログラムの出力を読み込むときのエンコーディング。
+  設定可能な値は|'encoding'|参照。省略値: &encoding
+
 'mapleader'
   キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
   CTRL-Kを指定する場合の例:
