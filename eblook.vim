@@ -3,17 +3,123 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.16 2003/06/09 12:52:39 deton Exp $
+" Revision: $Id: eblook.vim,v 1.17 2003/06/09 14:12:24 deton Exp $
 
 scriptencoding cp932
+
+" Description:
+"   `eblook'コマンドを使ってEPWING辞書を検索する。
+"   このスクリプトを使うためには、
+"   `eblook'コマンド<http://openlab.jp/edict/eblook/>とEPWING辞書が必要。
+"
+"   <Leader><C-Y>を押して検索語を入力すると、検索結果がentryウィンドウと
+"   contentウィンドウに表示される。
+"
+" コマンド:
+"   :EblookSearch       指定した単語の検索を行う
+"   :EblookListDict     辞書の一覧を表示する
+"   :EblookSkipDict     指定した辞書番号の辞書を一時的に検索対象から外す
+"   :EblookNotSkipDict  指定した辞書番号の辞書を一時的に検索対象に入れる
+"
+" nmap:
+"   <Leader><C-Y>       検索単語を入力して検索を行う
+"   <Leader>y           カーソル位置にある単語を検索する
+"
+" entryバッファのnmap
+"   <CR>                カーソル行のentryに対応するcontentを表示する
+"   J                   カーソルを下の行に移動してcontentを表示する
+"   K                   カーソルを上の行に移動してcontentを表示する
+"   x                   contentウィンドゥの表示/非表示を切り替える
+"   <Space>             contentウィンドゥでPageDownを行う
+"   <BS>                contentウィンドゥでPageUpを行う
+"   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+"   r                   contentウィンドゥに移動する
+"   R                   reference一覧を表示する
+"   q                   entryウィンドゥとcontentウィンドゥを閉じる
+"   <C-P>               検索履歴中の一つ前のバッファを表示する
+"   <C-N>               検索履歴中の一つ次のバッファを表示する
+"
+" contentバッファのnmap
+"   <CR>                カーソル位置のreferenceを表示する
+"   <Space>             PageDownを行う
+"   <BS>                PageUpを行う
+"   <Tab>               次のreferenceにカーソルを移動する
+"   r                   entryウィンドゥに移動する
+"   q                   entryウィンドゥとcontentウィンドゥを閉じる
+"   <C-P>               検索履歴中の一つ前のバッファを表示する
+"   <C-N>               検索履歴中の一つ次のバッファを表示する
+"
+" オプション:
+"    'eblook_dict{n}_title'
+"    'eblook_dict{n}_book'
+"    'eblook_dict{n}_name'
+"    'eblook_dict{n}_skip'
+"       EPWING辞書の設定。{n}は1, 2, 3, ...。使いたい辞書分指定する。
+"       ここで指定した数字(辞書番号)の順に検索を行う。
+"       数字は連続している必要がある。
+"
+"      'eblook_dict{n}_title'
+"         辞書の識別子を指定。
+"         (eblook.vim内部では辞書番号かtitleで辞書を識別する。)
+"         例:
+"           let eblook_dict1_title = '広辞苑第五版'
+"
+"      'eblook_dict{n}_book'
+"         eblookコマンドの`book'コマンドに渡すパラメータ。
+"         辞書のあるディレクトリを指定。
+"         Appendixがある場合は、
+"         辞書ディレクトリに続けてAppendixディレクトリを指定。
+"         例:
+"           let eblook_dict1_book = '/usr/local/epwing'
+"
+"      'eblook_dict{n}_name'
+"         eblookコマンドの`select'コマンドに渡すパラメータ。
+"         辞書名を指定。
+"         例:
+"           let eblook_dict1_name = 'kojien'
+"
+"      'eblook_dict{n}_skip'
+"         0でない値を設定すると、この辞書は検索しない。
+"         例:
+"           let eblook_dict1_skip = 1
+"
+"
+"    'eblook_history_max'
+"       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
+"
+"    'mapleader'
+"       キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
+"       CTRL-Kを指定する場合の例:
+"         let mapleader = "\<C-K>"
+"
+"    'plugin_eblook_disable'
+"       このプラグインを読み込みたくない場合に次のように設定する。
+"         let plugin_eblook_disable = 1
+
+if exists('plugin_eblook_disable')
+  finish
+endif
+
+" 保持しておく過去の検索バッファ数の上限
+if !exists('eblook_history_max')
+  let eblook_history_max = 10
+endif
 
 command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
 command! EblookListDict call <SID>ListDict()
 command! -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
 command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
 
+" entryバッファ名のベース
 let s:entrybufname = '_eblook_entry_'
+" contentバッファ名のベース
 let s:contentbufname = '_eblook_content_'
+" </reference=>で指定されるentryのpattern
+let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
+" eblookにリダイレクトするコマンドを保持する一時ファイル名
+let s:cmdfile = tempname()
+" バッファヒストリ中の現在位置
+let s:bufindex = 0
 
 " マッピングを有効化
 function! s:MappingOn()
@@ -60,16 +166,6 @@ function! s:MappingOff()
 endfunction
 
 call s:MappingOn()
-
-" file name to store commands for eblook
-let s:cmdfile = tempname()
-
-" 保持しておく過去の検索バッファ数の上限
-let s:history_max = 10
-" バッファヒストリ中の現在位置
-let s:bufindex = 0
-" </reference=>で指定されるentryのpattern
-let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
 
 " 空のバッファを作る
 function! s:Empty_BufReadCmd()
@@ -367,7 +463,7 @@ endfunction
 
 function! s:NextBufIndex()
   let i = s:bufindex + 1
-  if i > s:history_max
+  if i > g:eblook_history_max
     let i = 1
   endif
   return i
@@ -376,7 +472,7 @@ endfunction
 function! s:PrevBufIndex()
   let i = s:bufindex - 1
   if i < 1
-    let i = s:history_max
+    let i = g:eblook_history_max
   endif
   return i
 endfunction
