@@ -1,3 +1,4 @@
+let g:eblook_dict1 = 'kojien'
 let s:entrybufname = 'eblook.entry'
 let s:contentbufname = 'eblook.content'
 let s:buflisted = 1
@@ -19,13 +20,18 @@ endfunction
 
 " execute eblook's list command
 function! s:List()
-  call s:OpenEntryBuffer()
+  call s:OpenBuffer(s:entrybufname)
   execute 'redir! >' . s:cmdfile
-  silent echo 'set prompt ""'
+  "silent echo 'set prompt ""'
   silent echo "list\n"
   redir END
-  execute 'read! eblook < ' . s:cmdfile
-  silent! execute "normal! :%s/eblook> //g"
+  let save_fencs = &fencs
+  let &fencs = &enc
+  silent execute 'read! eblook < ' . s:cmdfile
+  let &fencs = save_fencs
+  silent :%s/eblook> //g
+  silent :g/^$/d
+  normal 1G
 endfunction
 
 " execute eblook's search command
@@ -33,30 +39,47 @@ endfunction
 function! s:Search(key)
   call s:OpenBuffer(s:entrybufname)
   execute 'redir! >' . s:cmdfile
-  silent echo 'set prompt ""'
-  silent echo 'select 1'
-  silent echo 'search ' . a:key . "\n"
+  let i = 1
+  while exists("g:eblook_dict{i}")
+    let dname = g:eblook_dict{i}
+    silent echo 'select ' . dname
+    silent echo 'set prompt "eblook-' . dname . '> "'
+    silent echo 'search ' . a:key . "\n"
+    let i = i + 1
+  endwhile
   redir END
-  execute 'read! eblook < ' . s:cmdfile
-  :%s/eblook> //g
+  let save_fencs = &fencs
+  let &fencs = &enc
+  silent execute 'read! eblook < ' . s:cmdfile
+  let &fencs = save_fencs
+  silent execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . dname . '  '
+  silent :%s/eblook.*> //g
+  silent :g/^$/d
+  normal 1G
 endfunction
 
 function! s:GetContent()
   let str = getline('.')
-  echo str
+  let dname = matchstr(str, '^[^ ]\+')
+  if strlen(dname) == 0
+    return
+  endif
   let pos = matchstr(str, '[0-9a-f]\+:[0-9a-f]\+')
-  echo pos
   if strlen(pos) == 0
     return
   endif
   call s:OpenBuffer(s:contentbufname)
   execute 'redir! >' . s:cmdfile
-  silent echo 'set prompt ""'
-  silent echo 'select 1'
+  "silent echo 'set prompt ""'
+  silent echo 'select ' . dname
   silent echo 'content ' . pos . "\n"
   redir END
-  execute 'read! eblook < ' . s:cmdfile
-  :%s/eblook> //g
+  let save_fencs = &fencs
+  let &fencs = &enc
+  silent execute 'read! eblook < ' . s:cmdfile
+  let &fencs = save_fencs
+  silent :%s/eblook> //g
+  silent :g/^$/d
   normal 1G
 endfunction
 
