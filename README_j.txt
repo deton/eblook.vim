@@ -1,6 +1,6 @@
 eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
-							     Version: 1.0.1
-							     Date: 2003-12-06
+							     Version: 1.0.2
+							     Date: 2004-06-26
 
 概要
   eblook.vimは、`eblook'プログラムを使って、
@@ -12,7 +12,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 必要条件
   Vim 6.1以降。
-  `eblook'プログラム<http://openlab.jp/edict/eblook/> 1.5.1。
+  `eblook'プログラム<http://openlab.jp/edict/eblook/>。
   EPWING/電子ブック辞書<http://openlab.jp/edict/info.html>。
 
 準備
@@ -32,6 +32,13 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblook.txtを参照してください。
 
 更新履歴
+  - 1.0.2 (2004-06-26)
+   - 'eblook_dict{n}_name'が同じ辞書が複数ある場合に、
+     内容が正しく表示されないバグを修正
+   - オプションを2つ追加。
+     'eblookprg': eblookプログラムの名前
+     'eblookenc': eblookプログラムの出力を読み込むときのエンコーディング
+
   - 1.0.1 (2003-12-06)
    - スペースを含む単語(de facto等)の検索ができなかったバグを修正。
 
@@ -41,4 +48,4 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 -- 
 木原 英人 / KIHARA, Hideto / deton@m1.interq.or.jp
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.3 2003/12/06 04:29:46 deton Exp $
+$Id: README_j.txt,v 1.4 2004/06/26 09:50:48 deton Exp $
