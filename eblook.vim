@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.4 2003/06/02 14:08:21 deton Exp $
+" Revision: $Id: eblook.vim,v 1.5 2003/06/03 12:34:45 deton Exp $
 
 scriptencoding cp932
 
@@ -67,7 +67,7 @@ endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
 function! s:SearchInput()
-  let str = input('eblook: ', expand('<cword>'))
+  let str = input('eblook: ')
   if strlen(str) == 0
     return
   endif
@@ -92,7 +92,14 @@ function! s:Search(key)
   let &fencs = &enc
   silent execute 'read! eblook < ' . s:cmdfile
   let &fencs = save_fencs
-  silent! execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . dname . '  '
+
+  silent! :%s/eblook.*> \(eblook.*> \)/\1/g
+  let i = 1
+  while exists("g:eblook_dict{i}")
+    let dname = g:eblook_dict{i}
+    silent! execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . dname . '  '
+    let i = i + 1
+  endwhile
   silent! :%s/eblook.*> //g
   silent! :g/^$/d
   normal! 1G
@@ -157,22 +164,21 @@ function! s:ToggleContentWindow()
   endif
 endfunction
 
-function! s:GoContentWindow()
-  if s:SelectWindowByName(s:contentbufname) < 0
-    execute "silent normal! :split " . s:contentbufname . "\<CR>"
+function! s:GoWindow(is_entry_buf)
+  if a:is_entry_buf
+    let bufname = s:entrybufname
+  else
+    let bufname = s:contentbufname
   endif
-endfunction
-
-function! s:GoEntryWindow()
-  if s:SelectWindowByName(s:entrybufname) < 0
-    execute "silent normal! :split " . s:entrybufname . "\<CR>"
+  if s:SelectWindowByName(bufname) < 0
+    execute "silent normal! :split " . bufname . "\<CR>"
   endif
 endfunction
 
 " contentウィンドウをスクロールする。
 " @param down 1の場合下に、0の場合上に。
 function! s:ScrollContent(down)
-  call s:GoContentWindow()
+  call s:GoWindow(0)
   if a:down
     execute "normal! \<PageDown>"
   else
@@ -204,17 +210,17 @@ function! s:OpenBuffer(bufname)
       nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
       nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
       nnoremap <buffer> <silent> f :call <SID>SearchInput()<CR>
-      nnoremap <buffer> <silent> h :call <SID>GoContentWindow()<CR>
+      nnoremap <buffer> <silent> g :call <SID>GoWindow(0)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     else
       nnoremap <buffer> <silent> <CR> :call <SID>GetContent(0)<CR>
       nnoremap <buffer> <silent> <Space> <PageDown>
       nnoremap <buffer> <silent> <BS> <PageUp>
-      nnoremap <buffer> <silent> h :call <SID>GoEntryWindow()<CR>
+      nnoremap <buffer> <silent> g :call <SID>GoWindow(1)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     endif
   endif
-  execute "normal! :%d\<CR>5\<C-W>\<C-_>"
+  silent execute "normal! :%d\<CR>"
 endfunction
 
 " SelectWindowByName(name)
