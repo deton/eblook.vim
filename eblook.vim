@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.25 2003/06/14 08:14:19 deton Exp $
+" Revision: $Id: eblook.vim,v 1.26 2003/06/14 13:47:24 deton Exp $
 
 scriptencoding cp932
 
@@ -120,8 +120,10 @@ let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
 let s:cmdfile = tempname()
 " entryバッファ名のベース
 let s:entrybufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_entry_'
+let s:entrybufname = substitute(s:entrybufname, '\\', '/', 'g')
 " contentバッファ名のベース
 let s:contentbufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_content_'
+let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 " バッファヒストリ中の現在位置
 let s:bufindex = 0
 
