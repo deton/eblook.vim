@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.20 2003/06/11 13:55:12 deton Exp $
+" Revision: $Id: eblook.vim,v 1.21 2003/06/11 15:01:10 deton Exp $
 
 scriptencoding cp932
 
@@ -231,7 +231,7 @@ function! s:NewBuffers()
   let s:bufindex = s:NextBufIndex()
   call s:CreateBuffer(s:entrybufname, oldindex)
   call s:CreateBuffer(s:contentbufname, oldindex)
-  execute "normal! \<C-W>J\<C-W>p4\<C-W>_"
+  execute "normal! \<C-W>p4\<C-W>_"
 endfunction
 
 " entryバッファかcontentバッファのいずれかを作る
@@ -245,11 +245,8 @@ function! s:CreateBuffer(bufname, oldindex)
   else
     let bufexists = 0
   endif
-  if s:SelectWindowByName(oldbufname) < 0
-    execute "silent normal! :botright split " . newbufname . "\<CR>"
-  else
-    execute "silent normal! :edit " . newbufname . "\<CR>"
-  endif
+  call s:OpenWindow(oldbufname)
+  execute "silent normal! :edit " . newbufname . "\<CR>"
   if bufexists
     silent execute "normal! :%d\<CR>"
   else
@@ -301,9 +298,7 @@ function! s:GetContent()
     return -1
   endif
 
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :botright split " . s:contentbufname . s:bufindex . "\<CR>"
-  endif
+  call s:OpenWindow(s:contentbufname . s:bufindex)
   if b:dictnum == dnum && b:refid ==# refid
     execute "normal! \<C-W>p"
     return 0
@@ -366,9 +361,7 @@ endfunction
 " 指定された<reference>の内容をcontentバッファに表示する。
 " @param refid 表示する内容を示す文字列。''の場合はリストの最初のものを表示
 function! s:FollowReference(refid)
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :botright split " . s:contentbufname . s:bufindex . "\<CR>"
-  endif
+  call s:OpenWindow(s:contentbufname . s:bufindex)
   let dnum = b:dictnum
   let save_line = line('.')
   let save_col = col('.')
@@ -379,8 +372,9 @@ function! s:FollowReference(refid)
   let i = 1
   while search('<reference>', searchflag) > 0
     let line = getline('.')
-    let label{i} = matchstr(line, '<reference>\zs.\{-}\ze</reference', col('.') - 1)
-    let entry{i} = matchstr(line, s:refpat, col('.') - 1)
+    let col = col('.') - 1
+    let label{i} = matchstr(line, '<reference>\zs.\{-}\ze</reference', col)
+    let entry{i} = matchstr(line, s:refpat, col)
     let i = i + 1
     let searchflag = 'W'
   endwhile
@@ -410,29 +404,24 @@ function! s:History(dir)
   let prevbufname = s:entrybufname . s:bufindex
   let prevcontentbufname = s:contentbufname . s:bufindex
   if a:dir > 0
-    let nextbufindex = s:NextBufIndex()
-    if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
+    let ni = s:NextBufIndex()
+    if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
       echomsg 'eblook-vim: 次のバッファはありません'
       return
     endif
   else
-    let nextbufindex = s:PrevBufIndex()
-    if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
+    let ni = s:PrevBufIndex()
+    if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
       echomsg 'eblook-vim: 前のバッファはありません'
       return
     endif
   endif
-  let s:bufindex = nextbufindex
-  if s:SelectWindowByName(prevcontentbufname) < 0
-    execute "silent normal! :botright split " . s:contentbufname . nextbufindex . "\<CR>"
-  else
-    execute "silent normal! :edit " . s:contentbufname . nextbufindex . "\<CR>"
-  endif
-  if s:SelectWindowByName(prevbufname) < 0
-    execute "silent normal! :aboveleft split " . s:entrybufname . nextbufindex . "\<CR>"
-  else
-    execute "silent normal! :edit " . s:entrybufname . nextbufindex . "\<CR>"
-  endif
+  let s:bufindex = ni
+  call s:OpenWindow(prevbufname)
+  execute "silent normal! :edit " . s:entrybufname . ni . "\<CR>"
+  call s:OpenWindow(prevcontentbufname)
+  execute "silent normal! :edit " . s:contentbufname . ni . "\<CR>"
+  execute "normal! \<C-W>p"
 endfunction
 
 " 次のバッファのインデックス番号を返す
@@ -486,7 +475,7 @@ function! s:GoWindow(to_entry_buf)
     let bufname = s:contentbufname . s:bufindex
   endif
   if s:SelectWindowByName(bufname) < 0
-    execute "silent normal! :belowright split " . bufname . "\<CR>"
+    execute "silent normal! :split " . bufname . "\<CR>"
   endif
 endfunction
 
@@ -536,6 +525,21 @@ function! s:SetDictSkip(is_skip, ...)
     endif
     let i = i + 1
   endwhile
+endfunction
+
+" ウィンドウを開く
+" @param name バッファ名
+function! s:OpenWindow(name)
+  if s:SelectWindowByName(a:name) < 0
+    execute 'silent normal! :split ' . a:name . "\<CR>"
+  endif
+  " entryウィンドウとcontentウィンドウの位置が逆にならないように。
+  " (でもこれだけだと間に他のウィンドウのある状態にはなりうる)
+  if &splitbelow
+    execute "normal! \<C-W>J"
+  else
+    execute "normal! \<C-W>K"
+  endif
 endfunction
 
 " SelectWindowByName(name)
