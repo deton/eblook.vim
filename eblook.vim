@@ -3,12 +3,12 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.17 2003/06/09 14:12:24 deton Exp $
+" Revision: $Id: eblook.vim,v 1.18 2003/06/10 14:05:44 deton Exp $
 
 scriptencoding cp932
 
 " Description:
-"   `eblook'コマンドを使ってEPWING辞書を検索する。
+"   `eblook'コマンドを使ってEPWING/電子ブック辞書を検索する。
 "   このスクリプトを使うためには、
 "   `eblook'コマンド<http://openlab.jp/edict/eblook/>とEPWING辞書が必要。
 "
@@ -29,11 +29,10 @@ scriptencoding cp932
 "   <CR>                カーソル行のentryに対応するcontentを表示する
 "   J                   カーソルを下の行に移動してcontentを表示する
 "   K                   カーソルを上の行に移動してcontentを表示する
-"   x                   contentウィンドゥの表示/非表示を切り替える
 "   <Space>             contentウィンドゥでPageDownを行う
 "   <BS>                contentウィンドゥでPageUpを行う
 "   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
-"   r                   contentウィンドゥに移動する
+"   p                   contentウィンドゥに移動する
 "   R                   reference一覧を表示する
 "   q                   entryウィンドゥとcontentウィンドゥを閉じる
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
@@ -44,7 +43,7 @@ scriptencoding cp932
 "   <Space>             PageDownを行う
 "   <BS>                PageUpを行う
 "   <Tab>               次のreferenceにカーソルを移動する
-"   r                   entryウィンドゥに移動する
+"   p                   entryウィンドゥに移動する
 "   q                   entryウィンドゥとcontentウィンドゥを閉じる
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
@@ -217,6 +216,10 @@ endfunction
 " execute eblook's search command
 " @param key string to search
 function! s:Search(key)
+  let hasoldwin = bufwinnr(s:entrybufname . s:bufindex)
+  if hasoldwin < 0
+    let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
+  endif
   call s:NewBuffers()
   execute 'redir! >' . s:cmdfile
   let prev_book = ''
@@ -259,7 +262,10 @@ function! s:Search(key)
     silent! :%s/./&/g
     if strlen(v:errmsg) > 0
       bwipeout!
-      call s:History(-1)
+      silent! call s:History(-1)
+      if hasoldwin < 0
+	call s:Quit()
+      endif
       echomsg 'eblook-vim: 何も見つかりませんでした: <' . a:key . '>'
     endif
   endif
@@ -283,7 +289,7 @@ function! s:GetContent()
   endif
 
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
+    execute "silent normal! :botright split " . s:contentbufname . s:bufindex . "\<CR>"
   endif
   silent execute "normal! :%d\<CR>"
   let b:dictid = did
@@ -344,7 +350,7 @@ endfunction
 " 指定された<reference>の内容をcontentバッファに表示する。
 function! s:FollowReference(refid)
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
+    execute "silent normal! :botright split " . s:contentbufname . s:bufindex . "\<CR>"
   endif
   let did = b:dictid
   let save_line = line('.')
@@ -390,14 +396,6 @@ function! s:GetDictIdFromTitle(title)
   return -1
 endfunction
 
-function! s:ToggleContentWindow()
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
-  else
-    quit!
-  endif
-endfunction
-
 function! s:GoWindow(to_entry_buf)
   if a:to_entry_buf
     let bufname = s:entrybufname . s:bufindex
@@ -405,7 +403,7 @@ function! s:GoWindow(to_entry_buf)
     let bufname = s:contentbufname . s:bufindex
   endif
   if s:SelectWindowByName(bufname) < 0
-    execute "silent normal! :split " . bufname . "\<CR>"
+    execute "silent normal! :belowright split " . bufname . "\<CR>"
   endif
 endfunction
 
@@ -450,15 +448,16 @@ function! s:History(dir)
   endif
   let s:bufindex = nextbufindex
   if s:SelectWindowByName(prevcontentbufname) < 0
-    execute "silent normal! :split " . s:contentbufname . nextbufindex . "\<CR>"
+    execute "silent normal! :botright split " . s:contentbufname . nextbufindex . "\<CR>"
   else
     execute "silent normal! :edit " . s:contentbufname . nextbufindex . "\<CR>"
   endif
   if s:SelectWindowByName(prevbufname) < 0
-    execute "silent normal! :split " . s:entrybufname . nextbufindex . "\<CR>"
+    execute "silent normal! :aboveleft split " . s:entrybufname . nextbufindex . "\<CR>"
   else
     execute "silent normal! :edit " . s:entrybufname . nextbufindex . "\<CR>"
   endif
+  execute "normal! 4\<C-W>_"
 endfunction
 
 function! s:NextBufIndex()
@@ -482,7 +481,7 @@ function! s:NewBuffers()
   let s:bufindex = s:NextBufIndex()
   call s:CreateBuffer(s:entrybufname, oldindex)
   call s:CreateBuffer(s:contentbufname, oldindex)
-  execute "normal! \<C-W>p"
+  execute "normal! \<C-W>J\<C-W>p4\<C-W>_"
 endfunction
 
 function! s:CreateBuffer(bufname, oldindex)
@@ -494,7 +493,7 @@ function! s:CreateBuffer(bufname, oldindex)
     let bufexists = 0
   endif
   if s:SelectWindowByName(oldbufname) < 0
-    execute "silent normal! :split " . newbufname . "\<CR>"
+    execute "silent normal! :botright split " . newbufname . "\<CR>"
   else
     execute "silent normal! :edit " . newbufname . "\<CR>"
   endif
@@ -506,16 +505,13 @@ function! s:CreateBuffer(bufname, oldindex)
     set noswapfile
     set nobuflisted
     if a:bufname ==# s:entrybufname
-      silent execute "normal! 4\<C-W>_"
-      set winfixheight
       nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
       nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
       nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
-      nnoremap <buffer> <silent> x :call <SID>ToggleContentWindow()<CR>
       nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
       nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
       nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
-      nnoremap <buffer> <silent> r :call <SID>GoWindow(0)<CR>
+      nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
       nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
       nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
@@ -525,7 +521,7 @@ function! s:CreateBuffer(bufname, oldindex)
       nnoremap <buffer> <silent> <Space> <PageDown>
       nnoremap <buffer> <silent> <BS> <PageUp>
       nnoremap <buffer> <silent> <Tab> /<reference/<CR>
-      nnoremap <buffer> <silent> r :call <SID>GoWindow(1)<CR>
+      nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
       nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
       nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
