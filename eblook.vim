@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.15 2003/06/08 14:15:41 deton Exp $
+" Revision: $Id: eblook.vim,v 1.16 2003/06/09 12:52:39 deton Exp $
 
 scriptencoding cp932
 
@@ -101,9 +101,9 @@ function! s:SetDictSkip(is_skip, ...)
   let i = 1
   while i <= a:0
     if a:is_skip
-      let g:eblook_dict{a:i}_skip = 1
+      let g:eblook_dict{a:{i}}_skip = 1
     else
-      unlet! g:eblook_dict{a:i}_skip
+      unlet! g:eblook_dict{a:{i}}_skip
     endif
     let i = i + 1
   endwhile
@@ -253,13 +253,15 @@ function! s:FollowReference(refid)
   let did = b:dictid
   let save_line = line('.')
   let save_col = col('.')
-  normal! gg
+  normal! G$
+  let searchflag = 'w'
   let i = 1
-  while search('<reference>', 'W') > 0
+  while search('<reference>', searchflag) > 0
     let line = getline('.')
     let label{i} = matchstr(line, '<reference>\zs.\{-}\ze</reference', col('.') - 1)
     let entry{i} = matchstr(line, s:refpat, col('.') - 1)
     let i = i + 1
+    let searchflag = 'W'
   endwhile
   if i <= 1
     return
@@ -352,14 +354,14 @@ function! s:History(dir)
   endif
   let s:bufindex = nextbufindex
   if s:SelectWindowByName(prevcontentbufname) < 0
-    execute "silent normal! :sbuffer " . s:contentbufname . nextbufindex . "\<CR>"
+    execute "silent normal! :split " . s:contentbufname . nextbufindex . "\<CR>"
   else
-    execute "silent normal! :buffer " . s:contentbufname . nextbufindex . "\<CR>"
+    execute "silent normal! :edit " . s:contentbufname . nextbufindex . "\<CR>"
   endif
   if s:SelectWindowByName(prevbufname) < 0
-    execute "silent normal! :sbuffer " . s:entrybufname . nextbufindex . "\<CR>"
+    execute "silent normal! :split " . s:entrybufname . nextbufindex . "\<CR>"
   else
-    execute "silent normal! :buffer " . s:entrybufname . nextbufindex . "\<CR>"
+    execute "silent normal! :edit " . s:entrybufname . nextbufindex . "\<CR>"
   endif
 endfunction
 
@@ -396,17 +398,9 @@ function! s:CreateBuffer(bufname, oldindex)
     let bufexists = 0
   endif
   if s:SelectWindowByName(oldbufname) < 0
-    if bufexists
-      execute "silent normal! :sbuffer " . newbufname . "\<CR>"
-    else
-      execute "silent normal! :split " . newbufname . "\<CR>"
-    endif
+    execute "silent normal! :split " . newbufname . "\<CR>"
   else
-    if bufexists
-      execute "silent normal! :buffer " . newbufname . "\<CR>"
-    else
-      execute "silent normal! :edit " . newbufname . "\<CR>"
-    endif
+    execute "silent normal! :edit " . newbufname . "\<CR>"
   endif
   if bufexists
     silent execute "normal! :%d\<CR>"
@@ -416,6 +410,8 @@ function! s:CreateBuffer(bufname, oldindex)
     set noswapfile
     set nobuflisted
     if a:bufname ==# s:entrybufname
+      silent execute "normal! 4\<C-W>_"
+      set winfixheight
       nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
       nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
       nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
@@ -438,9 +434,6 @@ function! s:CreateBuffer(bufname, oldindex)
       nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
       nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
     endif
-  endif
-  if a:bufname ==# s:entrybufname
-    silent execute "normal! 4\<C-W>_"
   endif
 endfunction
 
