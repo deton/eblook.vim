@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.14 2003/06/08 14:14:43 deton Exp $
+" Revision: $Id: eblook.vim,v 1.15 2003/06/08 14:15:41 deton Exp $
 
 scriptencoding cp932
 
@@ -15,7 +15,7 @@ command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
 let s:entrybufname = '_eblook_entry_'
 let s:contentbufname = '_eblook_content_'
 
-" マッピングを铜跟步
+" 儅僢僺儞僌傪桳岠壔
 function! s:MappingOn()
   let set_mapleader = 0
   if !exists('g:mapleader')
@@ -36,7 +36,7 @@ function! s:MappingOn()
   augroup END
 endfunction
 
-" マッピングを痰跟步
+" 儅僢僺儞僌傪柍岠壔
 function! s:MappingOff()
   let set_mapleader = 0
   if !exists('g:mapleader')
@@ -64,18 +64,18 @@ call s:MappingOn()
 " file name to store commands for eblook
 let s:cmdfile = tempname()
 
-" 瘦积しておく册殿の浮瑚バッファ眶の惧嘎
+" 曐帩偟偰偍偔夁嫀偺専嶕僶僢僼傽悢偺忋尷
 let s:history_max = 10
-" バッファヒストリ面の附哼疤弥
+" 僶僢僼傽僸僗僩儕拞偺尰嵼埵抲
 let s:bufindex = 0
-" </reference=>で回年されるentryのpattern
+" </reference=>偱巜掕偝傟傞entry偺pattern
 let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
 
-" 鄂のバッファを侯る
+" 嬻偺僶僢僼傽傪嶌傞
 function! s:Empty_BufReadCmd()
 endfunction
 
-" 辑今办枉を山绩する
+" 帿彂堦棗傪昞帵偡傞
 function! s:ListDict()
   let i = 1
   while exists("g:eblook_dict{i}_name")
@@ -94,9 +94,9 @@ function! s:ListDict()
   endwhile
 endfunction
 
-" 辑今をスキップするかどうかを办箕弄に肋年する。
-" @param is_skip スキップするかどうか。1:スキップする, 0:スキップしない
-" @param ... 辑今戎规
+" 帿彂傪僗僉僢僾偡傞偐偳偆偐傪堦帪揑偵愝掕偡傞丅
+" @param is_skip 僗僉僢僾偡傞偐偳偆偐丅1:僗僉僢僾偡傞, 0:僗僉僢僾偟側偄
+" @param ... 帿彂斣崋
 function! s:SetDictSkip(is_skip, ...)
   let i = 1
   while i <= a:0
@@ -109,7 +109,7 @@ function! s:SetDictSkip(is_skip, ...)
   endwhile
 endfunction
 
-" プロンプトを叫して、ユ〖ザから掐蜗された矢机误を浮瑚する
+" 僾儘儞僾僩傪弌偟偰丄儐乕僓偐傜擖椡偝傟偨暥帤楍傪専嶕偡傞
 function! s:SearchInput()
   let str = input('eblook: ')
   if strlen(str) == 0
@@ -164,13 +164,13 @@ function! s:Search(key)
     if strlen(v:errmsg) > 0
       bwipeout!
       call s:History(-1)
-      echomsg 'eblook-vim: 部も斧つかりませんでした: <' . a:key . '>'
+      echomsg 'eblook-vim: 壗傕尒偮偐傝傑偣傫偱偟偨: <' . a:key . '>'
     endif
   endif
 endfunction
 
-" content山绩
-" @return -1:content山绩己窃, 0:山绩喇根
+" content昞帵
+" @return -1:content昞帵幐攕, 0:昞帵惉岟
 function! s:GetContent()
   let str = getline('.')
   let title = matchstr(str, '^[^\t]\+')
@@ -212,8 +212,8 @@ function! s:GetContent()
   return 0
 endfunction
 
-" contentバッファ面のカ〖ソル疤弥烧夺の<reference>を藐叫して、
-" その柒推を山绩する。
+" content僶僢僼傽拞偺僇乕僜儖埵抲晅嬤偺<reference>傪拪弌偟偰丄
+" 偦偺撪梕傪昞帵偡傞丅
 function! s:SelectReference()
   let str = getline('.')
   let refid = matchstr(str, s:refpat)
@@ -221,7 +221,7 @@ function! s:SelectReference()
   if m1 < 0
     return -1
   endif
-  " <reference>が1乖に2つ笆惧ある眷圭は、カ〖ソルが疤弥する数を蝗う
+  " <reference>偑1峴偵2偮埲忋偁傞応崌偼丄僇乕僜儖偑埵抲偡傞曽傪巊偆
   let m2 = match(str, s:refpat, m1)
   if m2 >= 0
     let col = col('.')
@@ -238,14 +238,14 @@ function! s:SelectReference()
   call s:FollowReference(refid)
 endfunction
 
-" entryバッファでカ〖ソル乖のエントリに崔まれる<reference>のリストを山绩
+" entry僶僢僼傽偱僇乕僜儖峴偺僄儞僩儕偵娷傑傟傞<reference>偺儕僗僩傪昞帵
 function! s:ListReferences()
   call s:GetContent()
   call s:FollowReference('')
 endfunction
 
-" <reference>をリストアップしてentryバッファに山绩し、
-" 回年された<reference>の柒推をcontentバッファに山绩する。
+" <reference>傪儕僗僩傾僢僾偟偰entry僶僢僼傽偵昞帵偟丄
+" 巜掕偝傟偨<reference>偺撪梕傪content僶僢僼傽偵昞帵偡傞丅
 function! s:FollowReference(refid)
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
     execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
@@ -311,8 +311,8 @@ function! s:GoWindow(to_entry_buf)
   endif
 endfunction
 
-" contentウィンドウをスクロ〖ルする。
-" @param down 1の眷圭布に、0の眷圭惧に。
+" content僂傿儞僪僂傪僗僋儘乕儖偡傞丅
+" @param down 1偺応崌壓偵丄0偺応崌忋偵丅
 function! s:ScrollContent(down)
   call s:GoWindow(0)
   if a:down
@@ -332,21 +332,21 @@ function! s:Quit()
   endif
 endfunction
 
-" バッファのヒストリをたどる
-" @param dir -1:概い数羹へ, 1:糠しい数羹へ
+" 僶僢僼傽偺僸僗僩儕傪偨偳傞
+" @param dir -1:屆偄曽岦傊, 1:怴偟偄曽岦傊
 function! s:History(dir)
   let prevbufname = s:entrybufname . s:bufindex
   let prevcontentbufname = s:contentbufname . s:bufindex
   if a:dir > 0
     let nextbufindex = s:NextBufIndex()
     if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
-      echomsg 'eblook-vim: 肌のバッファはありません'
+      echomsg 'eblook-vim: 師偺僶僢僼傽偼偁傝傑偣傫'
       return
     endif
   else
     let nextbufindex = s:PrevBufIndex()
     if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
-      echomsg 'eblook-vim: 涟のバッファはありません'
+      echomsg 'eblook-vim: 慜偺僶僢僼傽偼偁傝傑偣傫'
       return
     endif
   endif
