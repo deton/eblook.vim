@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.9 2003/06/05 11:43:27 deton Exp $
+" Revision: $Id: eblook.vim,v 1.10 2003/06/05 13:44:44 deton Exp $
 
 scriptencoding cp932
 
@@ -110,21 +110,29 @@ function! s:Search(key)
   silent! :%s/eblook.*> //g
   silent! :g/^$/d
   normal! 1G
-  call s:GetContent(1)
+  if s:GetContent(1) < 0
+    let v:errmsg = ''
+    silent! :%s/./&/g
+    if strlen(v:errmsg) > 0
+      quit!
+      echomsg 'eblook-vim: pattern not found: <' . a:key . '>'
+    endif
+  endif
 endfunction
 
 " content表示
 " @param in_entry_buf entryバッファからcontent表示が実行されたかどうか
+" @return -1:content表示失敗, 0:表示成功
 function! s:GetContent(in_entry_buf)
   let str = getline('.')
   if a:in_entry_buf
     let title = matchstr(str, '^[^\t]\+')
     if strlen(title) == 0
-      return
+      return -1
     endif
     let did = s:GetDictIdFromTitle(title)
     if did <= 0
-      return
+      return -1
     endif
   endif
 
@@ -134,7 +142,7 @@ function! s:GetContent(in_entry_buf)
   if !a:in_entry_buf
     let m1 = matchend(str, refpat)
     if m1 < 0
-      return
+      return -1
     endif
     " <reference>が1行に2つ以上ある場合は、カーソルが位置する方を使う
     let m2 = match(str, refpat, m1)
@@ -147,7 +155,7 @@ function! s:GetContent(in_entry_buf)
     endif
   endif
   if strlen(pos) == 0
-    return
+    return -1
   endif
 
   call s:OpenBuffer(s:contentbufname)
@@ -173,6 +181,7 @@ function! s:GetContent(in_entry_buf)
   if a:in_entry_buf
     execute "normal! \<C-W>p"
   endif
+  return 0
 endfunction
 
 function! s:GetDictIdFromTitle(title)
