@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.12 2003/06/06 14:13:02 deton Exp $
+" Revision: $Id: eblook.vim,v 1.13 2003/06/07 16:41:53 deton Exp $
 
 scriptencoding cp932
 
@@ -63,10 +63,10 @@ let s:cmdfile = tempname()
 
 " 保持しておく過去の検索バッファ数の上限
 let s:history_max = 10
-" entryバッファヒストリ中の現在位置
-let s:entrybuf_index = 0
-" contentバッファヒストリ中の現在位置
-let s:contentbuf_index = 0
+" バッファヒストリ中の現在位置
+let s:bufindex = 0
+" </reference=>で指定されるentryのpattern
+let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
 
 " 空のバッファを作る
 function! s:Empty_BufReadCmd()
@@ -84,7 +84,7 @@ endfunction
 " execute eblook's search command
 " @param key string to search
 function! s:Search(key)
-  call s:NewEntryBuffer()
+  call s:NewBuffers()
   execute 'redir! >' . s:cmdfile
   let prev_book = ''
   let i = 1
@@ -117,65 +117,46 @@ function! s:Search(key)
   silent! :%s/eblook.*> //g
   silent! :g/^$/d
   normal! 1G
-  if s:GetContent(1) < 0
+  if s:GetContent() < 0
     let v:errmsg = ''
     silent! :%s/./&/g
     if strlen(v:errmsg) > 0
       bwipeout!
-      call s:EntryHistory(-1)
+      call s:History(-1)
       echomsg 'eblook-vim: pattern not found: <' . a:key . '>'
     endif
   endif
 endfunction
 
 " content表示
-" @param in_entry_buf entryバッファからcontent表示が実行されたかどうか
 " @return -1:content表示失敗, 0:表示成功
-function! s:GetContent(in_entry_buf)
+function! s:GetContent()
   let str = getline('.')
-  if a:in_entry_buf
-    let title = matchstr(str, '^[^\t]\+')
-    if strlen(title) == 0
-      return -1
-    endif
-    let did = s:GetDictIdFromTitle(title)
-    if did <= 0
-      return -1
-    endif
+  let title = matchstr(str, '^[^\t]\+')
+  if strlen(title) == 0
+    return -1
   endif
-
-  let refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
-  let pos = matchstr(str, refpat)
-  " contentバッファの場合は<reference>を取得
-  if !a:in_entry_buf
-    let m1 = matchend(str, refpat)
-    if m1 < 0
-      return -1
-    endif
-    " <reference>が1行に2つ以上ある場合は、カーソルが位置する方を使う
-    let m2 = match(str, refpat, m1)
-    if m2 >= 0
-      let col = col('.')
-      let offset = strridx(strpart(str, 0, col), '<')
-      if offset >= 0
-	let pos = matchstr(str, refpat, offset)
-      endif
-    endif
+  let did = s:GetDictIdFromTitle(title)
+  if did <= 0
+    return -1
   endif
-  if strlen(pos) == 0
+  let refid = matchstr(str, s:refpat)
+  if strlen(refid) == 0
     return -1
   endif
 
-  call s:OpenBuffer(s:contentbufname)
-  if exists("did") && did > 0
-    let b:dictid = did
+  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
+    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
   endif
+  silent execute "normal! :%d\<CR>"
+  let b:dictid = did
+  let b:refid = refid
   execute 'redir! >' . s:cmdfile
   if exists("g:eblook_dict{b:dictid}_book")
     silent echo 'book ' . g:eblook_dict{b:dictid}_book
   endif
   silent echo 'select ' . g:eblook_dict{b:dictid}_name
-  silent echo 'content ' . pos . "\n"
+  silent echo 'content ' . refid . "\n"
   redir END
   let save_fencs = &fencs
   let &fencs = &enc
@@ -186,10 +167,77 @@ function! s:GetContent(in_entry_buf)
   silent! :%s/eblook> //g
   silent! :g/^$/d
   normal! 1G
-  if a:in_entry_buf
-    execute "normal! \<C-W>p"
-  endif
+  execute "normal! \<C-W>p"
   return 0
+endfunction
+
+" contentバッファ中のカーソル位置付近の<reference>を抽出して、
+" その内容を表示する。
+function! s:SelectReference()
+  let str = getline('.')
+  let refid = matchstr(str, s:refpat)
+  let m1 = matchend(str, s:refpat)
+  if m1 < 0
+    return -1
+  endif
+  " <reference>が1行に2つ以上ある場合は、カーソルが位置する方を使う
+  let m2 = match(str, s:refpat, m1)
+  if m2 >= 0
+    let col = col('.')
+    let offset = strridx(strpart(str, 0, col), '<')
+    if offset >= 0
+      let refid = matchstr(str, refpat, offset)
+    endif
+  endif
+
+  if strlen(refid) == 0
+    return -1
+  endif
+
+  call s:FollowReference(refid)
+endfunction
+
+" entryバッファでカーソル行のエントリに含まれる<reference>のリストを表示
+function! s:ListReferences()
+  call s:GetContent()
+  call s:FollowReference('')
+endfunction
+
+" <reference>をリストアップしてentryバッファに表示し、
+" 指定された<reference>の内容をcontentバッファに表示する。
+function! s:FollowReference(refid)
+  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
+    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
+  endif
+  let did = b:dictid
+  let save_line = line('.')
+  let save_col = col('.')
+  normal! gg
+  let i = 1
+  while search('<reference>', 'W') > 0
+    let line = getline('.')
+    let label{i} = matchstr(line, '<reference>\zs.\{-}\ze</reference', col('.') - 1)
+    let entry{i} = matchstr(line, s:refpat, col('.') - 1)
+    let i = i + 1
+  endwhile
+  if i <= 1
+    return
+  endif
+  execute 'normal! ' . save_line . 'G' . save_col . '|'
+
+  call s:NewBuffers()
+  let j = 1
+  while j < i
+    execute 'normal! o' . g:eblook_dict{did}_title . "\<Tab>" . entry{j} . "\<Tab>" . label{j} . "\<Esc>"
+    let j = j + 1
+  endwhile
+  silent! :g/^$/d
+
+  normal! gg
+  if strlen(a:refid) > 0
+    execute 'normal! /' . a:refid . "\<CR>"
+  endif
+  call s:GetContent()
 endfunction
 
 function! s:GetDictIdFromTitle(title)
@@ -204,18 +252,18 @@ function! s:GetDictIdFromTitle(title)
 endfunction
 
 function! s:ToggleContentWindow()
-  if s:SelectWindowByName(s:contentbufname) < 0
-    execute "silent normal! :split " . s:contentbufname . "\<CR>"
+  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
+    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
   else
     quit!
   endif
 endfunction
 
-function! s:GoWindow(is_entry_buf)
-  if a:is_entry_buf
-    let bufname = s:entrybufname . s:entrybuf_index
+function! s:GoWindow(to_entry_buf)
+  if a:to_entry_buf
+    let bufname = s:entrybufname . s:bufindex
   else
-    let bufname = s:contentbufname
+    let bufname = s:contentbufname . s:bufindex
   endif
   if s:SelectWindowByName(bufname) < 0
     execute "silent normal! :split " . bufname . "\<CR>"
@@ -235,32 +283,38 @@ function! s:ScrollContent(down)
 endfunction
 
 function! s:Quit()
-  if s:SelectWindowByName(s:contentbufname) >= 0
-    quit!
+  if s:SelectWindowByName(s:contentbufname . s:bufindex) >= 0
+    hide
   endif
-  if s:SelectWindowByName(s:entrybufname . s:entrybuf_index) >= 0
+  if s:SelectWindowByName(s:entrybufname . s:bufindex) >= 0
     hide
   endif
 endfunction
 
-" entryバッファのヒストリをたどる
+" バッファのヒストリをたどる
 " @param dir -1:古い方向へ, 1:新しい方向へ
-function! s:EntryHistory(dir)
-  let prevbufname = s:entrybufname . s:entrybuf_index
+function! s:History(dir)
+  let prevbufname = s:entrybufname . s:bufindex
+  let prevcontentbufname = s:contentbufname . s:bufindex
   if a:dir > 0
-    let nextbufindex = s:NextEntryBufIndex()
-    if !bufexists(s:entrybufname . nextbufindex)
-      echomsg 'eblook-vim: not exists next entry buffer'
+    let nextbufindex = s:NextBufIndex()
+    if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
+      echomsg 'eblook-vim: not exists next buffer'
       return
     endif
   else
-    let nextbufindex = s:PrevEntryBufIndex()
-    if !bufexists(s:entrybufname . nextbufindex)
-      echomsg 'eblook-vim: not exists previous entry buffer'
+    let nextbufindex = s:PrevBufIndex()
+    if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
+      echomsg 'eblook-vim: not exists previous buffer'
       return
     endif
   endif
-  let s:entrybuf_index = nextbufindex
+  let s:bufindex = nextbufindex
+  if s:SelectWindowByName(prevcontentbufname) < 0
+    execute "silent normal! :sbuffer " . s:contentbufname . nextbufindex . "\<CR>"
+  else
+    execute "silent normal! :buffer " . s:contentbufname . nextbufindex . "\<CR>"
+  endif
   if s:SelectWindowByName(prevbufname) < 0
     execute "silent normal! :sbuffer " . s:entrybufname . nextbufindex . "\<CR>"
   else
@@ -268,26 +322,33 @@ function! s:EntryHistory(dir)
   endif
 endfunction
 
-function! s:NextEntryBufIndex()
-  let i = s:entrybuf_index + 1
+function! s:NextBufIndex()
+  let i = s:bufindex + 1
   if i > s:history_max
     let i = 1
   endif
   return i
 endfunction
 
-function! s:PrevEntryBufIndex()
-  let i = s:entrybuf_index - 1
+function! s:PrevBufIndex()
+  let i = s:bufindex - 1
   if i < 1
     let i = s:history_max
   endif
   return i
 endfunction
 
-function! s:NewEntryBuffer()
-  let oldbufname = s:entrybufname . s:entrybuf_index
-  let s:entrybuf_index = s:NextEntryBufIndex()
-  let newbufname = s:entrybufname . s:entrybuf_index
+function! s:NewBuffers()
+  let oldindex = s:bufindex
+  let s:bufindex = s:NextBufIndex()
+  call s:CreateBuffer(s:entrybufname, oldindex)
+  call s:CreateBuffer(s:contentbufname, oldindex)
+  execute "normal! \<C-W>p"
+endfunction
+
+function! s:CreateBuffer(bufname, oldindex)
+  let oldbufname = a:bufname . a:oldindex
+  let newbufname = a:bufname . s:bufindex
   if bufexists(newbufname)
     let bufexists = 1
   else
@@ -313,49 +374,32 @@ function! s:NewEntryBuffer()
     set bufhidden=hide
     set noswapfile
     set nobuflisted
-    nnoremap <buffer> <silent> <CR> :call <SID>GetContent(1)<CR>
-    nnoremap <buffer> <silent> J j:call <SID>GetContent(1)<CR>
-    nnoremap <buffer> <silent> K k:call <SID>GetContent(1)<CR>
-    nnoremap <buffer> <silent> x :call <SID>ToggleContentWindow()<CR>
-    nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
-    nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
-    nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
-    nnoremap <buffer> <silent> r :call <SID>GoWindow(0)<CR>
-    nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
-    nnoremap <buffer> <silent> <C-P> :call <SID>EntryHistory(-1)<CR>
-    nnoremap <buffer> <silent> <C-N> :call <SID>EntryHistory(1)<CR>
-  endif
-  silent execute "normal! 4\<C-W>_"
-endfunction
-
-function! s:OpenBuffer(bufname)
-  if s:SelectWindowByName(a:bufname) < 0
-    execute "silent normal! :split " . a:bufname . "\<CR>"
-    set buftype=nofile
-    set bufhidden=hide
-    set noswapfile
     if a:bufname ==# s:entrybufname
-      nnoremap <buffer> <silent> <CR> :call <SID>GetContent(1)<CR>
-      nnoremap <buffer> <silent> J j:call <SID>GetContent(1)<CR>
-      nnoremap <buffer> <silent> K k:call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
+      nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
+      nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
       nnoremap <buffer> <silent> x :call <SID>ToggleContentWindow()<CR>
       nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
       nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
       nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
       nnoremap <buffer> <silent> r :call <SID>GoWindow(0)<CR>
+      nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
+      nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
+      nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
     else
-      nnoremap <buffer> <silent> <CR> :call <SID>GetContent(0)<CR>
+      nnoremap <buffer> <silent> <CR> :call <SID>SelectReference()<CR>
       nnoremap <buffer> <silent> <Space> <PageDown>
       nnoremap <buffer> <silent> <BS> <PageUp>
       nnoremap <buffer> <silent> <Tab> /<reference/<CR>
       nnoremap <buffer> <silent> r :call <SID>GoWindow(1)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
+      nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>call <SID>GoWindow(0)<CR>
+      nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>call <SID>GoWindow(0)<CR>
     endif
   endif
-  silent execute "normal! :%d\<CR>"
   if a:bufname ==# s:entrybufname
-    silent execute "normal! 4\<C-W>\<C-_>"
+    silent execute "normal! 4\<C-W>_"
   endif
 endfunction
 
