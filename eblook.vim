@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.24 2003/06/13 14:12:26 deton Exp $
+" Revision: $Id: eblook.vim,v 1.25 2003/06/14 08:14:19 deton Exp $
 
 scriptencoding cp932
 
@@ -114,14 +114,14 @@ command! EblookListDict call <SID>ListDict()
 command! -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
 command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
 
-" entryバッファ名のベース
-let s:entrybufname = '_eblook_entry_'
-" contentバッファ名のベース
-let s:contentbufname = '_eblook_content_'
 " </reference=>で指定されるentryのpattern
 let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
 " eblookにリダイレクトするコマンドを保持する一時ファイル名
 let s:cmdfile = tempname()
+" entryバッファ名のベース
+let s:entrybufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_entry_'
+" contentバッファ名のベース
+let s:contentbufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_content_'
 " バッファヒストリ中の現在位置
 let s:bufindex = 0
 
@@ -232,13 +232,7 @@ function! s:Search(key)
     let i = i + 1
   endwhile
   redir END
-  " &encがeuc-jpで&fencsにcp932が入っている場合、検索結果が短いと、eblookは
-  " euc-jpで結果を返しているのにcp932とみなされて文字化けすることがあるので、
-  " 一時的に&fecnsには&encだけ入れてeblookプログラムの結果を読み込む。
-  let save_fencs = &fencs
-  let &fencs = &enc
-  silent execute 'read! eblook < ' . s:cmdfile
-  let &fencs = save_fencs
+  silent execute 'read! ++enc=' . &enc . ' eblook < ' . s:cmdfile
 
   silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook.*> \(eblook.*> \)/\1/g
@@ -327,10 +321,7 @@ function! s:GetContent()
   silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
   redir END
-  let save_fencs = &fencs
-  let &fencs = &enc
-  silent execute 'read! eblook < ' . s:cmdfile
-  let &fencs = save_fencs
+  silent execute 'read! ++enc=' . &enc . ' eblook < ' . s:cmdfile
 
   silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook> //g
