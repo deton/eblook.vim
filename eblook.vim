@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.10 2003/06/05 13:44:44 deton Exp $
+" Revision: $Id: eblook.vim,v 1.11 2003/06/05 15:51:49 deton Exp $
 
 scriptencoding cp932
 
@@ -28,8 +28,8 @@ function! s:MappingOn()
 
   augroup Eblook
   autocmd!
-  execute "autocmd BufReadCmd " . s:entrybufname . " call <SID>Empty_BufReadCmd()"
-  execute "autocmd BufReadCmd " . s:contentbufname . " call <SID>Empty_BufReadCmd()"
+  execute "autocmd BufReadCmd " . s:entrybufname . "* call <SID>Empty_BufReadCmd()"
+  execute "autocmd BufReadCmd " . s:contentbufname . "* call <SID>Empty_BufReadCmd()"
   augroup END
 endfunction
 
@@ -61,6 +61,13 @@ call s:MappingOn()
 " file name to store commands for eblook
 let s:cmdfile = tempname()
 
+" 保持しておく過去の検索バッファ数の上限
+let s:history_max = 10
+" entryバッファヒストリ中の現在位置
+let s:entrybuf_index = 0
+" contentバッファヒストリ中の現在位置
+let s:contentbuf_index = 0
+
 " 空のバッファを作る
 function! s:Empty_BufReadCmd()
 endfunction
@@ -77,7 +84,7 @@ endfunction
 " execute eblook's search command
 " @param key string to search
 function! s:Search(key)
-  call s:OpenBuffer(s:entrybufname)
+  call s:NewEntryBuffer()
   execute 'redir! >' . s:cmdfile
   let prev_book = ''
   let i = 1
@@ -205,7 +212,7 @@ endfunction
 
 function! s:GoWindow(is_entry_buf)
   if a:is_entry_buf
-    let bufname = s:entrybufname
+    let bufname = s:entrybufname . s:entrybuf_index
   else
     let bufname = s:contentbufname
   endif
@@ -230,9 +237,94 @@ function! s:Quit()
   if s:SelectWindowByName(s:contentbufname) >= 0
     quit!
   endif
-  if s:SelectWindowByName(s:entrybufname) >= 0
-    quit!
+  if s:SelectWindowByName(s:entrybufname . s:entrybuf_index) >= 0
+    hide
   endif
+endfunction
+
+" entryバッファのヒストリをたどる
+" @param dir -1:古い方向へ, 1:新しい方向へ
+function! s:EntryHistory(dir)
+  let prevbufname = s:entrybufname . s:entrybuf_index
+  if a:dir > 0
+    let nextbufindex = s:NextEntryBufIndex()
+    if !bufexists(s:entrybufname . nextbufindex)
+      echomsg 'eblook-vim: not exists next entry buffer'
+      return
+    endif
+  else
+    let nextbufindex = s:PrevEntryBufIndex()
+    if !bufexists(s:entrybufname . nextbufindex)
+      echomsg 'eblook-vim: not exists previous entry buffer'
+      return
+    endif
+  endif
+  let s:entrybuf_index = nextbufindex
+  if s:SelectWindowByName(prevbufname) < 0
+    execute "silent normal! :sbuffer " . s:entrybufname . nextbufindex . "\<CR>"
+  else
+    execute "silent normal! :buffer " . s:entrybufname . nextbufindex . "\<CR>"
+  endif
+endfunction
+
+function! s:NextEntryBufIndex()
+  let i = s:entrybuf_index + 1
+  if i > s:history_max
+    let i = 1
+  endif
+  return i
+endfunction
+
+function! s:PrevEntryBufIndex()
+  let i = s:entrybuf_index - 1
+  if i < 1
+    let i = s:history_max
+  endif
+  return i
+endfunction
+
+function! s:NewEntryBuffer()
+  let oldbufname = s:entrybufname . s:entrybuf_index
+  let s:entrybuf_index = s:NextEntryBufIndex()
+  let newbufname = s:entrybufname . s:entrybuf_index
+  if bufexists(newbufname)
+    let bufexists = 1
+  else
+    let bufexists = 0
+  endif
+  if s:SelectWindowByName(oldbufname) < 0
+    if bufexists
+      execute "silent normal! :sbuffer " . newbufname . "\<CR>"
+    else
+      execute "silent normal! :split " . newbufname . "\<CR>"
+    endif
+  else
+    if bufexists
+      execute "silent normal! :buffer " . newbufname . "\<CR>"
+    else
+      execute "silent normal! :edit " . newbufname . "\<CR>"
+    endif
+  endif
+  if bufexists
+    silent execute "normal! :%d"
+  else
+    set buftype=nofile
+    set bufhidden=hide
+    set noswapfile
+    set nobuflisted
+    nnoremap <buffer> <silent> <CR> :call <SID>GetContent(1)<CR>
+    nnoremap <buffer> <silent> J j:call <SID>GetContent(1)<CR>
+    nnoremap <buffer> <silent> K k:call <SID>GetContent(1)<CR>
+    nnoremap <buffer> <silent> x :call <SID>ToggleContentWindow()<CR>
+    nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
+    nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
+    nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
+    nnoremap <buffer> <silent> r :call <SID>GoWindow(0)<CR>
+    nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
+    nnoremap <buffer> <silent> <C-P> :call <SID>EntryHistory(-1)<CR>
+    nnoremap <buffer> <silent> <C-N> :call <SID>EntryHistory(1)<CR>
+  endif
+  silent execute "normal! 4\<C-W>_"
 endfunction
 
 function! s:OpenBuffer(bufname)
