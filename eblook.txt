@@ -18,9 +18,8 @@ EPWING辞書検索プラグイン			*eblook*
 eblook.vimは、`eblook'プログラムを使って、
 EPWING/電子ブック辞書の検索を行うプラグインです。
 
-このプラグインスクリプトを使うには、
-`eblook'プログラム<http://openlab.jp/edict/eblook/>と
-EPWING/電子ブック辞書が必要です。
+このプラグインを使うには、`eblook'プログラム<http://openlab.jp/edict/eblook/>
+とEPWING/電子ブック辞書が必要です。
 
 ==============================================================================
 2. チュートリアル				*eblook-tutorial*
@@ -34,37 +33,79 @@ EPWING/電子ブック辞書が必要です。
 準備: 検索対象辞書の指定			*eblook-tutor-setup*
 ------------------------
 eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく必要があります。
-|eblook-option|を参照してください。
+詳細は|eblook-option|を参照してください。
+
+設定する値を調べる方法は以下のようになります。
+(a) eblookプログラムを起動します:
+	% eblook
+	eblook> 
+
+(b) catalogsファイルのあるディレクトリを指定してbookコマンドを実行します:
+	eblook> book /usr/local/epwing/iwanami/koujien
+   パス中にスペースが含まれる場合は、パスを""でくくってください:
+	eblook> book "C:/Program Files/epwing/iwanami/koujien"
+
+(c) listコマンドを実行します:
+	eblook> list
+	 1. kojien      広辞苑第五版
+	 2. furoku      付属資料
+
+(d) vimrcの設定
+  (b)でbookコマンドの引数に指定したディレクトリをeblook_dict1_bookに設定します:
+	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
+  (c)のlistコマンド実行時に表示されたsubbookをeblook_dict1_nameに設定します:
+	let eblook_dict1_name='kojien'
+  (c)のlistコマンド実行時に表示された辞書タイトルを
+   eblook_dict1_titleに設定します:
+	let eblook_dict1_title='広辞苑第五版'
+
+(e) (b)-(d)を、使いたい辞書について繰り返して、
+    eblook_dict1_, eblook_dict2_, ... に値を設定します。
 
 例:
-	let eblook_dict1_name = 'kojien'
-	let eblook_dict1_book = '/usr/local/epwing'
-	let eblook_dict1_title = '広辞苑第五版'
+	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
+	let eblook_dict1_name='kojien'
+	let eblook_dict1_title='広辞苑第五版'
+	let eblook_dict2_book='/usr/local/epwing/kenkyush/chujisnd'
+	let eblook_dict2_name='chujiten'
+	let eblook_dict2_title='研究社　新英和・和英中辞典'
+	let eblook_dict3_book='/usr/local/epwing/kenkyush/plus'
+	let eblook_dict3_name='plus'
+	let eblook_dict3_title='研究社リーダーズ＋プラスＶ２'
 
 検索						*eblook-tutor-search*
 ----
-<Leader><C-Y>を押すと、検索語の入力プロンプトが表示されます。
+<Leader><C-Y>を押すと、検索語の入力プロンプト(eblook: )が
+コマンド行に表示されます。
+(<Leader>は|mapleader|で設定されたキーです。
+ eblook.vimではデフォルトでCTRL-Kです。つまり、<Leader><C-Y>はCTRL-K CTRL-Y)
 検索語を入力すると検索が行われます。
 検索結果はentryウィンドウとcontentウィンドウに表示されます。
+
+      テスト【test】
+      <gaiji=zb536>試験。検査。特に、学力試験。「心理―」「読解力を―する」
+      <gaiji=zb537>一般に、考えたことや試作品などを実際に試してみること。
+      「―‐ドライバー」
+      <reference><gaiji=zb655>―‐ケース【test case】</reference=2f52:27e>
+      <reference><gaiji=zb655>―‐パイロット【test pilot】</reference=2f52:3a0>
+      <reference><gaiji=zb655>―‐パターン【test pattern】</reference=2f52:400>
+      <reference><gaiji=zb655>―‐ピース【test-piece】</reference=2f52:4a4>
+      ~
+      ==/tmp/v584032/_eblook_content_1=========================================
+      広辞苑第五版     1. 2f52:b6     テスト【test】
+      研究社　新英和・和英中辞典       1. f936:5ec    テスト
+      研究社リーダーズ＋プラスＶ２     1. 37bca:262   　テスト <proof>
+      研究社リーダーズ＋プラスＶ２     2. 37da5:2da   　テスト <quiz>
+      ==/tmp/v584032/_eblook_entry_1===========================================
 
 見出し一覧					*eblook-tutor-entry*
 ----------
 検索で見つかった見出しの一覧がentryウィンドウに表示されます。
 最初の見出しの内容がcontentウィンドウに表示されます。
 
-	テスター【tester】
-	回路の電流・電圧・抵抗を簡便に測定する小型の計器。回路計。
-	~
-	~
-	=_eblook_content_1=======================================
-	広辞苑第五版     1. 2f51:4f2    テスター【tester】
-	広辞苑第五版     2. 2f52:b6     テスト【test】
-	~
-	=_eblook_entry_1=========================================
-
-entryウィンドウでj/kキーでカーソルを移動して、<CR>を押すと
+entryウィンドウでj,kキーでカーソルを移動して、<CR>を押すと
 その行の見出しの内容をcontentウィンドウに表示します。
-<Space>/<BS>でcontentウィンドウのPageDown/PageUpができます。
+<Space>,<BS>でcontentウィンドウのPageDown,PageUpができます。
 
 内容表示					*eblook-tutor-content*
 --------
@@ -138,22 +179,22 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 |'eblook_dict{n}_title'|	辞書識別子
 |'eblook_dict{n}_skip'|		この辞書を検索対象にするかどうか
 
-'eblook_dict{n}_name'
+'eblook_dict{n}_name'				*'eblook_dict{n}_name'*
   辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
   eblookプログラムのlistコマンドで調べてください。
   例:
     let eblook_dict1_name = 'kojien'
 
-'eblook_dict{n}_book'
+'eblook_dict{n}_book'				*'eblook_dict{n}_book'*
   辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
   eblookプログラムの`book'コマンドに渡すパラメータです。
   Appendixがある場合は、辞書ディレクトリに続けてAppendixディレクトリを
   指定します。
-  パスの途中にスペースが含まれる場合は、""でくくってください。
+  パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
   例:
     let eblook_dict1_book = '/usr/local/epwing'
 
-'eblook_dict{n}_title'
+'eblook_dict{n}_title'				*'eblook_dict{n}_title'*
   辞書の識別子を指定します。デフォルトでは、
   辞書番号とeblook_dict{n}_nameを組み合わせたものが設定されます。
   entryウィンドウ内で辞書を識別するために使われます。
@@ -163,7 +204,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
   例:
     let eblook_dict1_title = '広辞苑第五版'
 
-'eblook_dict{n}_skip'
+'eblook_dict{n}_skip'				*'eblook_dict{n}_skip'*
   0でない値を設定すると、この辞書は検索しません。
   skipする設定にしている辞書は、:EblookNotSkipDictコマンドを使って
   検索対象にすることができます。
@@ -171,7 +212,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
     let eblook_dict1_skip = 1
 
 
-'eblook_history_max'
+'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 
 'mapleader'
@@ -179,7 +220,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
   CTRL-Kを指定する場合の例:
     let mapleader = "\<C-K>"
 
-'plugin_eblook_disable'
+'plugin_eblook_disable'				*'plugin_eblook_disable'*
   このプラグインを読み込みたくない場合に次のように設定します。
     let plugin_eblook_disable = 1
 
@@ -187,7 +228,29 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 設定例
 ------
 辞書の設定例です。
-XXX
+
+	let eblook_dict1_name='kojien'
+	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
+	let eblook_dict1_title='広辞苑第五版'
+	let eblook_dict2_name='chujiten'
+	let eblook_dict2_book='/usr/local/epwing/kenkyush/chujisnd'
+	let eblook_dict2_title='研究社　新英和・和英中辞典'
+	let eblook_dict3_name='plus'
+	let eblook_dict3_book='/usr/local/epwing/kenkyush/plus /usr/local/epwing/appendix/plus-2.0'
+	let eblook_dict3_title='研究社リーダーズ＋プラスＶ２'
+	let eblook_dict3_skip=0
+	let eblook_dict4_name='kanjigen'
+	let eblook_dict4_book='/usr/local/epwing/gakken/kanjigen'
+	let eblook_dict4_title='漢字源'
+	let eblook_dict4_skip=1
+	let eblook_dict5_name='gn99ep01'
+	let eblook_dict5_book='/usr/local/epwing/jiyukok/gendai99'
+	let eblook_dict5_title='現代用語の基礎知識１９９９年版'
+	let eblook_dict5_skip=1
+	let eblook_dict6_name='gn99ep02'
+	let eblook_dict6_book='/usr/local/epwing/jiyukok/gendai99'
+	let eblook_dict6_title='最新日本語活用事典'
+	let eblook_dict6_skip=1
 
 ==============================================================================
 5. コマンド					*eblook-command*
@@ -210,3 +273,4 @@ XXX
   複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
 
 ==============================================================================
+ vim:set ft=help:
