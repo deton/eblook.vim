@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.22 2003/06/12 13:55:51 deton Exp $
+" Revision: $Id: eblook.vim,v 1.23 2003/06/12 14:04:05 deton Exp $
 
 scriptencoding cp932
 
@@ -271,6 +271,7 @@ function! s:CreateBuffer(bufname, oldindex)
       nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
       nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
       nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
+      nnoremap <buffer> <silent> <Tab> /[[:xdigit:]]\+:[[:xdigit:]]\+<CR>
       nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
       nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
