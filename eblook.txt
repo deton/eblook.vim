@@ -170,20 +170,14 @@ R                   reference一覧を表示する
 4. オプション					*eblook-option*
 
 EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
-(name, book, title, skip)で設定します。nameとbookは必須です。
+(book, name, title, skip)で設定します。bookとnameは必須です。
 {n}の部分は辞書番号で、具体的には1, 2, 3, ...を入れて設定します。
 指定した辞書番号の順に検索を行います。辞書番号は連続している必要があります。
 
-|'eblook_dict{n}_name'|		辞書名。(eblookプログラムのselectコマンドの引数)
-|'eblook_dict{n}_book'|		辞書ディレクトリ。(eblookのbookコマンド)
+|'eblook_dict{n}_book'|		辞書ディレクトリ。(eblookのbookコマンドの引数)
+|'eblook_dict{n}_name'|		辞書名。(eblookのselectコマンドの引数)
 |'eblook_dict{n}_title'|	辞書識別子
 |'eblook_dict{n}_skip'|		この辞書を検索対象にするかどうか
-
-'eblook_dict{n}_name'				*'eblook_dict{n}_name'*
-  辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
-  eblookプログラムのlistコマンドで調べてください。
-  例:
-    let eblook_dict1_name = 'kojien'
 
 'eblook_dict{n}_book'				*'eblook_dict{n}_book'*
   辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
@@ -193,6 +187,12 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
   パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
   例:
     let eblook_dict1_book = '/usr/local/epwing'
+
+'eblook_dict{n}_name'				*'eblook_dict{n}_name'*
+  辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
+  eblookプログラムのlistコマンドで調べてください。
+  例:
+    let eblook_dict1_name = 'kojien'
 
 'eblook_dict{n}_title'				*'eblook_dict{n}_title'*
   辞書の識別子を指定します。デフォルトでは、
@@ -229,26 +229,26 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 ------
 辞書の設定例です。
 
-	let eblook_dict1_name='kojien'
 	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
+	let eblook_dict1_name='kojien'
 	let eblook_dict1_title='広辞苑第五版'
-	let eblook_dict2_name='chujiten'
 	let eblook_dict2_book='/usr/local/epwing/kenkyush/chujisnd'
+	let eblook_dict2_name='chujiten'
 	let eblook_dict2_title='研究社　新英和・和英中辞典'
-	let eblook_dict3_name='plus'
 	let eblook_dict3_book='/usr/local/epwing/kenkyush/plus /usr/local/epwing/appendix/plus-2.0'
+	let eblook_dict3_name='plus'
 	let eblook_dict3_title='研究社リーダーズ＋プラスＶ２'
 	let eblook_dict3_skip=0
-	let eblook_dict4_name='kanjigen'
 	let eblook_dict4_book='/usr/local/epwing/gakken/kanjigen'
+	let eblook_dict4_name='kanjigen'
 	let eblook_dict4_title='漢字源'
 	let eblook_dict4_skip=1
-	let eblook_dict5_name='gn99ep01'
 	let eblook_dict5_book='/usr/local/epwing/jiyukok/gendai99'
+	let eblook_dict5_name='gn99ep01'
 	let eblook_dict5_title='現代用語の基礎知識１９９９年版'
 	let eblook_dict5_skip=1
-	let eblook_dict6_name='gn99ep02'
 	let eblook_dict6_book='/usr/local/epwing/jiyukok/gendai99'
+	let eblook_dict6_name='gn99ep02'
 	let eblook_dict6_title='最新日本語活用事典'
 	let eblook_dict6_skip=1
 
