@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.6 2003/06/03 13:11:15 deton Exp $
+" Revision: $Id: eblook.vim,v 1.7 2003/06/03 14:16:12 deton Exp $
 
 scriptencoding cp932
 
@@ -117,10 +117,6 @@ let s:dictname = ''
 " @param in_entry_buf entryバッファからcontent表示が実行されたかどうか
 function! s:GetContent(in_entry_buf)
   let str = getline('.')
-  let pos = matchstr(str, '[0-9a-f]\+:[0-9a-f]\+')
-  if strlen(pos) == 0
-    return
-  endif
   if a:in_entry_buf
     let dname = matchstr(str, '^[^ ]\+')
     if strlen(dname) == 0 || !s:IsValidDictName(dname)
@@ -132,6 +128,29 @@ function! s:GetContent(in_entry_buf)
   if strlen(s:dictname) == 0
     return
   endif
+
+  let refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
+  let pos = matchstr(str, refpat)
+  " contentバッファの場合は<reference>を取得
+  if !a:in_entry_buf
+    let m1 = matchend(str, refpat)
+    if m1 < 0
+      return
+    endif
+    " <reference>が1行に2つ以上ある場合は、カーソルが位置する方を使う
+    let m2 = match(str, refpat, m1)
+    if m2 >= 0
+      let col = col('.')
+      let offset = strridx(strpart(str, 0, col), '<')
+      if offset >= 0
+	let pos = matchstr(str, refpat, offset)
+      endif
+    endif
+  endif
+  if strlen(pos) == 0
+    return
+  endif
+
   call s:OpenBuffer(s:contentbufname)
   execute 'redir! >' . s:cmdfile
   if exists("g:eblook_{s:dictname}_book_param")
@@ -144,6 +163,7 @@ function! s:GetContent(in_entry_buf)
   let &fencs = &enc
   silent execute 'read! eblook < ' . s:cmdfile
   let &fencs = save_fencs
+
   silent! :%s/eblook> //g
   silent! :g/^$/d
   normal! 1G
