@@ -1,0 +1,212 @@
+*eblook.txt*   lookup EPWING dictionary using `eblook' command.
+
+			  eblook.vim説明書
+
+EPWING辞書検索プラグイン			*eblook*
+
+1. 概要					|eblook-overview|
+2. チュートリアル			|eblook-tutorial|
+3. 操作法				|eblook-usage|
+4. オプション				|eblook-option|
+5. コマンド				|eblook-command|
+
+{Vi does not have any of these features}
+
+==============================================================================
+1. 概要						*eblook-overview*
+
+eblook.vimは、`eblook'プログラムを使って、
+EPWING/電子ブック辞書の検索を行うプラグインです。
+
+このプラグインスクリプトを使うには、
+`eblook'プログラム<http://openlab.jp/edict/eblook/>と
+EPWING/電子ブック辞書が必要です。
+
+==============================================================================
+2. チュートリアル				*eblook-tutorial*
+
+|eblook-tutor-setup|	準備: 検索対象辞書の指定
+|eblook-tutor-search|	検索
+|eblook-tutor-entry|	見出し一覧
+|eblook-tutor-content|	内容表示
+|eblook-tutor-quit|	終了
+
+準備: 検索対象辞書の指定			*eblook-tutor-setup*
+------------------------
+eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく必要があります。
+|eblook-option|を参照してください。
+
+例:
+	let eblook_dict1_name = 'kojien'
+	let eblook_dict1_book = '/usr/local/epwing'
+	let eblook_dict1_title = '広辞苑第五版'
+
+検索						*eblook-tutor-search*
+----
+<Leader><C-Y>を押すと、検索語の入力プロンプトが表示されます。
+検索語を入力すると検索が行われます。
+検索結果はentryウィンドウとcontentウィンドウに表示されます。
+
+見出し一覧					*eblook-tutor-entry*
+----------
+検索で見つかった見出しの一覧がentryウィンドウに表示されます。
+最初の見出しの内容がcontentウィンドウに表示されます。
+
+	テスター【tester】
+	回路の電流・電圧・抵抗を簡便に測定する小型の計器。回路計。
+	~
+	~
+	=_eblook_content_1=======================================
+	広辞苑第五版     1. 2f51:4f2    テスター【tester】
+	広辞苑第五版     2. 2f52:b6     テスト【test】
+	~
+	=_eblook_entry_1=========================================
+
+entryウィンドウでj/kキーでカーソルを移動して、<CR>を押すと
+その行の見出しの内容をcontentウィンドウに表示します。
+<Space>/<BS>でcontentウィンドウのPageDown/PageUpができます。
+
+内容表示					*eblook-tutor-content*
+--------
+内容中に<reference>がある場合は、contentウィンドウの<reference>のある行で
+<CR>を押すと、<reference>の先の内容が表示されます。
+
+元の内容に戻るには、<C-P>を押して検索履歴を戻ります。
+
+終了						*eblook-tutor-quit*
+----
+検索結果を表示しているentryウィンドウとcontentウィンドウの両方を閉じるには、
+"q"を押します。
+
+==============================================================================
+3. 操作法					*eblook-usage*
+
+検索を行うには、次のキーを入力するか、|:EblookSearch|コマンドを実行します。
+
+<Leader><C-Y>       検索単語を入力して検索を行う
+<Leader>y           カーソル位置にある単語を検索する
+
+検索結果は、_eblook_entry_{n}と_eblook_content_{n}というウィンドウに
+表示されます。{n}は数字で、具体的には1, 2, ..., |eblook_history_max|です。
+entryウィンドウには見出し一覧が表示されます。
+contentウィンドウには見出しに対応する内容が表示されます。
+
+<C-P>,<C-N>で検索履歴をたどることができます。
+reference先を表示した後で元の検索結果に戻りたい場合などに使ってください。
+検索履歴は過去のentryバッファを表示します。
+
+
+entryウィンドウでの操作				*eblook-usage-entry*
+-----------------------
+
+<CR>                カーソル行のentryに対応するcontentを表示する
+J                   カーソルを下の行に移動してcontentを表示する
+K                   カーソルを上の行に移動してcontentを表示する
+<Space>             contentウィンドウでPageDownを行う
+<BS>                contentウィンドウでPageUpを行う
+q                   entryウィンドウとcontentウィンドウを閉じる
+s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+p                   contentウィンドウに移動する
+R                   reference一覧を表示する
+<C-P>               検索履歴中の一つ前のバッファを表示する
+<C-N>               検索履歴中の一つ次のバッファを表示する
+
+contentウィンドウでの操作			*eblook-usage-content*
+-------------------------
+
+<CR>                カーソル位置のreferenceを表示する
+<Space>             PageDownを行う
+<BS>                PageUpを行う
+<Tab>               次のreferenceにカーソルを移動する
+q                   entryウィンドウとcontentウィンドウを閉じる
+s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+p                   entryウィンドウに移動する
+R                   reference一覧を表示する
+<C-P>               検索履歴中の一つ前のバッファを表示する
+<C-N>               検索履歴中の一つ次のバッファを表示する
+
+==============================================================================
+4. オプション					*eblook-option*
+
+EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
+(name, book, title, skip)で設定します。nameとbookは必須です。
+{n}の部分は辞書番号で、具体的には1, 2, 3, ...を入れて設定します。
+指定した辞書番号の順に検索を行います。辞書番号は連続している必要があります。
+
+|'eblook_dict{n}_name'|		辞書名。(eblookプログラムのselectコマンドの引数)
+|'eblook_dict{n}_book'|		辞書ディレクトリ。(eblookのbookコマンド)
+|'eblook_dict{n}_title'|	辞書識別子
+|'eblook_dict{n}_skip'|		この辞書を検索対象にするかどうか
+
+'eblook_dict{n}_name'
+  辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
+  eblookプログラムのlistコマンドで調べてください。
+  例:
+    let eblook_dict1_name = 'kojien'
+
+'eblook_dict{n}_book'
+  辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
+  eblookプログラムの`book'コマンドに渡すパラメータです。
+  Appendixがある場合は、辞書ディレクトリに続けてAppendixディレクトリを
+  指定します。
+  パスの途中にスペースが含まれる場合は、""でくくってください。
+  例:
+    let eblook_dict1_book = '/usr/local/epwing'
+
+'eblook_dict{n}_title'
+  辞書の識別子を指定します。デフォルトでは、
+  辞書番号とeblook_dict{n}_nameを組み合わせたものが設定されます。
+  entryウィンドウ内で辞書を識別するために使われます。
+  辞書を識別するのに使うだけなので、
+  eblookプログラムのlistコマンドで表示される文字列など、
+  他の辞書とぶつからない文字列を適当に指定します。
+  例:
+    let eblook_dict1_title = '広辞苑第五版'
+
+'eblook_dict{n}_skip'
+  0でない値を設定すると、この辞書は検索しません。
+  skipする設定にしている辞書は、:EblookNotSkipDictコマンドを使って
+  検索対象にすることができます。
+  例:
+    let eblook_dict1_skip = 1
+
+
+'eblook_history_max'
+  保持しておく過去の検索履歴バッファ数の上限。省略値: 10
+
+'mapleader'
+  キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
+  CTRL-Kを指定する場合の例:
+    let mapleader = "\<C-K>"
+
+'plugin_eblook_disable'
+  このプラグインを読み込みたくない場合に次のように設定します。
+    let plugin_eblook_disable = 1
+
+
+設定例
+------
+辞書の設定例です。
+XXX
+
+==============================================================================
+5. コマンド					*eblook-command*
+
+:EblookSearch      				*:EblookSearch* 
+  辞書の検索を行います。検索する文字列を引数に指定します。
+
+:EblookListDict					*:EblookListDict*
+  辞書の一覧を表示します。
+  'eblook_dict{n}_name'等に設定されている内容を表示します。
+
+:EblookSkipDict					*:EblookSkipDict*
+  引数で指定した辞書番号の辞書を一時的に検索対象から外します。
+  'eblook_dict{n}_skip'を1に設定するのと同じです。
+  複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
+
+:EblookNotSkipDict				*:EblookNotSkipDict*
+  引数で指定した辞書番号の辞書を一時的に検索対象に入れます。
+  'eblook_dict{n}_skip'を0に設定するのと同じです。
+  複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
+
+==============================================================================
