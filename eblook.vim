@@ -1,4 +1,3 @@
-let g:eblook_dict1 = 'kojien'
 let s:entrybufname = 'eblook.entry'
 let s:contentbufname = 'eblook.content'
 let s:buflisted = 1
@@ -58,20 +57,31 @@ function! s:Search(key)
   normal 1G
 endfunction
 
-function! s:GetContent()
+let s:dictname = ''
+
+" content表示
+" @param in_entry_buf entryバッファからcontent表示が実行されたかどうか
+function! s:GetContent(in_entry_buf)
   let str = getline('.')
-  let dname = matchstr(str, '^[^ ]\+')
-  if strlen(dname) == 0
-    return
-  endif
   let pos = matchstr(str, '[0-9a-f]\+:[0-9a-f]\+')
   if strlen(pos) == 0
+    return
+  endif
+  if a:in_entry_buf
+    let dname = matchstr(str, '^[^ ]\+')
+    if strlen(dname) == 0 || !s:IsValidDictName(dname)
+      let s:dictname = ''
+      return
+    endif
+    let s:dictname = dname
+  endif
+  if strlen(s:dictname) == 0
     return
   endif
   call s:OpenBuffer(s:contentbufname)
   execute 'redir! >' . s:cmdfile
   "silent echo 'set prompt ""'
-  silent echo 'select ' . dname
+  silent echo 'select ' . s:dictname
   silent echo 'content ' . pos . "\n"
   redir END
   let save_fencs = &fencs
@@ -83,6 +93,17 @@ function! s:GetContent()
   normal 1G
 endfunction
 
+function! s:IsValidDictName(dname)
+  let i = 1
+  while exists("g:eblook_dict{i}")
+    if a:dname ==# g:eblook_dict{i}
+      return 1
+    endif
+    let i = i + 1
+  endwhile
+  return 0
+endfunction
+
 function! s:OpenBuffer(bufname)
   if s:SelectWindowByName(a:bufname) < 0
     execute "silent normal! :split " . a:bufname . "\<CR>"
@@ -92,7 +113,11 @@ function! s:OpenBuffer(bufname)
     if !s:buflisted
       set nobuflisted
     endif
-    nmap <buffer> <CR> :call <SID>GetContent()<CR>
+    if a:bufname ==# s:entrybufname
+      nmap <buffer> <CR> :call <SID>GetContent(1)<CR>
+    else
+      nmap <buffer> <CR> :call <SID>GetContent(0)<CR>
+    endif
   endif
   execute "normal! :%d\<CR>5\<C-W>\<C-_>"
 endfunction
