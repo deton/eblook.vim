@@ -3,14 +3,14 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.18 2003/06/10 14:05:44 deton Exp $
+" Revision: $Id: eblook.vim,v 1.19 2003/06/10 14:51:12 deton Exp $
 
 scriptencoding cp932
 
 " Description:
-"   `eblook'コマンドを使ってEPWING/電子ブック辞書を検索する。
+"   `eblook'プログラムを使ってEPWING/電子ブック辞書を検索する。
 "   このスクリプトを使うためには、
-"   `eblook'コマンド<http://openlab.jp/edict/eblook/>とEPWING辞書が必要。
+"   `eblook'プログラム<http://openlab.jp/edict/eblook/>とEPWING辞書が必要。
 "
 "   <Leader><C-Y>を押して検索語を入力すると、検索結果がentryウィンドウと
 "   contentウィンドウに表示される。
@@ -29,12 +29,12 @@ scriptencoding cp932
 "   <CR>                カーソル行のentryに対応するcontentを表示する
 "   J                   カーソルを下の行に移動してcontentを表示する
 "   K                   カーソルを上の行に移動してcontentを表示する
-"   <Space>             contentウィンドゥでPageDownを行う
-"   <BS>                contentウィンドゥでPageUpを行う
+"   <Space>             contentウィンドウでPageDownを行う
+"   <BS>                contentウィンドウでPageUpを行う
 "   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
-"   p                   contentウィンドゥに移動する
+"   p                   contentウィンドウに移動する
 "   R                   reference一覧を表示する
-"   q                   entryウィンドゥとcontentウィンドゥを閉じる
+"   q                   entryウィンドウとcontentウィンドウを閉じる
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
 "
@@ -43,8 +43,8 @@ scriptencoding cp932
 "   <Space>             PageDownを行う
 "   <BS>                PageUpを行う
 "   <Tab>               次のreferenceにカーソルを移動する
-"   p                   entryウィンドゥに移動する
-"   q                   entryウィンドゥとcontentウィンドゥを閉じる
+"   p                   entryウィンドウに移動する
+"   q                   entryウィンドウとcontentウィンドウを閉じる
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
 "
@@ -56,24 +56,27 @@ scriptencoding cp932
 "       EPWING辞書の設定。{n}は1, 2, 3, ...。使いたい辞書分指定する。
 "       ここで指定した数字(辞書番号)の順に検索を行う。
 "       数字は連続している必要がある。
+"       eblook_dict{n}_skip以外は必須。
 "
 "      'eblook_dict{n}_title'
-"         辞書の識別子を指定。
+"         辞書の識別子を指定。entryウィンドウ中で辞書を識別するために使う。
 "         (eblook.vim内部では辞書番号かtitleで辞書を識別する。)
+"         辞書を識別するために使うだけなので、
+"         他の辞書とぶつからない文字列を適当につける。
 "         例:
 "           let eblook_dict1_title = '広辞苑第五版'
 "
 "      'eblook_dict{n}_book'
-"         eblookコマンドの`book'コマンドに渡すパラメータ。
-"         辞書のあるディレクトリを指定。
+"         eblookプログラムの`book'コマンドに渡すパラメータ。
+"         辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定。
 "         Appendixがある場合は、
 "         辞書ディレクトリに続けてAppendixディレクトリを指定。
 "         例:
 "           let eblook_dict1_book = '/usr/local/epwing'
 "
 "      'eblook_dict{n}_name'
-"         eblookコマンドの`select'コマンドに渡すパラメータ。
-"         辞書名を指定。
+"         eblookプログラムの`select'コマンドに渡すパラメータ。
+"         辞書名を指定。eblookプログラムのlistコマンドで調べる。
 "         例:
 "           let eblook_dict1_name = 'kojien'
 "
@@ -279,8 +282,8 @@ function! s:GetContent()
   if strlen(title) == 0
     return -1
   endif
-  let did = s:GetDictIdFromTitle(title)
-  if did <= 0
+  let dnum = s:GetDictNumFromTitle(title)
+  if dnum <= 0
     return -1
   endif
   let refid = matchstr(str, s:refpat)
@@ -291,14 +294,19 @@ function! s:GetContent()
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
     execute "silent normal! :botright split " . s:contentbufname . s:bufindex . "\<CR>"
   endif
+  if b:dictnum == dnum && b:refid ==# refid
+    execute "normal! \<C-W>p"
+    return 0
+  endif
+
   silent execute "normal! :%d\<CR>"
-  let b:dictid = did
+  let b:dictnum = dnum
   let b:refid = refid
   execute 'redir! >' . s:cmdfile
-  if exists("g:eblook_dict{b:dictid}_book")
-    silent echo 'book ' . g:eblook_dict{b:dictid}_book
+  if exists("g:eblook_dict{b:dictnum}_book")
+    silent echo 'book ' . g:eblook_dict{b:dictnum}_book
   endif
-  silent echo 'select ' . g:eblook_dict{b:dictid}_name
+  silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
   redir END
   let save_fencs = &fencs
@@ -352,7 +360,7 @@ function! s:FollowReference(refid)
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
     execute "silent normal! :botright split " . s:contentbufname . s:bufindex . "\<CR>"
   endif
-  let did = b:dictid
+  let dnum = b:dictnum
   let save_line = line('.')
   let save_col = col('.')
   normal! G$
@@ -373,7 +381,7 @@ function! s:FollowReference(refid)
   call s:NewBuffers()
   let j = 1
   while j < i
-    execute 'normal! o' . g:eblook_dict{did}_title . "\<Tab>" . entry{j} . "\<Tab>" . label{j} . "\<Esc>"
+    execute 'normal! o' . g:eblook_dict{dnum}_title . "\<Tab>" . entry{j} . "\<Tab>" . label{j} . "\<Esc>"
     let j = j + 1
   endwhile
   silent! :g/^$/d
@@ -385,7 +393,7 @@ function! s:FollowReference(refid)
   call s:GetContent()
 endfunction
 
-function! s:GetDictIdFromTitle(title)
+function! s:GetDictNumFromTitle(title)
   let i = 1
   while exists("g:eblook_dict{i}_title")
     if a:title ==# g:eblook_dict{i}_title
@@ -517,6 +525,8 @@ function! s:CreateBuffer(bufname, oldindex)
       nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
       nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
     else
+      let b:dictnum = -1
+      let b:refid = ''
       nnoremap <buffer> <silent> <CR> :call <SID>SelectReference()<CR>
       nnoremap <buffer> <silent> <Space> <PageDown>
       nnoremap <buffer> <silent> <BS> <PageUp>
