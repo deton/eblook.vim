@@ -1,14 +1,62 @@
-let s:entrybufname = 'eblook.entry'
-let s:contentbufname = 'eblook.content'
-let s:buflisted = 1
-augroup Eblook
-autocmd!
-execute "autocmd BufReadCmd " . s:entrybufname . " call <SID>Empty_BufReadCmd()"
-execute "autocmd BufReadCmd " . s:contentbufname . " call <SID>Empty_BufReadCmd()"
-augroup END
+" vi:set ts=8 sts=2 sw=2 tw=0:
+"
+" eblook.vim - lookup EPWING dictionary using `eblook' command.
+"
+" Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
+" Revision: $Id: eblook.vim,v 1.4 2003/06/02 14:08:21 deton Exp $
 
-command! EblookList call <SID>List()
-command! -nargs=1 EblookSearch call <SID>Search(<args>)
+scriptencoding cp932
+
+command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
+
+let s:entrybufname = '__eblook__entry__'
+let s:contentbufname = '__eblook__content__'
+
+" マッピングを有効化
+function! s:MappingOn()
+  let set_mapleader = 0
+  if !exists('g:mapleader')
+    let g:mapleader = "\<C-K>"
+    let set_mapleader = 1
+  endif
+  let s:mapleader = g:mapleader
+  nnoremap <silent> <Leader><C-Y> :<C-U>call <SID>SearchInput()<CR>
+  nnoremap <silent> <Leader>y :<C-U>call <SID>Search(expand('<cword>'))<CR>
+  if set_mapleader
+    unlet g:mapleader
+  endif
+
+  augroup Eblook
+  autocmd!
+  execute "autocmd BufReadCmd " . s:entrybufname . " call <SID>Empty_BufReadCmd()"
+  execute "autocmd BufReadCmd " . s:contentbufname . " call <SID>Empty_BufReadCmd()"
+  augroup END
+endfunction
+
+" マッピングを無効化
+function! s:MappingOff()
+  let set_mapleader = 0
+  if !exists('g:mapleader')
+    let g:mapleader = "\<C-K>"
+    let set_mapleader = 1
+  else
+    let save_mapleader = g:mapleader
+  endif
+  let g:mapleader = s:mapleader
+  silent! nunmap <Leader><C-Y>
+  silent! nunmap <Leader>y
+  if set_mapleader
+    unlet g:mapleader
+  else
+    let g:mapleader = save_mapleader
+  endif
+
+  augroup Eblook
+  autocmd!
+  augroup END
+endfunction
+
+call s:MappingOn()
 
 " file name to store commands for eblook
 let s:cmdfile = tempname()
@@ -17,20 +65,13 @@ let s:cmdfile = tempname()
 function! s:Empty_BufReadCmd()
 endfunction
 
-" execute eblook's list command
-function! s:List()
-  call s:OpenBuffer(s:entrybufname)
-  execute 'redir! >' . s:cmdfile
-  "silent echo 'set prompt ""'
-  silent echo "list\n"
-  redir END
-  let save_fencs = &fencs
-  let &fencs = &enc
-  silent execute 'read! eblook < ' . s:cmdfile
-  let &fencs = save_fencs
-  silent :%s/eblook> //g
-  silent :g/^$/d
-  normal 1G
+" プロンプトを出して、ユーザから入力された文字列を検索する
+function! s:SearchInput()
+  let str = input('eblook: ', expand('<cword>'))
+  if strlen(str) == 0
+    return
+  endif
+  call s:Search(str)
 endfunction
 
 " execute eblook's search command
@@ -51,10 +92,11 @@ function! s:Search(key)
   let &fencs = &enc
   silent execute 'read! eblook < ' . s:cmdfile
   let &fencs = save_fencs
-  silent execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . dname . '  '
-  silent :%s/eblook.*> //g
-  silent :g/^$/d
-  normal 1G
+  silent! execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . dname . '  '
+  silent! :%s/eblook.*> //g
+  silent! :g/^$/d
+  normal! 1G
+  call s:GetContent(1)
 endfunction
 
 let s:dictname = ''
@@ -88,9 +130,12 @@ function! s:GetContent(in_entry_buf)
   let &fencs = &enc
   silent execute 'read! eblook < ' . s:cmdfile
   let &fencs = save_fencs
-  silent :%s/eblook> //g
-  silent :g/^$/d
-  normal 1G
+  silent! :%s/eblook> //g
+  silent! :g/^$/d
+  normal! 1G
+  if a:in_entry_buf
+    execute "normal! \<C-W>p"
+  endif
 endfunction
 
 function! s:IsValidDictName(dname)
@@ -104,19 +149,69 @@ function! s:IsValidDictName(dname)
   return 0
 endfunction
 
+function! s:ToggleContentWindow()
+  if s:SelectWindowByName(s:contentbufname) < 0
+    execute "silent normal! :split " . s:contentbufname . "\<CR>"
+  else
+    quit!
+  endif
+endfunction
+
+function! s:GoContentWindow()
+  if s:SelectWindowByName(s:contentbufname) < 0
+    execute "silent normal! :split " . s:contentbufname . "\<CR>"
+  endif
+endfunction
+
+function! s:GoEntryWindow()
+  if s:SelectWindowByName(s:entrybufname) < 0
+    execute "silent normal! :split " . s:entrybufname . "\<CR>"
+  endif
+endfunction
+
+" contentウィンドウをスクロールする。
+" @param down 1の場合下に、0の場合上に。
+function! s:ScrollContent(down)
+  call s:GoContentWindow()
+  if a:down
+    execute "normal! \<PageDown>"
+  else
+    execute "normal! \<PageUp>"
+  endif
+  execute "normal! \<C-W>p"
+endfunction
+
+function! s:Quit()
+  if s:SelectWindowByName(s:contentbufname) >= 0
+    quit!
+  endif
+  if s:SelectWindowByName(s:entrybufname) >= 0
+    quit!
+  endif
+endfunction
+
 function! s:OpenBuffer(bufname)
   if s:SelectWindowByName(a:bufname) < 0
     execute "silent normal! :split " . a:bufname . "\<CR>"
     set buftype=nofile
     set bufhidden=hide
     set noswapfile
-    if !s:buflisted
-      set nobuflisted
-    endif
     if a:bufname ==# s:entrybufname
-      nmap <buffer> <CR> :call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> <CR> :call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> n j:call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> p k:call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> v :call <SID>ToggleContentWindow()<CR>
+      nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
+      nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
+      nnoremap <buffer> <silent> f :call <SID>SearchInput()<CR>
+      nnoremap <buffer> <silent> h :call <SID>GoContentWindow()<CR>
+      nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     else
-      nmap <buffer> <CR> :call <SID>GetContent(0)<CR>
+      nnoremap <buffer> <silent> <CR> :call <SID>GetContent(0)<CR>
+      nnoremap <buffer> <silent> <Space> <PageDown>
+      nnoremap <buffer> <silent> <BS> <PageUp>
+      nnoremap <buffer> <silent> h :call <SID>GoEntryWindow()<CR>
+      nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     endif
   endif
   execute "normal! :%d\<CR>5\<C-W>\<C-_>"
