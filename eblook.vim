@@ -3,14 +3,14 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.5 2003/06/03 12:34:45 deton Exp $
+" Revision: $Id: eblook.vim,v 1.6 2003/06/03 13:11:15 deton Exp $
 
 scriptencoding cp932
 
 command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
 
-let s:entrybufname = '__eblook__entry__'
-let s:contentbufname = '__eblook__content__'
+let s:entrybufname = '_eblook_entry_'
+let s:contentbufname = '_eblook_content_'
 
 " マッピングを有効化
 function! s:MappingOn()
@@ -79,9 +79,14 @@ endfunction
 function! s:Search(key)
   call s:OpenBuffer(s:entrybufname)
   execute 'redir! >' . s:cmdfile
+  let prev_book_param = ''
   let i = 1
   while exists("g:eblook_dict{i}")
     let dname = g:eblook_dict{i}
+    if exists("g:eblook_{dname}_book_param") && g:eblook_{dname}_book_param !=# prev_book_param
+      silent echo 'book ' . g:eblook_{dname}_book_param
+      let prev_book_param = g:eblook_{dname}_book_param
+    endif
     silent echo 'select ' . dname
     silent echo 'set prompt "eblook-' . dname . '> "'
     silent echo 'search ' . a:key . "\n"
@@ -129,7 +134,9 @@ function! s:GetContent(in_entry_buf)
   endif
   call s:OpenBuffer(s:contentbufname)
   execute 'redir! >' . s:cmdfile
-  "silent echo 'set prompt ""'
+  if exists("g:eblook_{s:dictname}_book_param")
+    silent echo 'book ' . g:eblook_{s:dictname}_book_param
+  endif
   silent echo 'select ' . s:dictname
   silent echo 'content ' . pos . "\n"
   redir END
@@ -204,19 +211,19 @@ function! s:OpenBuffer(bufname)
     set noswapfile
     if a:bufname ==# s:entrybufname
       nnoremap <buffer> <silent> <CR> :call <SID>GetContent(1)<CR>
-      nnoremap <buffer> <silent> n j:call <SID>GetContent(1)<CR>
-      nnoremap <buffer> <silent> p k:call <SID>GetContent(1)<CR>
-      nnoremap <buffer> <silent> v :call <SID>ToggleContentWindow()<CR>
+      nnoremap <buffer> <silent> J j:call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> K k:call <SID>GetContent(1)<CR>
+      nnoremap <buffer> <silent> x :call <SID>ToggleContentWindow()<CR>
       nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
       nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
-      nnoremap <buffer> <silent> f :call <SID>SearchInput()<CR>
-      nnoremap <buffer> <silent> g :call <SID>GoWindow(0)<CR>
+      nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
+      nnoremap <buffer> <silent> r :call <SID>GoWindow(0)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     else
       nnoremap <buffer> <silent> <CR> :call <SID>GetContent(0)<CR>
       nnoremap <buffer> <silent> <Space> <PageDown>
       nnoremap <buffer> <silent> <BS> <PageUp>
-      nnoremap <buffer> <silent> g :call <SID>GoWindow(1)<CR>
+      nnoremap <buffer> <silent> r :call <SID>GoWindow(1)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     endif
   endif
