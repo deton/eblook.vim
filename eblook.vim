@@ -3,11 +3,14 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.13 2003/06/07 16:41:53 deton Exp $
+" Revision: $Id: eblook.vim,v 1.14 2003/06/08 14:14:43 deton Exp $
 
 scriptencoding cp932
 
 command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
+command! EblookListDict call <SID>ListDict()
+command! -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
+command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
 
 let s:entrybufname = '_eblook_entry_'
 let s:contentbufname = '_eblook_content_'
@@ -72,6 +75,40 @@ let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
 function! s:Empty_BufReadCmd()
 endfunction
 
+" 辞書一覧を表示する
+function! s:ListDict()
+  let i = 1
+  while exists("g:eblook_dict{i}_name")
+    let skip = ''
+    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+      let skip = 'skip'
+    endif
+    let title = g:eblook_dict{i}_title
+    let dname = g:eblook_dict{i}_name
+    let book = ''
+    if exists("g:eblook_dict{i}_book")
+      let book = g:eblook_dict{i}_book
+    endif
+    echo skip . "\t" . i . "\t" . title . "\t" . dname . "\t" . book
+    let i = i + 1
+  endwhile
+endfunction
+
+" 辞書をスキップするかどうかを一時的に設定する。
+" @param is_skip スキップするかどうか。1:スキップする, 0:スキップしない
+" @param ... 辞書番号
+function! s:SetDictSkip(is_skip, ...)
+  let i = 1
+  while i <= a:0
+    if a:is_skip
+      let g:eblook_dict{a:i}_skip = 1
+    else
+      unlet! g:eblook_dict{a:i}_skip
+    endif
+    let i = i + 1
+  endwhile
+endfunction
+
 " プロンプトを出して、ユーザから入力された文字列を検索する
 function! s:SearchInput()
   let str = input('eblook: ')
@@ -89,6 +126,10 @@ function! s:Search(key)
   let prev_book = ''
   let i = 1
   while exists("g:eblook_dict{i}_name")
+    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+      let i = i + 1
+      continue
+    endif
     let dname = g:eblook_dict{i}_name
     if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
       silent echo 'book ' . g:eblook_dict{i}_book
@@ -123,7 +164,7 @@ function! s:Search(key)
     if strlen(v:errmsg) > 0
       bwipeout!
       call s:History(-1)
-      echomsg 'eblook-vim: pattern not found: <' . a:key . '>'
+      echomsg 'eblook-vim: 何も見つかりませんでした: <' . a:key . '>'
     endif
   endif
 endfunction
@@ -299,13 +340,13 @@ function! s:History(dir)
   if a:dir > 0
     let nextbufindex = s:NextBufIndex()
     if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
-      echomsg 'eblook-vim: not exists next buffer'
+      echomsg 'eblook-vim: 次のバッファはありません'
       return
     endif
   else
     let nextbufindex = s:PrevBufIndex()
     if !bufexists(s:entrybufname . nextbufindex) || !bufexists(s:contentbufname . nextbufindex)
-      echomsg 'eblook-vim: not exists previous buffer'
+      echomsg 'eblook-vim: 前のバッファはありません'
       return
     endif
   endif
@@ -394,8 +435,8 @@ function! s:CreateBuffer(bufname, oldindex)
       nnoremap <buffer> <silent> <Tab> /<reference/<CR>
       nnoremap <buffer> <silent> r :call <SID>GoWindow(1)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
-      nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>call <SID>GoWindow(0)<CR>
-      nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>call <SID>GoWindow(0)<CR>
+      nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
+      nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
     endif
   endif
   if a:bufname ==# s:entrybufname
