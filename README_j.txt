@@ -13,7 +13,8 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 必要条件
   Vim 6.1以降。
   `eblook'プログラム<http://openlab.jp/edict/eblook/>。
-  EPWING/電子ブック辞書<http://openlab.jp/edict/info.html>。
+  EPWING/電子ブック辞書
+    <http://hp.vector.co.jp/authors/VA000022/unixdic/unix-dic1.html#c1s4>。
 
 準備
   eblookプログラムをPATHの通った場所に置いて、
@@ -48,4 +49,4 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 -- 
 木原 英人 / KIHARA, Hideto / deton@m1.interq.or.jp
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.4 2004/06/26 09:50:48 deton Exp $
+$Id: README_j.txt,v 1.5 2004/06/26 11:45:41 deton Exp $
