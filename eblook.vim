@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.11 2003/06/05 15:51:49 deton Exp $
+" Revision: $Id: eblook.vim,v 1.12 2003/06/06 14:13:02 deton Exp $
 
 scriptencoding cp932
 
@@ -121,7 +121,8 @@ function! s:Search(key)
     let v:errmsg = ''
     silent! :%s/./&/g
     if strlen(v:errmsg) > 0
-      quit!
+      bwipeout!
+      call s:EntryHistory(-1)
       echomsg 'eblook-vim: pattern not found: <' . a:key . '>'
     endif
   endif
@@ -306,7 +307,7 @@ function! s:NewEntryBuffer()
     endif
   endif
   if bufexists
-    silent execute "normal! :%d"
+    silent execute "normal! :%d\<CR>"
   else
     set buftype=nofile
     set bufhidden=hide
