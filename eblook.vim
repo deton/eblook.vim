@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.7 2003/06/03 14:16:12 deton Exp $
+" Revision: $Id: eblook.vim,v 1.8 2003/06/04 14:21:42 deton Exp $
 
 scriptencoding cp932
 
@@ -81,11 +81,11 @@ function! s:Search(key)
   execute 'redir! >' . s:cmdfile
   let prev_book_param = ''
   let i = 1
-  while exists("g:eblook_dict{i}")
-    let dname = g:eblook_dict{i}
-    if exists("g:eblook_{dname}_book_param") && g:eblook_{dname}_book_param !=# prev_book_param
-      silent echo 'book ' . g:eblook_{dname}_book_param
-      let prev_book_param = g:eblook_{dname}_book_param
+  while exists("g:eblook_dict{i}_name")
+    let dname = g:eblook_dict{i}_name
+    if exists("g:eblook_dict{i}_book_param") && g:eblook_dict{i}_book_param !=# prev_book_param
+      silent echo 'book ' . g:eblook_dict{i}_book_param
+      let prev_book_param = g:eblook_dict{i}_book_param
     endif
     silent echo 'select ' . dname
     silent echo 'set prompt "eblook-' . dname . '> "'
@@ -98,11 +98,13 @@ function! s:Search(key)
   silent execute 'read! eblook < ' . s:cmdfile
   let &fencs = save_fencs
 
+  silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook.*> \(eblook.*> \)/\1/g
   let i = 1
-  while exists("g:eblook_dict{i}")
-    let dname = g:eblook_dict{i}
-    silent! execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . dname . '  '
+  while exists("g:eblook_dict{i}_name")
+    let dname = g:eblook_dict{i}_name
+    let title = g:eblook_dict{i}_title
+    silent! execute ':1/eblook-' . dname . '/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
   silent! :%s/eblook.*> //g
@@ -111,22 +113,19 @@ function! s:Search(key)
   call s:GetContent(1)
 endfunction
 
-let s:dictname = ''
-
 " content表示
 " @param in_entry_buf entryバッファからcontent表示が実行されたかどうか
 function! s:GetContent(in_entry_buf)
   let str = getline('.')
   if a:in_entry_buf
-    let dname = matchstr(str, '^[^ ]\+')
-    if strlen(dname) == 0 || !s:IsValidDictName(dname)
-      let s:dictname = ''
+    let title = matchstr(str, '^[^\t]\+')
+    if strlen(title) == 0
       return
     endif
-    let s:dictname = dname
-  endif
-  if strlen(s:dictname) == 0
-    return
+    let did = s:GetDictIdFromTitle(title)
+    if did <= 0
+      return
+    endif
   endif
 
   let refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
@@ -152,11 +151,14 @@ function! s:GetContent(in_entry_buf)
   endif
 
   call s:OpenBuffer(s:contentbufname)
-  execute 'redir! >' . s:cmdfile
-  if exists("g:eblook_{s:dictname}_book_param")
-    silent echo 'book ' . g:eblook_{s:dictname}_book_param
+  if exists("did") && did > 0
+    let b:dictid = did
   endif
-  silent echo 'select ' . s:dictname
+  execute 'redir! >' . s:cmdfile
+  if exists("g:eblook_dict{b:dictid}_book_param")
+    silent echo 'book ' . g:eblook_dict{b:dictid}_book_param
+  endif
+  silent echo 'select ' . g:eblook_dict{b:dictid}_name
   silent echo 'content ' . pos . "\n"
   redir END
   let save_fencs = &fencs
@@ -164,6 +166,7 @@ function! s:GetContent(in_entry_buf)
   silent execute 'read! eblook < ' . s:cmdfile
   let &fencs = save_fencs
 
+  silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook> //g
   silent! :g/^$/d
   normal! 1G
@@ -172,15 +175,15 @@ function! s:GetContent(in_entry_buf)
   endif
 endfunction
 
-function! s:IsValidDictName(dname)
+function! s:GetDictIdFromTitle(title)
   let i = 1
-  while exists("g:eblook_dict{i}")
-    if a:dname ==# g:eblook_dict{i}
-      return 1
+  while exists("g:eblook_dict{i}_title")
+    if a:title ==# g:eblook_dict{i}_title
+      return i
     endif
     let i = i + 1
   endwhile
-  return 0
+  return -1
 endfunction
 
 function! s:ToggleContentWindow()
@@ -243,11 +246,15 @@ function! s:OpenBuffer(bufname)
       nnoremap <buffer> <silent> <CR> :call <SID>GetContent(0)<CR>
       nnoremap <buffer> <silent> <Space> <PageDown>
       nnoremap <buffer> <silent> <BS> <PageUp>
+      nnoremap <buffer> <silent> <Tab> /<reference/<CR>
       nnoremap <buffer> <silent> r :call <SID>GoWindow(1)<CR>
       nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
     endif
   endif
   silent execute "normal! :%d\<CR>"
+  if a:bufname ==# s:entrybufname
+    silent execute "normal! 4\<C-W>\<C-_>"
+  endif
 endfunction
 
 " SelectWindowByName(name)
