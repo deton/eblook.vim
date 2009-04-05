@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.28 2004/06/26 09:49:52 deton Exp $
+" Revision: $Id: eblook.vim,v 1.29 2009/04/05 02:55:37 deton Exp $
 
 scriptencoding cp932
 
@@ -238,11 +238,13 @@ function! s:Search(key)
 
   silent! :g/^Warning: you should specify a book directory first$/d
   silent! :%s/eblook.*> \(eblook.*> \)/\1/g
+  silent! :g/^eblook.*> $/d
+  execute "normal! Go0\<C-D>eblook-dummy> \<Esc>"
   let i = 1
   while exists("g:eblook_dict{i}_name")
     let dname = g:eblook_dict{i}_name
     let title = g:eblook_dict{i}_title
-    silent! execute ':1/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
+    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
   silent! :%s/eblook.*> //g
