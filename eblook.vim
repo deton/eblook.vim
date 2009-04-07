@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.30 2009/04/05 04:37:27 deton Exp $
+" Revision: $Id: eblook.vim,v 1.31 2009/04/06 11:28:55 deton Exp $
 
 scriptencoding cp932
 
@@ -417,7 +417,7 @@ function! s:FollowReference(refid)
   call s:NewBuffers()
   let j = 1
   while j < i
-    execute 'normal! o' . g:eblook_dict{dnum}_title . "\<Tab>" . entry{j} . "\<Tab>" . label{j} . "\<Esc>"
+    execute 'normal! o' . g:eblook_dict{dnum}_title . "\<C-V>\<Tab>" . entry{j} . "\<C-V>\<Tab>" . label{j} . "\<Esc>"
     let j = j + 1
   endwhile
   silent! :g/^$/d
