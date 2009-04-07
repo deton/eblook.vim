@@ -35,7 +35,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 更新履歴
   - 1.0.3 (2009-04-06)
    - vim7で、単語が見つからない辞書がある場合に、entryバッファでのtitleの
-     挿入が2重になってしまい、内容表示ができない問題を修正
+     挿入が二重になってしまい、内容表示ができない問題を修正
    - set expandtabしている場合に、<reference>先の内容表示ができない問題を修正
 
   - 1.0.2 (2004-06-26)
@@ -54,4 +54,4 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 -- 
 木原 英人 / KIHARA, Hideto / deton@m1.interq.or.jp
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.7 2009/04/06 11:36:36 deton Exp $
+$Id: README_j.txt,v 1.8 2009/04/06 11:41:40 deton Exp $
