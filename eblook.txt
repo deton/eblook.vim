@@ -186,7 +186,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
   指定します。
   パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
   例:
-    let eblook_dict1_book = '/usr/local/epwing'
+    let eblook_dict1_book = '"C:/Program Files/epwing/iwanami/koujien"'
 
 'eblook_dict{n}_name'				*'eblook_dict{n}_name'*
   辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
