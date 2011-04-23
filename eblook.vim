@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.32 2011/04/23 03:14:34 deton Exp $
+" Revision: $Id: eblook.vim,v 1.33 2011/04/23 05:46:28 deton Exp $
 
 scriptencoding cp932
 
@@ -152,8 +152,8 @@ if !exists('g:mapleader')
 endif
 nnoremap <silent> <Leader><C-Y> :<C-U>call <SID>SearchInput()<CR>
 nnoremap <silent> <Leader>y :<C-U>call <SID>Search(expand('<cword>'))<CR>
+nnoremap <silent> <Leader>Y :<C-U>call <SID>SetupOpfunc("<SID>SearchOpfunc")<CR>g@
 vnoremap <silent> <Leader>y :<C-U>call <SID>SearchVisual()<CR>
-"vnoremap <silent> <Leader>y ""y:<C-U>call <SID>Search("<C-R>"")<CR>
 if s:set_mapleader
   unlet g:mapleader
 endif
@@ -222,6 +222,39 @@ function! s:SearchInput()
     return
   endif
   call s:Search(str)
+endfunction
+
+" 'opfunc'を設定する
+" @param func 設定するopfunc
+function! s:SetupOpfunc(func)
+  let s:save_opfunc = &opfunc
+  let &opfunc = a:func
+  "let &opfunc = s:SID() . "SearchOpfunc"
+endfunction
+
+function! s:SID()
+  return matchstr(expand('<sfile>'), '\zs<SNR>\d\+_\zeSID$')
+endfun
+
+" g@{motion}で実行される'opfunc'として、motionで指定された文字列を検索する。
+" 終了時に'opfunc'を元に戻す。
+" @param type "line"か"char"か"block"
+function! s:SearchOpfunc(type)
+  let save_sel = &selection
+  let &selection = "inclusive"
+  let save_reg = @9
+  if a:type == 'line'
+    silent exe 'normal! '[V']"9y'
+  elseif a:type == 'block'
+    silent exe "normal! `[\<C-V>" . '`]"9y'
+  else
+    silent exe 'normal! `[v`]"9y'
+  endif
+  " TODO:複数行を1行に連結して検索する
+  call s:Search(@9)
+  let &selection = save_sel
+  let @9 = save_reg
+  let &opfunc = s:save_opfunc
 endfunction
 
 " Visual modeで選択されている文字列を検索する
