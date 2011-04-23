@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.31 2009/04/06 11:28:55 deton Exp $
+" Revision: $Id: eblook.vim,v 1.32 2011/04/23 03:14:34 deton Exp $
 
 scriptencoding cp932
 
@@ -152,6 +152,8 @@ if !exists('g:mapleader')
 endif
 nnoremap <silent> <Leader><C-Y> :<C-U>call <SID>SearchInput()<CR>
 nnoremap <silent> <Leader>y :<C-U>call <SID>Search(expand('<cword>'))<CR>
+vnoremap <silent> <Leader>y :<C-U>call <SID>SearchVisual()<CR>
+"vnoremap <silent> <Leader>y ""y:<C-U>call <SID>Search("<C-R>"")<CR>
 if s:set_mapleader
   unlet g:mapleader
 endif
@@ -222,6 +224,14 @@ function! s:SearchInput()
   call s:Search(str)
 endfunction
 
+" Visual modeで選択されている文字列を検索する
+function! s:SearchVisual()
+  let save_reg = @9
+  silent execute 'normal! `<' . visualmode() . '`>"9y'
+  call s:Search(@9)
+  let @9 = save_reg
+endfunction
+
 " 指定された単語の検索を行う。
 " entryバッファに検索結果のリストを表示し、
 " そのうち先頭のentryの内容をcontentバッファに表示する。
@@ -236,8 +246,8 @@ function! s:Search(key)
   " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" < "' . s:cmdfile . '"'
 
-  silent! :g/^Warning: you should specify a book directory first$/d
-  silent! :%s/eblook.*> \(eblook.*> \)/\1/g
+  silent! :g/^Warning: you should specify a book directory first$/d _
+  silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
   let i = 1
   while exists("g:eblook_dict{i}_name")
     let dname = g:eblook_dict{i}_name
@@ -245,13 +255,11 @@ function! s:Search(key)
     silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
-  silent! :%s/eblook.*> //g
-  silent! :g/^$/d
+  silent! :g/eblook.*> /s///g
+  silent! :g/^$/d _
   normal! 1G
   if s:GetContent() < 0
-    let v:errmsg = ''
-    silent! :%s/./&/g
-    if strlen(v:errmsg) > 0
+    if search('.', 'w') == 0
       bwipeout!
       silent! call s:History(-1)
       if hasoldwin < 0
@@ -312,7 +320,7 @@ function! s:CreateBuffer(bufname, oldindex)
     execute "silent normal! :edit " . newbufname . "\<CR>"
   endif
   if bufexists
-    silent execute "normal! :%d\<CR>"
+    silent execute "normal! :%d _\<CR>"
   endif
 endfunction
 
@@ -337,7 +345,7 @@ function! s:GetContent()
     execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
   endif
 
-  silent execute "normal! :%d\<CR>"
+  silent execute "normal! :%d _\<CR>"
   let b:dictnum = dnum
   execute 'redir! >' . s:cmdfile
   if exists("g:eblook_dict{b:dictnum}_book")
@@ -348,9 +356,9 @@ function! s:GetContent()
   redir END
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" < "' . s:cmdfile . '"'
 
-  silent! :g/^Warning: you should specify a book directory first$/d
-  silent! :%s/eblook> //g
-  silent! :g/^$/d
+  silent! :g/^Warning: you should specify a book directory first$/d _
+  silent! :g/eblook> /s///g
+  silent! :g/^$/d _
   normal! 1G
   execute "normal! \<C-W>p"
   return 0
@@ -420,7 +428,7 @@ function! s:FollowReference(refid)
     execute 'normal! o' . g:eblook_dict{dnum}_title . "\<C-V>\<Tab>" . entry{j} . "\<C-V>\<Tab>" . label{j} . "\<Esc>"
     let j = j + 1
   endwhile
-  silent! :g/^$/d
+  silent! :g/^$/d _
 
   normal! gg
   if strlen(a:refid) > 0
