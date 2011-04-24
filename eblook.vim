@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.33 2011/04/23 05:46:28 deton Exp $
+" Revision: $Id: eblook.vim,v 1.34 2011/04/23 06:50:41 deton Exp $
 
 scriptencoding cp932
 
@@ -24,6 +24,10 @@ scriptencoding cp932
 " nmap:
 "   <Leader><C-Y>       検索単語を入力して検索を行う
 "   <Leader>y           カーソル位置にある単語を検索する
+"   <Leader>Y{motion}   {motion}(e,b,w,t,f等)で指定する文字列を検索する
+"
+" vmap:
+"   <Leader>y           選択した文字列を検索する
 "
 " entryバッファのnmap
 "   <CR>                カーソル行のentryに対応するcontentを表示する
@@ -227,14 +231,14 @@ endfunction
 " 'opfunc'を設定する
 " @param func 設定するopfunc
 function! s:SetupOpfunc(func)
+  " XXX:'opfunc'のリセットはSearchOpfunc()内で行うが、motionが入力されなかった
+  " 場合(例:<Leader>Y<Esc>)、SearchOpfunc()が呼ばれず、設定が残ったままになる
+  if &opfunc == a:func
+    return
+  endif
   let s:save_opfunc = &opfunc
   let &opfunc = a:func
-  "let &opfunc = s:SID() . "SearchOpfunc"
 endfunction
-
-function! s:SID()
-  return matchstr(expand('<sfile>'), '\zs<SNR>\d\+_\zeSID$')
-endfun
 
 " g@{motion}で実行される'opfunc'として、motionで指定された文字列を検索する。
 " 終了時に'opfunc'を元に戻す。
@@ -243,15 +247,14 @@ function! s:SearchOpfunc(type)
   let save_sel = &selection
   let &selection = "inclusive"
   let save_reg = @9
-  if a:type == 'line'
-    silent exe 'normal! '[V']"9y'
-  elseif a:type == 'block'
-    silent exe "normal! `[\<C-V>" . '`]"9y'
-  else
+  if a:type == 'char'
     silent exe 'normal! `[v`]"9y'
+  elseif a:type == 'line'
+    silent exe "normal! '[V']" . '"9y'
+  else
+    silent exe "normal! `[\<C-V>" . '`]"9y'
   endif
-  " TODO:複数行を1行に連結して検索する
-  call s:Search(@9)
+  call s:Search(substitute(@9, '\n', ' ', 'g'))
   let &selection = save_sel
   let @9 = save_reg
   let &opfunc = s:save_opfunc
@@ -261,7 +264,7 @@ endfunction
 function! s:SearchVisual()
   let save_reg = @9
   silent execute 'normal! `<' . visualmode() . '`>"9y'
-  call s:Search(@9)
+  call s:Search(substitute(@9, '\n', ' ', 'g'))
   let @9 = save_reg
 endfunction
 
