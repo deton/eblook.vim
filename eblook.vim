@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.35 2011/04/23 07:01:16 deton Exp $
+" Revision: $Id: eblook.vim,v 1.36 2011/04/23 09:50:52 deton Exp $
 
 scriptencoding cp932
 
@@ -24,7 +24,6 @@ scriptencoding cp932
 " nmap:
 "   <Leader><C-Y>       検索単語を入力して検索を行う
 "   <Leader>y           カーソル位置にある単語を検索する
-"   <Leader>Y{motion}   {motion}(e,b,w,t,f等)で指定する文字列を検索する
 "
 " vmap:
 "   <Leader>y           選択した文字列を検索する
@@ -156,8 +155,8 @@ if !exists('g:mapleader')
 endif
 nnoremap <silent> <Leader><C-Y> :<C-U>call <SID>SearchInput()<CR>
 nnoremap <silent> <Leader>y :<C-U>call <SID>Search(expand('<cword>'))<CR>
-nnoremap <silent> <Leader>Y :<C-U>call <SID>SetupOpfunc("<SID>SearchOpfunc")<CR>g@
 vnoremap <silent> <Leader>y :<C-U>call <SID>SearchVisual()<CR>
+"vnoremap <silent> <Leader>y ""y:<C-U>call <SID>Search("<C-R>"")<CR>
 if s:set_mapleader
   unlet g:mapleader
 endif
@@ -228,43 +227,11 @@ function! s:SearchInput()
   call s:Search(str)
 endfunction
 
-" 'opfunc'を設定する
-" @param func 設定するopfunc
-function! s:SetupOpfunc(func)
-  " XXX:'opfunc'のリセットはSearchOpfunc()内で行うが、motionが入力されなかった
-  " 場合(例:<Leader>Y<Esc>)、SearchOpfunc()が呼ばれず、設定が残ったままになる
-  if &opfunc == a:func
-    return
-  endif
-  let s:save_opfunc = &opfunc
-  let &opfunc = a:func
-endfunction
-
-" g@{motion}で実行される'opfunc'として、motionで指定された文字列を検索する。
-" 終了時に'opfunc'を元に戻す。
-" @param type "line"か"char"か"block"
-function! s:SearchOpfunc(type)
-  let save_sel = &selection
-  let &selection = "inclusive"
-  let save_reg = @@
-  if a:type == 'char'
-    silent exe 'normal! `[v`]y'
-  elseif a:type == 'line'
-    silent exe "normal! '[V']y"
-  else
-    silent exe "normal! `[\<C-V>`]y"
-  endif
-  call s:Search(substitute(@@, '\n', ' ', 'g'))
-  let &selection = save_sel
-  let @@ = save_reg
-  let &opfunc = s:save_opfunc
-endfunction
-
 " Visual modeで選択されている文字列を検索する
 function! s:SearchVisual()
   let save_reg = @@
   silent execute 'normal! `<' . visualmode() . '`>y'
-  call s:Search(substitute(@@, '\n', ' ', 'g'))
+  call s:Search(substitute(@@, '\n', '', 'g'))
   let @@ = save_reg
 endfunction
 

@@ -127,7 +127,6 @@ entryウィンドウでj,kキーでカーソルを移動して、<CR>を押すと
 <Leader><C-Y>       検索単語を入力して検索を行う
 <Leader>y           カーソル位置にある単語を検索する
                     Visual modeの場合は、選択した文字列を検索する
-<Leader>Y{motion}   |{motion}|(e,b,w,t,f等)で指定する文字列を検索する
 
 検索結果は、_eblook_entry_{n}と_eblook_content_{n}というウィンドウに
 表示されます。{n}は数字で、具体的には1, 2, ..., |eblook_history_max|です。
