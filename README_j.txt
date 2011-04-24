@@ -57,6 +57,6 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
     最初のリリース。
 
 -- 
-木原 英人 / KIHARA, Hideto / deton@m1.interq.or.jp
+木原 英人 / KIHARA, Hideto
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.11 2011/04/23 09:50:52 deton Exp $
+$Id: README_j.txt,v 1.12 2011/04/23 22:40:59 deton Exp $
