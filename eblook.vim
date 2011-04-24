@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.34 2011/04/23 06:50:41 deton Exp $
+" Revision: $Id: eblook.vim,v 1.35 2011/04/23 07:01:16 deton Exp $
 
 scriptencoding cp932
 
@@ -246,26 +246,26 @@ endfunction
 function! s:SearchOpfunc(type)
   let save_sel = &selection
   let &selection = "inclusive"
-  let save_reg = @9
+  let save_reg = @@
   if a:type == 'char'
-    silent exe 'normal! `[v`]"9y'
+    silent exe 'normal! `[v`]y'
   elseif a:type == 'line'
-    silent exe "normal! '[V']" . '"9y'
+    silent exe "normal! '[V']y"
   else
-    silent exe "normal! `[\<C-V>" . '`]"9y'
+    silent exe "normal! `[\<C-V>`]y"
   endif
-  call s:Search(substitute(@9, '\n', ' ', 'g'))
+  call s:Search(substitute(@@, '\n', ' ', 'g'))
   let &selection = save_sel
-  let @9 = save_reg
+  let @@ = save_reg
   let &opfunc = s:save_opfunc
 endfunction
 
 " Visual modeで選択されている文字列を検索する
 function! s:SearchVisual()
-  let save_reg = @9
-  silent execute 'normal! `<' . visualmode() . '`>"9y'
-  call s:Search(substitute(@9, '\n', ' ', 'g'))
-  let @9 = save_reg
+  let save_reg = @@
+  silent execute 'normal! `<' . visualmode() . '`>y'
+  call s:Search(substitute(@@, '\n', ' ', 'g'))
+  let @@ = save_reg
 endfunction
 
 " 指定された単語の検索を行う。
