@@ -36,7 +36,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   - 1.0.4 (2011-04-25)
    - Visual modeで選択された文字列を検索するためのmapを追加
      (katonoさんのmapを取り込み(一部修整))
-   - registerを汚さないように修整
+   - Vimのregisterを汚さないように修整
 
   - 1.0.3 (2009-04-07)
    - vim7で、単語が見つからない辞書がある場合に、entryバッファでのtitleの
@@ -59,4 +59,4 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 -- 
 木原 英人 / KIHARA, Hideto
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.12 2011/04/23 22:40:59 deton Exp $
+$Id: README_j.txt,v 1.13 2011/04/24 10:11:32 deton Exp $
