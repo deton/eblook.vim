@@ -186,6 +186,7 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  set filetype=eblook
   nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
@@ -206,6 +207,7 @@ function! s:Content_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  set filetype=eblook
   nnoremap <buffer> <silent> <CR> :call <SID>SelectReference()<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
