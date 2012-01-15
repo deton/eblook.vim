@@ -274,7 +274,7 @@ function! s:Search(key)
   endif
 endfunction
 
-" eblookブログラムにリダイレクトするための検索コマンドファイルを作成する
+" eblookプログラムにリダイレクトするための検索コマンドファイルを作成する
 function! s:RedirSearchCommand(key)
   execute 'redir! >' . s:cmdfile
   let prev_book = ''
@@ -383,7 +383,7 @@ function! s:SelectReference()
     let col = col('.')
     let offset = strridx(strpart(str, 0, col), '<')
     if offset >= 0
-      let refid = matchstr(str, refpat, offset)
+      let refid = matchstr(str, s:refpat, offset)
     endif
   endif
   if strlen(refid) == 0
