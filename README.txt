@@ -1,6 +1,6 @@
 eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
-							     Version: 1.0.4
-							     Date: 2011-04-25
+							     Version: 1.0.5
+							     Date: 2012-01-15
 
 概要
   eblook.vimは、`eblook'プログラムを使って、
@@ -24,8 +24,9 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   アーカイブに含まれるファイルを次の場所に置いてください。
 
     ファイル            置く場所              ファイルの説明
-  eblook.vim          'runtimepath'/plugin  プラグインスクリプト本体
-  eblook.txt          'runtimepath'/doc     スクリプトの説明書
+  plugin/eblook.vim     'runtimepath'/plugin  プラグインスクリプト本体
+  syntax/eblook.vim     'runtimepath'/syntax  eblook.vim用syntaxファイル
+  doc/eblook.txt        'runtimepath'/doc     スクリプトの説明書
 
   'runtimepath'で示されるディレクトリは、Vim上で
   :echo &runtimepath を実行することで確認できます。
@@ -34,6 +35,11 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblook.txtを参照してください。
 
 更新履歴
+  - 1.0.5 (2012-01-15)
+   - katonoさん作成のsyntaxファイルを取り込み
+   - <reference></reference=xxxx:xxx>の非表示化
+     (Vim 7.3で追加されたconceal syntaxを使用)
+
   - 1.0.4 (2011-04-25)
    - Visual modeで選択された文字列を検索するためのmapを追加
      (katonoさんのmapをもとに作成)
