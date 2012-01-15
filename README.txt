@@ -1,61 +1,61 @@
-eblook.vim - EPWING/“dŽqƒuƒbƒNŽ«‘ŒŸõƒvƒ‰ƒOƒCƒ“ƒXƒNƒŠƒvƒg
+eblook.vim - EPWING/é›»å­ãƒ–ãƒƒã‚¯è¾žæ›¸æ¤œç´¢ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚¹ã‚¯ãƒªãƒ—ãƒˆ
 							     Version: 1.0.4
 							     Date: 2011-04-25
 
-ŠT—v
-  eblook.vim‚ÍA`eblook'ƒvƒƒOƒ‰ƒ€‚ðŽg‚Á‚ÄA
-  EPWING/“dŽqƒuƒbƒNŽ«‘‚ÌŒŸõ‚ðs‚¤ƒvƒ‰ƒOƒCƒ“ƒXƒNƒŠƒvƒg‚Å‚·B
+æ¦‚è¦
+  eblook.vimã¯ã€`eblook'ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ã£ã¦ã€
+  EPWING/é›»å­ãƒ–ãƒƒã‚¯è¾žæ›¸ã®æ¤œç´¢ã‚’è¡Œã†ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
 
-  Vim‚Å‚àEmacs‚ÌLookup‚Ì‚æ‚¤‚ÉŽ«‘‚ð‚Ð‚«‚½‚©‚Á‚½‚Ì‚Åì‚è‚Ü‚µ‚½B
-  •¡”‚ÌŽ«‘‚ðˆê“x‚ÉŒŸõ‚Å‚«‚Ü‚·B
-  eblookƒvƒƒOƒ‰ƒ€‚Ìƒtƒƒ“ƒgƒGƒ“ƒh‚Å‚·B
+  Vimã§ã‚‚Emacsã®Lookupã®ã‚ˆã†ã«è¾žæ›¸ã‚’ã²ããŸã‹ã£ãŸã®ã§ä½œã‚Šã¾ã—ãŸã€‚
+  è¤‡æ•°ã®è¾žæ›¸ã‚’ä¸€åº¦ã«æ¤œç´¢ã§ãã¾ã™ã€‚
+  eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ãƒ•ãƒ­ãƒ³ãƒˆã‚¨ãƒ³ãƒ‰ã§ã™ã€‚
 
-•K—vðŒ
-  Vim 6.1ˆÈ~B
-  `eblook'ƒvƒƒOƒ‰ƒ€<http://openlab.jp/edict/eblook/>B
-  EPWING/“dŽqƒuƒbƒNŽ«‘
-    <http://hp.vector.co.jp/authors/VA000022/unixdic/unix-dic1.html#c1s4>B
+å¿…è¦æ¡ä»¶
+  Vim 6.1ä»¥é™ã€‚
+  `eblook'ãƒ—ãƒ­ã‚°ãƒ©ãƒ <http://openlab.jp/edict/eblook/>ã€‚
+  EPWING/é›»å­ãƒ–ãƒƒã‚¯è¾žæ›¸
+    <http://hp.vector.co.jp/authors/VA000022/unixdic/unix-dic1.html#c1s4>ã€‚
 
-€”õ
-  eblookƒvƒƒOƒ‰ƒ€‚ðPATH‚Ì’Ê‚Á‚½êŠ‚É’u‚¢‚ÄA
-  ŽÀs‚Å‚«‚é‚æ‚¤‚É‚µ‚Ä‚¨‚¢‚Ä‚­‚¾‚³‚¢B
+æº–å‚™
+  eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’PATHã®é€šã£ãŸå ´æ‰€ã«ç½®ã„ã¦ã€
+  å®Ÿè¡Œã§ãã‚‹ã‚ˆã†ã«ã—ã¦ãŠã„ã¦ãã ã•ã„ã€‚
 
-  ƒA[ƒJƒCƒu‚ÉŠÜ‚Ü‚ê‚éƒtƒ@ƒCƒ‹‚ðŽŸ‚ÌêŠ‚É’u‚¢‚Ä‚­‚¾‚³‚¢B
+  ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–ã«å«ã¾ã‚Œã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ¬¡ã®å ´æ‰€ã«ç½®ã„ã¦ãã ã•ã„ã€‚
 
-    ƒtƒ@ƒCƒ‹            ’u‚­êŠ              ƒtƒ@ƒCƒ‹‚Ìà–¾
-  eblook.vim          'runtimepath'/plugin  ƒvƒ‰ƒOƒCƒ“ƒXƒNƒŠƒvƒg–{‘Ì
-  eblook.txt          'runtimepath'/doc     ƒXƒNƒŠƒvƒg‚Ìà–¾‘
+    ãƒ•ã‚¡ã‚¤ãƒ«            ç½®ãå ´æ‰€              ãƒ•ã‚¡ã‚¤ãƒ«ã®èª¬æ˜Ž
+  eblook.vim          'runtimepath'/plugin  ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚¹ã‚¯ãƒªãƒ—ãƒˆæœ¬ä½“
+  eblook.txt          'runtimepath'/doc     ã‚¹ã‚¯ãƒªãƒ—ãƒˆã®èª¬æ˜Žæ›¸
 
-  'runtimepath'‚ÅŽ¦‚³‚ê‚éƒfƒBƒŒƒNƒgƒŠ‚ÍAVimã‚Å
-  :echo &runtimepath ‚ðŽÀs‚·‚é‚±‚Æ‚ÅŠm”F‚Å‚«‚Ü‚·B
+  'runtimepath'ã§ç¤ºã•ã‚Œã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¯ã€Vimä¸Šã§
+  :echo &runtimepath ã‚’å®Ÿè¡Œã™ã‚‹ã“ã¨ã§ç¢ºèªã§ãã¾ã™ã€‚
 
-Žg‚¢•û
-  eblook.txt‚ðŽQÆ‚µ‚Ä‚­‚¾‚³‚¢B
+ä½¿ã„æ–¹
+  eblook.txtã‚’å‚ç…§ã—ã¦ãã ã•ã„ã€‚
 
-XV—š—ð
+æ›´æ–°å±¥æ­´
   - 1.0.4 (2011-04-25)
-   - Visual mode‚Å‘I‘ð‚³‚ê‚½•¶Žš—ñ‚ðŒŸõ‚·‚é‚½‚ß‚Ìmap‚ð’Ç‰Á
-     (katono‚³‚ñ‚Ìmap‚ð‚à‚Æ‚Éì¬)
-   - Vim‚Ìregister‚ð‰˜‚³‚È‚¢‚æ‚¤‚ÉC®
+   - Visual modeã§é¸æŠžã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’æ¤œç´¢ã™ã‚‹ãŸã‚ã®mapã‚’è¿½åŠ 
+     (katonoã•ã‚“ã®mapã‚’ã‚‚ã¨ã«ä½œæˆ)
+   - Vimã®registerã‚’æ±šã•ãªã„ã‚ˆã†ã«ä¿®æ•´
 
   - 1.0.3 (2009-04-07)
-   - vim7‚ÅA’PŒê‚ªŒ©‚Â‚©‚ç‚È‚¢Ž«‘‚ª‚ ‚éê‡‚ÉAentryƒoƒbƒtƒ@‚Å‚Ìtitle‚Ì
-     ‘}“ü‚ª“ñd‚É‚È‚Á‚Ä‚µ‚Ü‚¢A“à—e‚ª³‚µ‚­•\Ž¦‚³‚ê‚È‚¢–â‘è‚ðC³
-   - set expandtab‚µ‚Ä‚¢‚éê‡‚ÉA<reference>æ‚Ì“à—e•\Ž¦‚ª‚Å‚«‚È‚¢–â‘è‚ðC³
+   - vim7ã§ã€å˜èªžãŒè¦‹ã¤ã‹ã‚‰ãªã„è¾žæ›¸ãŒã‚ã‚‹å ´åˆã«ã€entryãƒãƒƒãƒ•ã‚¡ã§ã®titleã®
+     æŒ¿å…¥ãŒäºŒé‡ã«ãªã£ã¦ã—ã¾ã„ã€å†…å®¹ãŒæ­£ã—ãè¡¨ç¤ºã•ã‚Œãªã„å•é¡Œã‚’ä¿®æ­£
+   - set expandtabã—ã¦ã„ã‚‹å ´åˆã«ã€<reference>å…ˆã®å†…å®¹è¡¨ç¤ºãŒã§ããªã„å•é¡Œã‚’ä¿®æ­£
 
   - 1.0.2 (2004-06-26)
-   - 'eblook_dict{n}_name'‚ª“¯‚¶Ž«‘‚ª•¡”‚ ‚éê‡‚ÉA
-     “à—e‚ª³‚µ‚­•\Ž¦‚³‚ê‚È‚¢ƒoƒO‚ðC³
-   - ƒIƒvƒVƒ‡ƒ“‚ð2‚Â’Ç‰ÁB
-     'eblookprg': eblookƒvƒƒOƒ‰ƒ€‚Ì–¼‘O
-     'eblookenc': eblookƒvƒƒOƒ‰ƒ€‚Ìo—Í‚ð“Ç‚Ýž‚Þ‚Æ‚«‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒO
+   - 'eblook_dict{n}_name'ãŒåŒã˜è¾žæ›¸ãŒè¤‡æ•°ã‚ã‚‹å ´åˆã«ã€
+     å†…å®¹ãŒæ­£ã—ãè¡¨ç¤ºã•ã‚Œãªã„ãƒã‚°ã‚’ä¿®æ­£
+   - ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’2ã¤è¿½åŠ ã€‚
+     'eblookprg': eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®åå‰
+     'eblookenc': eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å‡ºåŠ›ã‚’èª­ã¿è¾¼ã‚€ã¨ãã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
   - 1.0.1 (2003-12-06)
-   - ƒXƒy[ƒX‚ðŠÜ‚Þ’PŒê(de facto“™)‚ÌŒŸõ‚ª‚Å‚«‚È‚©‚Á‚½ƒoƒO‚ðC³B
+   - ã‚¹ãƒšãƒ¼ã‚¹ã‚’å«ã‚€å˜èªž(de factoç­‰)ã®æ¤œç´¢ãŒã§ããªã‹ã£ãŸãƒã‚°ã‚’ä¿®æ­£ã€‚
 
   - 1.0 (2003-06-15)
-    Å‰‚ÌƒŠƒŠ[ƒXB
+    æœ€åˆã®ãƒªãƒªãƒ¼ã‚¹ã€‚
 
 -- 
-–ØŒ´ ‰pl / KIHARA, Hideto
+æœ¨åŽŸ è‹±äºº / KIHARA, Hideto
 http://www1.interq.or.jp/~deton/eblook-vim/
