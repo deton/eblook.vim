@@ -3,7 +3,6 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Revision: $Id: eblook.vim,v 1.36 2011/04/23 09:50:52 deton Exp $
 
 scriptencoding cp932
 

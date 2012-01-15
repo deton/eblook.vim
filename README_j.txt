@@ -59,4 +59,3 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 -- 
 木原 英人 / KIHARA, Hideto
 http://www1.interq.or.jp/~deton/eblook-vim/
-$Id: README_j.txt,v 1.14 2011/04/25 10:47:53 deton Exp $
