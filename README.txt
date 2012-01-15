@@ -12,9 +12,10 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 必要条件
   Vim 6.1以降。
-  `eblook'プログラム<http://openlab.jp/edict/eblook/>。
+  `eblook'プログラム
+     http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
   EPWING/電子ブック辞書
-    <http://hp.vector.co.jp/authors/VA000022/unixdic/unix-dic1.html#c1s4>。
+     http://hp.vector.co.jp/authors/VA000022/unixdic/unix-dic1.html#c1s4
 
 準備
   eblookプログラムをPATHの通った場所に置いて、
