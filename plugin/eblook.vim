@@ -186,6 +186,9 @@ function! s:Entry_BufEnter()
   set noswapfile
   set nobuflisted
   set filetype=eblook
+  if has("conceal")
+    setlocal conceallevel=2 concealcursor=nc
+  endif
   nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
@@ -207,6 +210,9 @@ function! s:Content_BufEnter()
   set noswapfile
   set nobuflisted
   set filetype=eblook
+  if has("conceal")
+    setlocal conceallevel=2 concealcursor=nc
+  endif
   nnoremap <buffer> <silent> <CR> :call <SID>SelectReference()<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>

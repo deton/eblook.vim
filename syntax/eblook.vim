@@ -1,11 +1,10 @@
 " Vim syntax file
 " Language:     eblook.vim用syntax
-" Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2011/05/03
+" Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
+" Original Maintainer:   KATO Noriaki <katono123@gmail.com>
+" Last Change:  2012-01-15
 
-" このファイルをvimfiles/syntaxにコピーして、
-" vimfiles/plugin/eblook.vimのs:Content_BufEnter()とs:Entry_BufEnter()に
-" set filetype=eblookを追加してください。
+" このファイルをvimfiles/syntaxにコピーしてください。
 
 if version < 600
   syntax clear
@@ -16,18 +15,33 @@ endif
 
 syn match ebGaiji		"<gaiji=[^>]*>"
 syn match ebGaiji		"<gaiji=[^>]*>" contained
-syn match ebRefBeg		"<reference>" contained
-syn match ebRefEnd		"</reference=[^>]*>"
+if has("conceal")
+  syn match ebRefBeg		"<reference>" contained conceal
+  syn match ebRefEnd		"</reference=[^>]*>" conceal
+  syn match ebEntRef		"\([[:digit:]]\+\. \)\?[[:xdigit:]]\+:[[:xdigit:]]\+\t" conceal
+else
+  syn match ebRefBeg		"<reference>" contained
+  syn match ebRefEnd		"</reference=[^>]*>"
+endif
 syn region ebRefLink start="<reference>" end="</reference"me=e-11 contains=ebRefBeg,ebRefEnd,ebGaiji
 syn match ebPrevBeg		"<prev>"
-syn match ebPrevEnd		"</prev>"
+if has("conceal")
+  syn match ebPrevEnd		"</prev>" conceal
+else
+  syn match ebPrevEnd		"</prev>"
+endif
 syn match ebNextBeg		"<next>"
-syn match ebNextEnd		"</next>"
+if has("conceal")
+  syn match ebNextEnd		"</next>" conceal
+else
+  syn match ebNextEnd		"</next>"
+endif
 
 command -nargs=+ HiLink hi def link <args>
 HiLink ebRefLink	Underlined
-HiLink ebRefBeg		NonText
-HiLink ebRefEnd		NonText
+HiLink ebRefBeg		Ignore
+HiLink ebRefEnd		Ignore
+HiLink ebEntRef		Ignore
 HiLink ebGaiji		NonText
 HiLink ebPrevBeg	NonText
 HiLink ebPrevEnd	NonText
