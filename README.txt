@@ -1,6 +1,6 @@
 eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 							     Version: 1.0.5
-							     Date: 2012-01-15
+							     Date: 2012-01-19
 
 概要
   eblook.vimは、`eblook'プログラムを使って、
@@ -35,7 +35,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblook.txtを参照してください。
 
 更新履歴
-  - 1.0.5 (2012-01-15)
+  - 1.0.5 (2012-01-19)
    - katonoさん作成のsyntaxファイルを取り込み
    - <reference></reference=xxxx:xxx>の非表示化
      (Vim 7.3で追加されたconceal syntaxを使用)
@@ -62,7 +62,3 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
   - 1.0 (2003-06-15)
     最初のリリース。
-
--- 
-木原 英人 / KIHARA, Hideto
-http://www1.interq.or.jp/~deton/eblook-vim/
