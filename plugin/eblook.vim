@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-01-15
+" Last Change: 2012-01-28
 
 scriptencoding cp932
 
@@ -128,6 +128,19 @@ endif
 if !exists('eblookenc')
   let eblookenc = &encoding
 endif
+" eblookenc値(vimのencoding)からeblook --encodingオプション値への変換テーブル
+let s:eblookenc2opt = {
+\  'euc-jp': 'euc',
+\  'cp932': 'sjis',
+\  'sjis': 'sjis',
+\  'utf-8': 'utf8',
+\  'utf8': 'utf8'
+\}
+let s:eblookopt = ""
+if has_key(s:eblookenc2opt, eblookenc)
+  let s:eblookopt = '-e ' . s:eblookenc2opt[eblookenc]
+endif
+unlet s:eblookenc2opt
 
 command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
 command! EblookListDict call <SID>ListDict()
@@ -255,7 +268,7 @@ function! s:Search(key)
   call s:NewBuffers()
   call s:RedirSearchCommand(a:key)
   " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
-  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" -e utf8 < "' . s:cmdfile . '"'
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
 
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
@@ -365,7 +378,7 @@ function! s:GetContent()
   silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
   redir END
-  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" -e utf8 < "' . s:cmdfile . '"'
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
 
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook> /s///g
@@ -387,11 +400,9 @@ endfunction
 " @return 置換文字列
 function! s:GetGaiji(dnum, key)
   let name = g:eblook_dict{a:dnum}_name
-  if !exists("g:eblook#{name}#gaijimap")
-    return '_'
-  endif
   let gaiji = g:eblook#{name}#gaijimap[a:key]
-  if empty(gaiji)
+  " 'encoding'がutf-8でない場合、外字マップファイルの内容によってはloadできない
+  if !exists("g:eblook#{name}#gaijimap") || empty(gaiji)
     return '_'
   endif
   let res = gaiji[0]    " utf-8
