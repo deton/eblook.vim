@@ -255,7 +255,7 @@ function! s:Search(key)
   call s:NewBuffers()
   call s:RedirSearchCommand(a:key)
   " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
-  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" < "' . s:cmdfile . '"'
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" -e utf8 < "' . s:cmdfile . '"'
 
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
@@ -365,14 +365,40 @@ function! s:GetContent()
   silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
   redir END
-  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" < "' . s:cmdfile . '"'
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" -e utf8 < "' . s:cmdfile . '"'
 
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook> /s///g
+  call s:ReplaceGaiji(dnum)
   silent! :g/^$/d _
   normal! 1G
   execute "normal! \<C-W>p"
   return 0
+endfunction
+
+" <gaiji=xxxxx>を置き換える。
+function! s:ReplaceGaiji(dnum)
+  silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(a:dnum, submatch(1))/g
+endfunction
+
+" 外字置換文字列を取得する。
+" @param dnum 辞書番号
+" @param key 外字キー
+" @return 置換文字列
+function! s:GetGaiji(dnum, key)
+  let name = g:eblook_dict{a:dnum}_name
+  if !exists("g:eblook#{name}#gaijimap")
+    return '_'
+  endif
+  let gaiji = g:eblook#{name}#gaijimap[a:key]
+  if empty(gaiji)
+    return '_'
+  endif
+  let res = gaiji[0]    " utf-8
+  if res ==# '-'
+    res = gaiji[1]
+  endif
+  return res
 endfunction
 
 " contentバッファ中のカーソル位置付近の<reference>を抽出して、
