@@ -196,6 +196,16 @@ while exists("g:eblook_dict{s:i}_name")
   endif
   let s:i = s:i + 1
 endwhile
+" titleをeblookencに変換(&encとeblookencが異なる場合用)
+let s:i = 1
+while exists("g:eblook_dict{s:i}_title")
+  if &enc ==# g:eblookenc
+    let g:eblook_dict{s:i}_title_enc = g:eblook_dict{s:i}_title
+  else
+    let g:eblook_dict{s:i}_title_enc = iconv(g:eblook_dict{s:i}_title, &enc, g:eblookenc)
+  endif
+  let s:i = s:i + 1
+endwhile
 unlet s:i
 
 " entryバッファに入った時に実行。set nobuflistedする。
@@ -280,7 +290,7 @@ function! s:Search(key)
   let i = 1
   while exists("g:eblook_dict{i}_name")
     let dname = g:eblook_dict{i}_name
-    let title = g:eblook_dict{i}_title
+    let title = g:eblook_dict{i}_title_enc
     silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
@@ -480,7 +490,7 @@ function! s:FollowReference(refid)
   call s:NewBuffers()
   let j = 1
   while j < i
-    execute 'normal! o' . g:eblook_dict{dnum}_title . "\<C-V>\<Tab>" . entry{j} . "\<C-V>\<Tab>" . label{j} . "\<Esc>"
+    execute 'normal! o' . g:eblook_dict{dnum}_title_enc . "\<C-V>\<Tab>" . entry{j} . "\<C-V>\<Tab>" . label{j} . "\<Esc>"
     let j = j + 1
   endwhile
   silent! :g/^$/d _
@@ -582,8 +592,8 @@ endfunction
 " @return 辞書番号
 function! s:GetDictNumFromTitle(title)
   let i = 1
-  while exists("g:eblook_dict{i}_title")
-    if a:title ==# g:eblook_dict{i}_title
+  while exists("g:eblook_dict{i}_title_enc")
+    if a:title ==# g:eblook_dict{i}_title_enc
       return i
     endif
     let i = i + 1
@@ -599,7 +609,7 @@ function! s:ListDict()
     if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
       let skip = 'skip'
     endif
-    let title = g:eblook_dict{i}_title
+    let title = g:eblook_dict{i}_title_enc
     let dname = g:eblook_dict{i}_name
     let book = ''
     if exists("g:eblook_dict{i}_book")
