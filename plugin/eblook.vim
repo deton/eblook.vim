@@ -407,14 +407,25 @@ endfunction
 " @return 置換文字列
 function! s:GetGaiji(dnum, key)
   let name = g:eblook_dict{a:dnum}_name
-  let gaiji = g:eblook#{name}#gaijimap[a:key]
+  let gaiji = get(g:eblook#{name}#gaijimap, a:key)
   " 'encoding'がutf-8でない場合、外字マップファイルの内容によってはloadできない
-  if !exists("g:eblook#{name}#gaijimap") || empty(gaiji)
-    return '_'
+  if !exists("g:eblook#{name}#gaijimap") || !gaiji
+    return '<gaiji=' . a:key . '>'     " DEBUG
+    "return '_'
   endif
-  let res = gaiji[0]    " utf-8
-  if res ==# '-'
-    res = gaiji[1]
+  if &encoding ==# 'utf-8'
+    let res = gaiji[0]
+    if res ==# 'null'
+      return ''
+    elseif res ==# '-'
+      res = gaiji[1]
+    endif
+  else
+    let res = gaiji[1]
+  endif
+  if strlen(res) == 0
+    return '<gaiji=' . a:key . '>'     " DEBUG
+    "return '_'
   endif
   return res
 endfunction
