@@ -114,6 +114,11 @@ if exists('plugin_eblook_disable')
   finish
 endif
 
+" entryバッファの行数
+if !exists('eblook_entrybuf_height')
+  let eblook_entrybuf_height = 4
+endif
+
 " 保持しておく過去の検索バッファ数の上限
 if !exists('eblook_history_max')
   let eblook_history_max = 10
@@ -324,7 +329,7 @@ function! s:NewBuffers()
   let s:bufindex = s:NextBufIndex()
   call s:CreateBuffer(s:entrybufname, oldindex)
   call s:CreateBuffer(s:contentbufname, oldindex)
-  execute "normal! \<C-W>p4\<C-W>_"
+  execute "normal! \<C-W>p" . g:eblook_entrybuf_height . "\<C-W>_"
 endfunction
 
 " entryバッファかcontentバッファのいずれかを作る
@@ -380,12 +385,14 @@ function! s:GetContent()
   redir END
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
 
+  let height = winheight(0)
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook> /s///g
   call s:ReplaceGaiji(dnum)
   silent! :g/^$/d _
   normal! 1G
-  execute "normal! \<C-W>p"
+  " utf-8への外字置換をするとなぜかウィンドウ高さが1行になるので元に戻す
+  execute 'normal! ' . height . "\<C-W>_\<C-W>p" . g:eblook_entrybuf_height . "\<C-W>_"
   return 0
 endfunction
 
