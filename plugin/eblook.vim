@@ -392,7 +392,7 @@ function! s:GetContent()
   silent! :g/^$/d _
   normal! 1G
   " utf-8への外字置換をするとなぜかウィンドウ高さが1行になるので元に戻す
-  execute 'normal! ' . height . "\<C-W>_\<C-W>p" . g:eblook_entrybuf_height . "\<C-W>_"
+  execute 'normal! ' . height . "\<C-W>_\<C-W>p"
   return 0
 endfunction
 
