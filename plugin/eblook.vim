@@ -398,33 +398,48 @@ endfunction
 
 " <gaiji=xxxxx>を置き換える。
 function! s:ReplaceGaiji(dnum)
-  silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(a:dnum, submatch(1))/g
+  let name = g:eblook_dict{a:dnum}_name
+  if !exists("g:eblook#{name}#gaijimap")
+    try
+      let gaijimap = g:eblook#{name}#gaijimap    " autoload
+    catch /^Vim(let):E121/    " no autoload file
+      let g:eblook#{name}#gaijimap = {}
+    endtry
+    " {'ha121':['u00E1','a'], ...}
+    " => {'ha121':['u00E1','a','u00E1に対応する文字'], ... }
+    if &encoding ==# 'utf-8'
+      for v in values(g:eblook#{name}#gaijimap)
+        let u8str = substitute(v[0], 'u\([[:xdigit:]]\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
+        call add(v, u8str)
+      endfor
+    " &encodingがutf-8でない場合はv[1]を使用(nr2char()では変換不可だし)
+    endif
+  endif
+  silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(g:eblook#{name}#gaijimap, submatch(1))/g
 endfunction
 
 " 外字置換文字列を取得する。
-" @param dnum 辞書番号
+" @param gaijimap 外字置換表
 " @param key 外字キー
 " @return 置換文字列
-function! s:GetGaiji(dnum, key)
-  let name = g:eblook_dict{a:dnum}_name
-  let gaiji = get(g:eblook#{name}#gaijimap, a:key)
-  " 'encoding'がutf-8でない場合、外字マップファイルの内容によってはloadできない
-  if !exists("g:eblook#{name}#gaijimap") || !gaiji
-    return '<gaiji=' . a:key . '>'     " DEBUG
+function! s:GetGaiji(gaijimap, key)
+  let gaiji = get(a:gaijimap, a:key)
+  if !gaiji
+    return '_' . a:key . '_'     " DEBUG
     "return '_'
   endif
   if &encoding ==# 'utf-8'
-    let res = gaiji[0]
+    let res = gaiji[2]
     if res ==# 'null'
       return ''
     elseif res ==# '-'
-      res = gaiji[1]
+      let res = gaiji[1]
     endif
   else
     let res = gaiji[1]
   endif
   if strlen(res) == 0
-    return '<gaiji=' . a:key . '>'     " DEBUG
+    return '_' . a:key . '_'     " DEBUG
     "return '_'
   endif
   return res
