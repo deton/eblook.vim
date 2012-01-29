@@ -311,7 +311,13 @@ function! s:RedirSearchCommand(key)
     endif
     let dname = g:eblook_dict{i}_name
     if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
-      silent echo 'book ' . g:eblook_dict{i}_book
+      " 直前のbook用に指定したappendixが引き継がれないように必ずappendixを指定
+      if g:eblook_dict{i}_book =~ '\S\+\s\+\S\+'
+        let book = g:eblook_dict{i}_book
+      else
+        let book = g:eblook_dict{i}_book . ' ' . g:eblook_dict{i}_book
+      endif
+      silent echo 'book ' . book
       let prev_book = g:eblook_dict{i}_book
     endif
     silent echo 'select ' . dname
@@ -390,7 +396,13 @@ function! s:GetContent()
   let b:dictnum = dnum
   execute 'redir! >' . s:cmdfile
   if exists("g:eblook_dict{b:dictnum}_book")
-    silent echo 'book ' . g:eblook_dict{b:dictnum}_book
+    " 直前のbook用に指定したappendixが引き継がれないように必ずappendixを指定
+    if g:eblook_dict{b:dictnum}_book =~ '\S\+\s\+\S\+'
+      let book = g:eblook_dict{b:dictnum}_book
+    else
+      let book = g:eblook_dict{b:dictnum}_book . ' ' . g:eblook_dict{b:dictnum}_book
+    endif
+    silent echo 'book ' . book
   endif
   silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
