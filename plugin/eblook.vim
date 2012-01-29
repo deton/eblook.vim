@@ -282,6 +282,10 @@ function! s:Search(key)
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
   let i = 1
   while exists("g:eblook_dict{i}_name")
+    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+      let i = i + 1
+      continue
+    endif
     let dname = g:eblook_dict{i}_name
     let title = g:eblook_dict{i}_title
     let gaijimap = s:GetGaijiMap(i)
