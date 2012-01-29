@@ -274,6 +274,9 @@ function! s:Search(key)
   call s:RedirSearchCommand(a:key)
   " ++enc‚ğw’è‚µ‚È‚¢‚ÆEUC‚Å‚Ì’Z‚¢o—Í‚ğCP932‚ÆŒë”F¯‚·‚é‚±‚Æ‚ª‚ ‚é
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
+  if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
+    setlocal fileencoding=utf-8
+  endif
 
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
@@ -384,6 +387,9 @@ function! s:GetContent()
   silent echo 'content ' . refid . "\n"
   redir END
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
+  if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
+    setlocal fileencoding=utf-8
+  endif
 
   let height = winheight(0)
   silent! :g/^Warning: you should specify a book directory first$/d _
