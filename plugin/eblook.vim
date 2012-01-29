@@ -422,24 +422,46 @@ endfunction
 " @param dnum 辞書番号
 " @return 外字置換表
 function! s:GetGaijiMap(dnum)
+  if !exists("g:eblook_dict{a:dnum}_gaijimap")
+    let g:eblook_dict{a:dnum}_gaijimap = s:LoadGaijiMapFile(a:dnum)
+  endif
+  return g:eblook_dict{a:dnum}_gaijimap
+endfunction
+
+" EBWin形式の外字定義ファイルを読み込む
+" http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
+" @param dnum 辞書番号
+function! s:LoadGaijiMapFile(dnum)
   let name = g:eblook_dict{a:dnum}_name
-  if !exists("g:eblook#{name}#gaijimap")
-    try
-      let gaijimap = g:eblook#{name}#gaijimap    " autoload
-    catch /^Vim(let):E121/    " no autoload file
-      let g:eblook#{name}#gaijimap = {}
-    endtry
+  let dir = substitute(g:eblook_dict{a:dnum}_book, '\s\+.*', '', '')
+  let mapfile = dir . '/' . toupper(name) . '.map'
+  let gaijimap = {}
+  if !filereadable(mapfile)
+    return gaijimap
+  endif
+  execute 'silent normal! :sview ' . mapfile . "\<CR>"
+  setlocal nobuflisted
+  for line in getline(1, '$')
+    if line !~ '^[hzcg][[:xdigit:]]\{4\}'
+      continue
+    endif
+    " 例: hA121	u00E0	a	# comment
+    let lst = split(line)
+    let gaiji = tolower(get(lst, 0))
+    let unicode = get(lst, 1, '-')
+    let unicode = substitute(unicode, ',', '', 'g')
+    let ascii = get(lst, 2, '')
+    let value = [unicode, ascii]
     " {'ha121':['u00E1','a'], ...}
     " => {'ha121':['u00E1','a','u00E1に対応する文字'], ... }
     if &encoding ==# 'utf-8'
-      for v in values(g:eblook#{name}#gaijimap)
-        let u8str = substitute(v[0], 'u\([[:xdigit:]]\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
-        call add(v, u8str)
-      endfor
-    " &encodingがutf-8でない場合はv[1]を使用(nr2char()では変換不可だし)
+      let u8str = substitute(unicode, 'u\([[:xdigit:]]\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
+      call add(value, u8str)
     endif
-  endif
-  return g:eblook#{name}#gaijimap
+    let gaijimap[gaiji] = value
+  endfor
+  bdelete!
+  return gaijimap
 endfunction
 
 " 外字置換文字列を取得する。
