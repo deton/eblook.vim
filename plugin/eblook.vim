@@ -272,11 +272,7 @@ function! s:Search(key)
   endif
   call s:NewBuffers()
   call s:RedirSearchCommand(a:key)
-  " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
-  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
-  if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
-    setlocal fileencoding=utf-8
-  endif
+  call s:ExecuteEblook()
 
   silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
@@ -323,6 +319,15 @@ function! s:RedirSearchCommand(key)
     let i = i + 1
   endwhile
   redir END
+endfunction
+
+" eblookプログラムを実行する
+function! s:ExecuteEblook()
+  " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
+  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
+  if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
+    setlocal fileencoding=utf-8
+  endif
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
@@ -386,10 +391,7 @@ function! s:GetContent()
   silent echo 'select ' . g:eblook_dict{b:dictnum}_name
   silent echo 'content ' . refid . "\n"
   redir END
-  silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
-  if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
-    setlocal fileencoding=utf-8
-  endif
+  call s:ExecuteEblook()
 
   let height = winheight(0)
   silent! :g/^Warning: you should specify a book directory first$/d _
