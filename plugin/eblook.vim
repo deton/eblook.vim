@@ -437,7 +437,7 @@ endfunction
 " @param dnum «‘”Ô†
 function! s:LoadGaijiMapFile(dnum)
   let name = g:eblook_dict{a:dnum}_name
-  let dir = substitute(g:eblook_dict{a:dnum}_book, '\s\+.*', '', '')
+  let dir = matchstr(g:eblook_dict{a:dnum}_book, '\%("\zs[^"]\+\ze"\)\|\S\+')
   let mapfile = dir . '/' . toupper(name) . '.map'
   let gaijimap = {}
   if !filereadable(mapfile)
