@@ -196,7 +196,7 @@ while exists("g:eblook_dict{s:i}_name")
   endif
   " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
   " (XXX: eblook 1.6.1+media版では対処されているので不要)
-  if g:eblook_dict{s:i}_book !~ '\S\+\s\+\S\+'
+  if g:eblook_dict{s:i}_book !~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
     let g:eblook_dict{s:i}_book = g:eblook_dict{s:i}_book . ' ' . g:eblook_dict{s:i}_book
   endif
   let s:i = s:i + 1
@@ -437,7 +437,7 @@ endfunction
 " @param dnum 辞書番号
 function! s:LoadGaijiMapFile(dnum)
   let name = g:eblook_dict{a:dnum}_name
-  let dir = matchstr(g:eblook_dict{a:dnum}_book, '\%("\zs[^"]\+\ze"\)\|\S\+')
+  let dir = matchstr(g:eblook_dict{a:dnum}_book, '"\zs[^"]\+\ze"\|\S\+')
   let mapfile = dir . '/' . toupper(name) . '.map'
   let gaijimap = {}
   if !filereadable(mapfile)
@@ -446,7 +446,7 @@ function! s:LoadGaijiMapFile(dnum)
   execute 'silent normal! :sview ' . mapfile . "\<CR>"
   setlocal nobuflisted
   for line in getline(1, '$')
-    if line !~ '^[hzcg][[:xdigit:]]\{4\}'
+    if line !~ '^[hzcg][[:xdigit:]]\{4}'
       continue
     endif
     " 例: hA121	u00E0	a	# comment
