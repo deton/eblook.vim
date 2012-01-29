@@ -279,6 +279,8 @@ function! s:Search(key)
   while exists("g:eblook_dict{i}_name")
     let dname = g:eblook_dict{i}_name
     let title = g:eblook_dict{i}_title
+    let gaijimap = s:GetGaijiMap(i)
+    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
     silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
@@ -407,6 +409,14 @@ endfunction
 
 " <gaiji=xxxxx>を置き換える。
 function! s:ReplaceGaiji(dnum)
+  let gaijimap = s:GetGaijiMap(a:dnum)
+  silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(gaijimap, submatch(1))/g
+endfunction
+
+" 外字置換表を取得する
+" @param dnum 辞書番号
+" @return 外字置換表
+function! s:GetGaijiMap(dnum)
   let name = g:eblook_dict{a:dnum}_name
   if !exists("g:eblook#{name}#gaijimap")
     try
@@ -424,7 +434,7 @@ function! s:ReplaceGaiji(dnum)
     " &encodingがutf-8でない場合はv[1]を使用(nr2char()では変換不可だし)
     endif
   endif
-  silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(g:eblook#{name}#gaijimap, submatch(1))/g
+  return g:eblook#{name}#gaijimap
 endfunction
 
 " 外字置換文字列を取得する。
