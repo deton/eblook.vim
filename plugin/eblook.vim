@@ -195,6 +195,7 @@ while exists("g:eblook_dict{s:i}_name")
     let g:eblook_dict{s:i}_title = s:i . g:eblook_dict{s:i}_name
   endif
   " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
+  " (XXX: eblook 1.6.1+media版では対処されているので不要)
   if g:eblook_dict{s:i}_book !~ '\S\+\s\+\S\+'
     let g:eblook_dict{s:i}_book = g:eblook_dict{s:i}_book . ' ' . g:eblook_dict{s:i}_book
   endif
