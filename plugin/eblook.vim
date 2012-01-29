@@ -329,6 +329,7 @@ function! s:ExecuteEblook()
   endif
 
   silent! :g/^Warning: you should specify a book directory first$/d _
+  silent! :g/<snd=[^>]*>.*<\/snd>/s///g
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
