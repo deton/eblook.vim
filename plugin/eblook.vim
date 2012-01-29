@@ -274,7 +274,6 @@ function! s:Search(key)
   call s:RedirSearchCommand(a:key)
   call s:ExecuteEblook()
 
-  silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
   let i = 1
   while exists("g:eblook_dict{i}_name")
@@ -328,6 +327,8 @@ function! s:ExecuteEblook()
   if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
     setlocal fileencoding=utf-8
   endif
+
+  silent! :g/^Warning: you should specify a book directory first$/d _
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
@@ -394,7 +395,6 @@ function! s:GetContent()
   call s:ExecuteEblook()
 
   let height = winheight(0)
-  silent! :g/^Warning: you should specify a book directory first$/d _
   silent! :g/eblook> /s///g
   call s:ReplaceGaiji(dnum)
   silent! :g/^$/d _
