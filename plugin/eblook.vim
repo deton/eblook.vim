@@ -452,16 +452,12 @@ function! s:LoadGaijiMapFile(dnum)
     let lst = split(line)
     let gaiji = tolower(get(lst, 0))
     let unicode = get(lst, 1, '-')
-    let unicode = substitute(unicode, ',', '', 'g')
     let ascii = get(lst, 2, '')
-    let value = [unicode, ascii]
-    " {'ha121':['u00E1','a'], ...}
-    " => {'ha121':['u00E1','a','u00E1‚É‘Î‰ž‚·‚é•¶Žš'], ... }
     if &encoding ==# 'utf-8'
-      let u8str = substitute(unicode, 'u\([[:xdigit:]]\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
-      call add(value, u8str)
+      let unicode = substitute(unicode, ',', '', 'g')
+      let unicode = substitute(unicode, 'u\([[:xdigit:]]\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
     endif
-    let gaijimap[gaiji] = value
+    let gaijimap[gaiji] = [unicode, ascii]
   endfor
   bdelete!
   return gaijimap
@@ -478,7 +474,7 @@ function! s:GetGaiji(gaijimap, key)
     "return '_'
   endif
   if &encoding ==# 'utf-8'
-    let res = gaiji[2]
+    let res = gaiji[0]
     if res ==# 'null'
       return ''
     elseif res ==# '-'
