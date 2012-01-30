@@ -13,13 +13,15 @@ elseif exists("b:current_syntax")
 endif
 
 
-syn match ebGaiji		"<gaiji=[^>]*>"
-syn match ebGaiji		"<gaiji=[^>]*>" contained
+"syn match ebGaiji		"<gaiji=[^>]*>"
+"syn match ebGaiji		"<gaiji=[^>]*>" contained
 if has("conceal")
+  syn match ebSnd		"<snd=[^>]*>.*</snd>" conceal
   syn match ebRefBeg		"<reference>" contained conceal
   syn match ebRefEnd		"</reference=[^>]*>" conceal
   syn match ebEntRef		"\([[:digit:]]\+\. \)\?[[:xdigit:]]\+:[[:xdigit:]]\+\t" conceal
 else
+  syn match ebSnd		"<snd=[^>]*>.*</snd>"
   syn match ebRefBeg		"<reference>" contained
   syn match ebRefEnd		"</reference=[^>]*>"
 endif
@@ -42,7 +44,8 @@ HiLink ebRefLink	Underlined
 HiLink ebRefBeg		Ignore
 HiLink ebRefEnd		Ignore
 HiLink ebEntRef		Ignore
-HiLink ebGaiji		NonText
+HiLink ebSnd		Ignore
+"HiLink ebGaiji		NonText
 HiLink ebPrevBeg	NonText
 HiLink ebPrevEnd	NonText
 HiLink ebNextBeg	NonText
