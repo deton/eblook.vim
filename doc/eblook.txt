@@ -95,12 +95,20 @@ http://sites.google.com/site/fudist/Home/vim-nihongo-ban
 ただし、eblookコマンドとして、以下で配布されているWin32用バイナリ
 eblook-1.6.1+media-20110801-ebu-4.4.3-20110801.exe
 http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
-を使う場合、utf8での入出力指定が効かないようなので、
-|'eblookenc'|オプションをcp932に設定してください。
+を使う場合、|'eblookenc'|オプションをcp932に設定してください。
   例: let eblookenc='cp932'
+(eblookコマンドの入出力エンコーディングとして-e utf8を指定しても効かない
+ ようなので、eblookコマンドとのやりとりをcp932で行うように設定)
 
 euc-jp環境で置換後の丸数字等が文字化けする場合は、
-mapファイルをnkfでeuc-jpに変換したものを使ってみてください。
+mapファイルをnkf -eでeuc-jpに変換して、<nameの大文字>.map.<&encodingの値>
+というファイル名で上記(2)のディレクトリに置いてください。
+  例: nkf -e KOJIEN.map >KOJIEN.map.euc-jp
+      nkf -e READERS2.map >READERS2.map.euc-jp
+(UNIX上のvimやiconvではエンコーディング変換に失敗するようなので、
+ nkfやWindows上のvimで変換してください)
+(.map.<&encodingの値>という名前のファイルがあれば、
+ .mapファイルよりも優先して読み込みます。.mapファイルはcp932で読み込みます)
 
 ==============================================================================
 3. チュートリアル				*eblook-tutorial*

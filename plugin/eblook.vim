@@ -443,11 +443,16 @@ function! s:LoadGaijiMapFile(dnum)
   let name = g:eblook_dict{a:dnum}_name
   let dir = matchstr(g:eblook_dict{a:dnum}_book, '"\zs[^"]\+\ze"\|\S\+')
   let mapfile = dir . '/' . toupper(name) . '.map'
+  let enc = 'cp932'
+  let encmapfile = mapfile . '.' . &encoding
   let gaijimap = {}
-  if !filereadable(mapfile)
+  if filereadable(encmapfile)
+    let mapfile = encmapfile
+    let enc = &encoding
+  elseif !filereadable(mapfile)
     return gaijimap
   endif
-  execute 'silent normal! :sview ' . mapfile . "\<CR>"
+  execute 'silent normal! :sview ++enc=' . enc . ' ' . mapfile . "\<CR>"
   setlocal nobuflisted
   for line in getline(1, '$')
     if line !~ '^[hzcg][[:xdigit:]]\{4}'
