@@ -82,7 +82,7 @@ http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
 http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji
 
 (2)bookで指定したディレクトリに、<nameの大文字>.mapファイルをコピー。
-例:/usr/local/epwing/iwanami/koujien/に、KOJIEN.mapをコピー。
+  例:/usr/local/epwing/iwanami/koujien/に、KOJIEN.mapをコピー。
 なお、GENIUS_DAIEIWA.map、GENIUS4.map、KANJIGEN_EPW.mapはコピー後、
 ファイル名をGENIUS.map、GENIUS.map、KANJIGEN.mapに変更する必要があります。
 
@@ -92,6 +92,12 @@ mapファイルで指定される置換文字列への置換を行います。
 
 Windows環境でVimをUTF-8化するには以下を参照してください。
 http://sites.google.com/site/fudist/Home/vim-nihongo-ban
+ただし、eblookコマンドとして、以下で配布されているWin32用バイナリ
+eblook-1.6.1+media-20110801-ebu-4.4.3-20110801.exe
+http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
+を使う場合、utf8での入出力指定が効かないようなので、
+|'eblookenc'|オプションをcp932に設定してください。
+  例: let eblookenc='cp932'
 
 euc-jp環境で丸数字等が文字化けする場合は、
 mapファイルをnkfでeuc-jpに変換したものを使ってみてください。

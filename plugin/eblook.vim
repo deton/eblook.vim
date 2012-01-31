@@ -313,7 +313,8 @@ endfunction
 
 " eblookプログラムにリダイレクトするための検索コマンドファイルを作成する
 function! s:RedirSearchCommand(key)
-  execute 'redir! >' . s:cmdfile
+  new
+  setlocal nobuflisted
   let prev_book = ''
   let i = 1
   while exists("g:eblook_dict{i}_name")
@@ -323,23 +324,24 @@ function! s:RedirSearchCommand(key)
     endif
     let dname = g:eblook_dict{i}_name
     if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
-      silent echo 'book ' . g:eblook_dict{i}_book
+      execute 'normal! obook ' . g:eblook_dict{i}_book . "\<Esc>"
       let prev_book = g:eblook_dict{i}_book
     endif
-    silent echo 'select ' . dname
-    silent echo 'set prompt "eblook-' . i . '> "'
-    silent echo 'search "' . a:key . "\"\n"
+    execute 'normal! oselect ' . dname . "\<CR>"
+      \ . 'set prompt "eblook-' . i . '> "' . "\<CR>"
+      \ . 'search "' . a:key . '"' . "\<CR>\<Esc>"
     let i = i + 1
   endwhile
-  redir END
+  silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
+  bdelete!
 endfunction
 
 " eblookプログラムを実行する
 function! s:ExecuteEblook()
   " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
-  if &encoding ==# 'utf-8' && s:eblookopt !=# '-e utf8'
-    setlocal fileencoding=utf-8
+  if &encoding !=# g:eblookenc
+    setlocal fileencoding=&encoding
   endif
 
   silent! :g/^Warning: you should specify a book directory first$/d _
