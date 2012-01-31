@@ -11,7 +11,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblookプログラムのフロントエンドです。
 
 必要条件
-  Vim 6.1以降。
+  Vim7以降。
   `eblook'プログラム
      http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
   EPWING/電子ブック辞書
@@ -35,6 +35,10 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblook.txtを参照してください。
 
 更新履歴
+  - 1.1.0 (2012-02-01)
+   - EBWin用の外字定義ファイルを使用した外字置換機能を追加(要Vim7)
+   - 'eblook_entrybuf_height'オプションを追加
+
   - 1.0.5 (2012-01-19)
    - katonoさん作成のsyntaxファイルを取り込み
    - <reference></reference=xxxx:xxx>の非表示化

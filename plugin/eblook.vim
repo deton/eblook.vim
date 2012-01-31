@@ -91,6 +91,9 @@ scriptencoding cp932
 "           let eblook_dict1_skip = 1
 "
 "
+"    'eblook_entrybuf_height'
+"       entryウィンドウの行数。省略値: 4
+"
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 "
@@ -114,7 +117,7 @@ if exists('plugin_eblook_disable')
   finish
 endif
 
-" entryバッファの行数
+" entryウィンドウの行数
 if !exists('eblook_entrybuf_height')
   let eblook_entrybuf_height = 4
 endif
@@ -470,8 +473,8 @@ endfunction
 function! s:GetGaiji(gaijimap, key)
   let gaiji = get(a:gaijimap, a:key)
   if !gaiji
-    return '_' . a:key . '_'     " DEBUG
-    "return '_'
+    return '_'
+    "return '_' . a:key . '_'     " DEBUG
   endif
   if &encoding ==# 'utf-8'
     let res = gaiji[0]
@@ -484,8 +487,8 @@ function! s:GetGaiji(gaijimap, key)
     let res = gaiji[1]
   endif
   if strlen(res) == 0
-    return '_' . a:key . '_'     " DEBUG
-    "return '_'
+    return '_'
+    "return '_' . a:key . '_'     " DEBUG
   endif
   return res
 endfunction

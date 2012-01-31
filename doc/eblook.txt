@@ -5,10 +5,11 @@
 EPWING辞書検索プラグイン			*eblook*
 
 1. 概要					|eblook-overview|
-2. チュートリアル			|eblook-tutorial|
-3. 操作法				|eblook-usage|
-4. オプション				|eblook-option|
-5. コマンド				|eblook-command|
+2. 準備					|eblook-setup|
+3. チュートリアル			|eblook-tutorial|
+4. 操作法				|eblook-usage|
+5. オプション				|eblook-option|
+6. コマンド				|eblook-command|
 
 {Vi does not have any of these features}
 
@@ -18,19 +19,17 @@ EPWING辞書検索プラグイン			*eblook*
 eblook.vimは、`eblook'プログラムを使って、
 EPWING/電子ブック辞書の検索を行うプラグインです。
 
-このプラグインを使うには、`eblook'プログラム<http://openlab.jp/edict/eblook/>
+このプラグインを使うには、`eblook'プログラム
+http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
 とEPWING/電子ブック辞書が必要です。
 
 ==============================================================================
-2. チュートリアル				*eblook-tutorial*
+2. 準備						*eblook-setup*
 
-|eblook-tutor-setup|	準備: 検索対象辞書の指定
-|eblook-tutor-search|	検索
-|eblook-tutor-entry|	見出し一覧
-|eblook-tutor-content|	内容表示
-|eblook-tutor-quit|	終了
+|eblook-setup-dict|	準備: 検索対象辞書の指定
+|eblook-setup-gaiji|	準備: 外字置換設定
 
-準備: 検索対象辞書の指定			*eblook-tutor-setup*
+準備: 検索対象辞書の指定			*eblook-setup-dict*
 ------------------------
 eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく必要があります。
 詳細は|eblook-option|を参照してください。
@@ -72,6 +71,38 @@ eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく必要があります。
 	let eblook_dict3_book='/usr/local/epwing/kenkyush/plus'
 	let eblook_dict3_name='plus'
 	let eblook_dict3_title='研究社リーダーズ＋プラスＶ２'
+
+準備: 外字置換設定			*eblook-setup-gaiji*
+------------------
+発音記号などの外字をUnicode文字列へ置換するには、以下の設定をしてください。
+EBWin用の外字定義ファイルを使用します。
+http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
+
+(1)EBWinのアプリケーションディレクトリもしくは以下から外字定義ファイルを入手。
+http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji
+
+(2)bookで指定したディレクトリに、<nameの大文字>.mapファイルをコピー。
+例:/usr/local/epwing/iwanami/koujien/に、KOJIEN.mapをコピー。
+なお、GENIUS_DAIEIWA.map、GENIUS4.map、KANJIGEN_EPW.mapはコピー後、
+ファイル名をGENIUS.map、GENIUS.map、KANJIGEN.mapに変更する必要があります。
+
+(3)可能であれば、Vimの|'encoding'|をutf-8にする。
+なお、Vimの&encodingがutf-8以外の場合は、Unicodeへの置換ではなく、
+mapファイルで指定される置換文字列への置換を行います。
+
+Windows環境でVimをUTF-8化するには以下を参照してください。
+http://sites.google.com/site/fudist/Home/vim-nihongo-ban
+
+euc-jp環境で丸数字等が文字化けする場合は、
+mapファイルをnkfでeuc-jpに変換したものを使ってみてください。
+
+==============================================================================
+3. チュートリアル				*eblook-tutorial*
+
+|eblook-tutor-search|	検索
+|eblook-tutor-entry|	見出し一覧
+|eblook-tutor-content|	内容表示
+|eblook-tutor-quit|	終了
 
 検索						*eblook-tutor-search*
 ----
@@ -120,7 +151,7 @@ entryウィンドウでj,kキーでカーソルを移動して、<CR>を押すと
 "q"を押します。
 
 ==============================================================================
-3. 操作法					*eblook-usage*
+4. 操作法					*eblook-usage*
 
 検索を行うには、次のキーを入力するか、|:EblookSearch|コマンドを実行します。
 
@@ -168,7 +199,7 @@ R                   reference一覧を表示する
 <C-N>               検索履歴中の一つ次のバッファを表示する
 
 ==============================================================================
-4. オプション					*eblook-option*
+5. オプション					*eblook-option*
 
 EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 (book, name, title, skip)で設定します。bookとnameは必須です。
@@ -212,6 +243,9 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
   例:
     let eblook_dict1_skip = 1
 
+
+'eblook_entrybuf_height'			*'eblook_entrybuf_height'*
+  entryウィンドウの行数。省略値: 4
 
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
@@ -261,7 +295,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 	let eblook_dict6_skip=1
 
 ==============================================================================
-5. コマンド					*eblook-command*
+6. コマンド					*eblook-command*
 
 :EblookSearch      				*:EblookSearch* 
   辞書の検索を行います。検索する文字列を引数に指定します。
