@@ -91,7 +91,7 @@ scriptencoding cp932
 "           let eblook_dict1_skip = 1
 "
 "
-"    'eblook_entrybuf_height'
+"    'eblook_entrywin_height'
 "       entryウィンドウの行数。省略値: 4
 "
 "    'eblook_history_max'
@@ -118,8 +118,8 @@ if exists('plugin_eblook_disable')
 endif
 
 " entryウィンドウの行数
-if !exists('eblook_entrybuf_height')
-  let eblook_entrybuf_height = 4
+if !exists('eblook_entrywin_height')
+  let eblook_entrywin_height = 4
 endif
 
 " 保持しておく過去の検索バッファ数の上限
@@ -354,7 +354,7 @@ function! s:NewBuffers()
   let s:bufindex = s:NextBufIndex()
   call s:CreateBuffer(s:entrybufname, oldindex)
   call s:CreateBuffer(s:contentbufname, oldindex)
-  execute "normal! \<C-W>p" . g:eblook_entrybuf_height . "\<C-W>_"
+  execute "normal! \<C-W>p" . g:eblook_entrywin_height . "\<C-W>_"
 endfunction
 
 " entryバッファかcontentバッファのいずれかを作る

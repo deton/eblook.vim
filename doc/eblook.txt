@@ -99,7 +99,7 @@ http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
 |'eblookenc'|オプションをcp932に設定してください。
   例: let eblookenc='cp932'
 
-euc-jp環境で丸数字等が文字化けする場合は、
+euc-jp環境で置換後の丸数字等が文字化けする場合は、
 mapファイルをnkfでeuc-jpに変換したものを使ってみてください。
 
 ==============================================================================
@@ -250,7 +250,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
     let eblook_dict1_skip = 1
 
 
-'eblook_entrybuf_height'			*'eblook_entrybuf_height'*
+'eblook_entrywin_height'			*'eblook_entrywin_height'*
   entryウィンドウの行数。省略値: 4
 
 'eblook_history_max'				*'eblook_history_max'*
