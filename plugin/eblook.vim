@@ -439,6 +439,7 @@ endfunction
 " EBWin形式の外字定義ファイルを読み込む
 " http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
 " @param dnum 辞書番号
+" @return 読み込んだ外字置換表。{'ha121':[unicode, ascii], ...}
 function! s:LoadGaijiMapFile(dnum)
   let name = g:eblook_dict{a:dnum}_name
   let dir = matchstr(g:eblook_dict{a:dnum}_book, '"\zs[^"]\+\ze"\|\S\+')
@@ -478,6 +479,8 @@ endfunction
 " @param key 外字キー
 " @return 置換文字列
 function! s:GetGaiji(gaijimap, key)
+  " XXX:GetGaiji()内からGetGaijiMap()を呼びたいが、
+  " substitute()で\=が再帰的に呼ばれる形になってしまうため動作せず
   let gaiji = get(a:gaijimap, a:key)
   if !gaiji
     return '_'

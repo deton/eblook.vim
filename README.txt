@@ -35,11 +35,11 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   eblook.txtを参照してください。
 
 更新履歴
-  - 1.1.0 (2012-02-01)
+  - 1.1.0 (2012-02-06)
    - EBWin用の外字定義ファイルを使用した外字置換機能を追加
    - その他の外字を_(下線)に置換するように変更
    - entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
-   - <snd>...</snd>の非表示化(conceal syntax)
+   - <img>,<snd>,<mov>の非表示化(conceal syntax)
    - Vim6対応を終了。要Vim7
 
   - 1.0.5 (2012-01-19)

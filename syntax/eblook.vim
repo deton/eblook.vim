@@ -16,11 +16,15 @@ endif
 "syn match ebGaiji		"<gaiji=[^>]*>"
 "syn match ebGaiji		"<gaiji=[^>]*>" contained
 if has("conceal")
+  syn region ebImg		start="<img=[^>]*>" end="</img=[^>]*>" conceal
+  syn region ebMov		start="<mov=[^>]*>" end="</mov>" conceal
   syn match ebSnd		"<snd=[^>]*>.*</snd>" conceal
   syn match ebRefBeg		"<reference>" contained conceal
   syn match ebRefEnd		"</reference=[^>]*>" conceal
   syn match ebEntRef		"\([[:digit:]]\+\. \)\?[[:xdigit:]]\+:[[:xdigit:]]\+\t" conceal
 else
+  syn region ebImg		start="<img=[^>]*>" end="</img=[^>]*>"
+  syn region ebMov		start="<mov=[^>]*>" end="</mov>"
   syn match ebSnd		"<snd=[^>]*>.*</snd>"
   syn match ebRefBeg		"<reference>" contained
   syn match ebRefEnd		"</reference=[^>]*>"
@@ -44,7 +48,9 @@ HiLink ebRefLink	Underlined
 HiLink ebRefBeg		Ignore
 HiLink ebRefEnd		Ignore
 HiLink ebEntRef		Ignore
+HiLink ebImg		Ignore
 HiLink ebSnd		Ignore
+HiLink ebMov		Ignore
 "HiLink ebGaiji		NonText
 HiLink ebPrevBeg	NonText
 HiLink ebPrevEnd	NonText
