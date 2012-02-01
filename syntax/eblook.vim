@@ -18,6 +18,7 @@ endif
 if has("conceal")
   syn region ebImg		start="<img=[^>]*>" end="</img=[^>]*>" conceal
   syn region ebMov		start="<mov=[^>]*>" end="</mov>" conceal
+  syn match ebInline		"<inline=[^>]*>.*</inline=[^>]*>" conceal
   syn match ebSnd		"<snd=[^>]*>.*</snd>" conceal
   syn match ebRefBeg		"<reference>" contained conceal
   syn match ebRefEnd		"</reference=[^>]*>" conceal
@@ -25,6 +26,7 @@ if has("conceal")
 else
   syn region ebImg		start="<img=[^>]*>" end="</img=[^>]*>"
   syn region ebMov		start="<mov=[^>]*>" end="</mov>"
+  syn match ebInline		"<inline=[^>]*>.*</inline=[^>]*>"
   syn match ebSnd		"<snd=[^>]*>.*</snd>"
   syn match ebRefBeg		"<reference>" contained
   syn match ebRefEnd		"</reference=[^>]*>"
@@ -49,8 +51,9 @@ HiLink ebRefBeg		Ignore
 HiLink ebRefEnd		Ignore
 HiLink ebEntRef		Ignore
 HiLink ebImg		Ignore
-HiLink ebSnd		Ignore
 HiLink ebMov		Ignore
+HiLink ebInline		Ignore
+HiLink ebSnd		Ignore
 "HiLink ebGaiji		NonText
 HiLink ebPrevBeg	NonText
 HiLink ebPrevEnd	NonText
