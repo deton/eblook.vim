@@ -81,7 +81,7 @@ http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
 (1)EBWinのアプリケーションディレクトリもしくは以下から外字定義ファイルを入手。
 http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji
 
-(2)bookで指定したディレクトリに、<nameの大文字>.mapファイルをコピー。
+(2)bookで指定したディレクトリに、{nameの大文字}.mapファイルをコピー。
   例:/usr/local/epwing/iwanami/koujien/に、KOJIEN.mapをコピー。
 なお、GENIUS_DAIEIWA.map、GENIUS4.map、KANJIGEN_EPW.mapはコピー後、
 ファイル名をGENIUS.map、GENIUS.map、KANJIGEN.mapに変更する必要があります。
@@ -101,14 +101,15 @@ http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
  ようなので、eblookコマンドとのやりとりをcp932で行うように設定)
 
 euc-jp環境で置換後の丸数字等が文字化けする場合は、
-mapファイルをnkf -eでeuc-jpに変換して、<nameの大文字>.map.<&encodingの値>
+mapファイルをnkf -eでeuc-jpに変換して、{nameの大文字}_{&encodingの値}.map
 というファイル名で上記(2)のディレクトリに置いてください。
-  例: nkf -e KOJIEN.map >KOJIEN.map.euc-jp
-      nkf -e READERS2.map >READERS2.map.euc-jp
+  例: nkf -e KOJIEN.map >KOJIEN_euc-jp.map
+      nkf -e READERS2.map >READERS2_euc-jp.map
 (UNIX上のvimやiconvではエンコーディング変換に失敗するようなので、
  nkfやWindows上のvimで変換してください)
-(.map.<&encodingの値>という名前のファイルがあれば、
- .mapファイルよりも優先して読み込みます。.mapファイルはcp932で読み込みます)
+({&encodingの値}付きの名前のファイルがあれば、{&encodingの値}無しの.map
+ ファイルよりも優先して読み込みます。
+ それぞれを読む際のfileencodingは、&encodingとcp932です)
 
 ==============================================================================
 3. チュートリアル				*eblook-tutorial*

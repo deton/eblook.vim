@@ -443,14 +443,17 @@ endfunction
 function! s:LoadGaijiMapFile(dnum)
   let name = g:eblook_dict{a:dnum}_name
   let dir = matchstr(g:eblook_dict{a:dnum}_book, '"\zs[^"]\+\ze"\|\S\+')
-  let mapfile = dir . '/' . toupper(name) . '.map'
-  let enc = 'cp932'
-  let encmapfile = mapfile . '.' . &encoding
+  " "{dir}/{NAME}_{encoding}.map"Ç™ñ≥ÇØÇÍÇŒ"{dir}/{NAME}.map"Çcp932Ç≈ì«Ç›çûÇ›
+  let mapfilebase = dir . '/' . toupper(name)
+  let encmapfile = mapfilebase . '_' . &encoding . '.map'
+  let mapfile = mapfilebase . '.map'
   let gaijimap = {}
   if filereadable(encmapfile)
     let mapfile = encmapfile
     let enc = &encoding
-  elseif !filereadable(mapfile)
+  elseif filereadable(mapfile)
+    let enc = 'cp932'
+  else
     return gaijimap
   endif
   execute 'silent normal! :sview ++enc=' . enc . ' ' . mapfile . "\<CR>"
