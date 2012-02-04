@@ -423,15 +423,13 @@ function! s:GetContent()
   redir END
   call s:ExecuteEblook()
 
-  let height = winheight(0)
   silent! :g/eblook> /s///g
   if search('<gaiji=', 'nw') != 0
     call s:ReplaceGaiji(dnum)
   endif
   silent! :g/^$/d _
   normal! 1G
-  " utf-8への外字置換をするとなぜかウィンドウ高さが1行になるので元に戻す
-  execute 'normal! ' . height . "\<C-W>_\<C-W>p"
+  call s:GoWindow(1)
   return 0
 endfunction
 
