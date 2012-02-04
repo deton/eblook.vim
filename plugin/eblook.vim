@@ -346,7 +346,7 @@ function! s:RedirSearchCommand(key)
     let i = i + 1
   endwhile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
-  quit!
+  close!
 endfunction
 
 " eblookƒvƒƒOƒ‰ƒ€‚ğÀs‚·‚é
@@ -487,7 +487,7 @@ function! s:LoadGaijiMapFile(dnum)
     endif
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
-  quit!
+  close!
   return gaijimap
 endfunction
 
