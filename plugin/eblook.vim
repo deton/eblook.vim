@@ -346,7 +346,7 @@ function! s:RedirSearchCommand(key)
     let i = i + 1
   endwhile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
-  bdelete!
+  quit!
 endfunction
 
 " eblookプログラムを実行する
@@ -367,7 +367,8 @@ function! s:NewBuffers()
   let s:bufindex = s:NextBufIndex()
   call s:CreateBuffer(s:entrybufname, oldindex)
   call s:CreateBuffer(s:contentbufname, oldindex)
-  execute "normal! \<C-W>p" . g:eblook_entrywin_height . "\<C-W>_"
+  call s:GoWindow(1)
+  execute g:eblook_entrywin_height . 'wincmd _'
 endfunction
 
 " entryバッファかcontentバッファのいずれかを作る
