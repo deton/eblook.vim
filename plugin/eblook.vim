@@ -487,7 +487,7 @@ function! s:LoadGaijiMapFile(dnum)
     endif
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
-  bdelete!
+  quit!
   return gaijimap
 endfunction
 
