@@ -2,7 +2,7 @@
 " Language:     eblook.vim用syntax
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-01-15
+" Last Change:  2012-02-04
 
 " このファイルをvimfiles/syntaxにコピーしてください。
 
