@@ -283,6 +283,17 @@ function! s:Search(key)
   call s:ExecuteEblook()
 
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
+  " 必要なgaiji mapファイルのみ読み込む: <gaiji=のある辞書番号をリストアップ
+  silent! normal! G$
+  let gaijidnums = []
+  while search('<gaiji=', 'bW') != 0
+    if search('eblook-\d\+>', 'bW') != 0
+      let dnum = matchstr(getline('.'), 'eblook-\zs\d\+\ze>')
+      if strlen(dnum) > 0
+        call add(gaijidnums, str2nr(dnum))
+      endif
+    endif
+  endwhile
   let i = 1
   while exists("g:eblook_dict{i}_name")
     if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
@@ -291,8 +302,10 @@ function! s:Search(key)
     endif
     let dname = g:eblook_dict{i}_name
     let title = g:eblook_dict{i}_title
-    let gaijimap = s:GetGaijiMap(i)
-    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
+    if index(gaijidnums, i) >= 0
+      let gaijimap = s:GetGaijiMap(i)
+      silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
+    endif
     silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
@@ -412,7 +425,9 @@ function! s:GetContent()
 
   let height = winheight(0)
   silent! :g/eblook> /s///g
-  call s:ReplaceGaiji(dnum)
+  if search('<gaiji=', 'nw') != 0
+    call s:ReplaceGaiji(dnum)
+  endif
   silent! :g/^$/d _
   normal! 1G
   " utf-8への外字置換をするとなぜかウィンドウ高さが1行になるので元に戻す
