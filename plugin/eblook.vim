@@ -278,7 +278,9 @@ function! s:Search(key)
   if hasoldwin < 0
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
-  call s:NewBuffers()
+  if s:NewBuffers() < 0
+    return -1
+  endif
   call s:RedirSearchCommand(a:key)
   call s:ExecuteEblook()
 
@@ -365,10 +367,19 @@ function! s:NewBuffers()
   " entryバッファとcontentバッファは一対で扱う。
   let oldindex = s:bufindex
   let s:bufindex = s:NextBufIndex()
-  call s:CreateBuffer(s:entrybufname, oldindex)
-  call s:CreateBuffer(s:contentbufname, oldindex)
-  call s:GoWindow(1)
+  if s:CreateBuffer(s:entrybufname, oldindex) < 0
+    return -1
+  endif
+  if s:CreateBuffer(s:contentbufname, oldindex) < 0
+    call s:Quit()
+    return -1
+  endif
+  if s:GoWindow(1) < 0
+    call s:Quit()
+    return -1
+  endif
   execute g:eblook_entrywin_height . 'wincmd _'
+  return 0
 endfunction
 
 " entryバッファかcontentバッファのいずれかを作る
@@ -383,13 +394,16 @@ function! s:CreateBuffer(bufname, oldindex)
     let bufexists = 0
   endif
   if s:SelectWindowByName(oldbufname) < 0
-    execute "silent normal! :split " . newbufname . "\<CR>"
+    if s:OpenWindow(newbufname) < 0
+      return -1
+    endif
   else
     execute "silent normal! :edit " . newbufname . "\<CR>"
   endif
   if bufexists
     silent execute "normal! :%d _\<CR>"
   endif
+  return 0
 endfunction
 
 " entryバッファのカーソル行に対応する内容をcontentバッファに表示する
@@ -410,7 +424,9 @@ function! s:GetContent()
   endif
 
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
+    if s:OpenWindow(s:contentbufname . s:bufindex) < 0
+      return -1
+    endif
   endif
 
   silent execute "normal! :%d _\<CR>"
@@ -555,7 +571,9 @@ endfunction
 " @param refid 表示する内容を示す文字列。''の場合はリストの最初のものを表示
 function! s:FollowReference(refid)
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:contentbufname . s:bufindex . "\<CR>"
+    if s:OpenWindow(s:contentbufname . s:bufindex) < 0
+      return
+    endif
   endif
   let dnum = b:dictnum
   let save_line = line('.')
@@ -578,7 +596,9 @@ function! s:FollowReference(refid)
   endif
   execute 'normal! ' . save_line . 'G' . save_col . '|'
 
-  call s:NewBuffers()
+  if s:NewBuffers() < 0
+    return -1
+  endif
   let j = 1
   while j < i
     execute 'normal! o' . g:eblook_dict{dnum}_title . "\<C-V>\<Tab>" . entry{j} . "\<C-V>\<Tab>" . label{j} . "\<Esc>"
@@ -610,12 +630,12 @@ function! s:History(dir)
     endif
   endif
   if s:SelectWindowByName(s:entrybufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:entrybufname . ni . "\<CR>"
+    call s:OpenWindow(s:entrybufname . ni)
   else
     execute "silent normal! :edit " . s:entrybufname . ni . "\<CR>"
   endif
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    execute "silent normal! :split " . s:contentbufname . ni . "\<CR>"
+    call s:OpenWindow(s:contentbufname . ni)
   else
     execute "silent normal! :edit " . s:contentbufname . ni . "\<CR>"
   endif
@@ -656,7 +676,9 @@ endfunction
 " entryウィンドウからcontentウィンドウをスクロールする。
 " @param down 1の場合下に、0の場合上に。
 function! s:ScrollContent(down)
-  call s:GoWindow(0)
+  if s:GoWindow(0) < 0
+    return
+  endif
   if a:down
     execute "normal! \<PageDown>"
   else
@@ -674,8 +696,11 @@ function! s:GoWindow(to_entry_buf)
     let bufname = s:contentbufname . s:bufindex
   endif
   if s:SelectWindowByName(bufname) < 0
-    execute "silent normal! :split " . bufname . "\<CR>"
+    if s:OpenWindow(bufname) < 0
+      return -1
+    endif
   endif
+  return 0
 endfunction
 
 " title文字列から辞書番号を返す
@@ -734,6 +759,34 @@ function! s:SelectWindowByName(name)
     execute 'normal! ' . num . "\<C-W>\<C-W>"
   endif
   return num
+endfunction
+
+" 新しいウィンドウを開く
+function! s:OpenWindow(name)
+  if winheight(0) > 2
+    execute "silent normal! :split " . a:name . "\<CR>"
+    return winnr()
+  else
+    " 'noequalalways'の場合、高さが足りずにsplitがE36エラーになる場合あるので、
+    " 一番高さのあるwindowで再度splitを試みる
+    let maxheight = 2
+    let maxnr = 0
+    for i in range(1, winnr('$'))
+      let height = winheight(i)
+      if height > maxheight
+	let maxheight = height
+	let maxnr = i
+      endif
+    endfor
+    if maxnr > 0
+      execute maxnr . 'wincmd w'
+      execute "silent normal! :split " . a:name . "\<CR>"
+      return winnr()
+    else
+      echoerr 'eblook-vim: 新規ウィンドウを開くための空きがありません(' . a:name . ')'
+      return -1
+    endif
+  endif
 endfunction
 
 " 空のバッファを作る
