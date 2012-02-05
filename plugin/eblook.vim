@@ -469,7 +469,12 @@ endfunction
 " @return 外字置換表
 function! s:GetGaijiMap(dnum)
   if !exists("g:eblook_dict{a:dnum}_gaijimap")
-    let g:eblook_dict{a:dnum}_gaijimap = s:LoadGaijiMapFile(a:dnum)
+    try
+      let g:eblook_dict{a:dnum}_gaijimap = s:LoadGaijiMapFile(a:dnum)
+    catch /load-error/
+      " ウィンドウを閉じて空きを作って再度検索し直した時に外字取得できるように
+      return {}
+    endtry
   endif
   return g:eblook_dict{a:dnum}_gaijimap
 endfunction
@@ -499,7 +504,7 @@ function! s:LoadGaijiMapFile(dnum)
   " closeした後で元のウィンドウに明示的に切り替える必要あり
   let curbuf = bufnr('')
   if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
-    return gaijimap
+    throw 'load-error'
   endif
   setlocal nobuflisted
   for line in getline(1, '$')
@@ -798,7 +803,7 @@ function! s:OpenWindow(cmd)
       execute "silent normal! :" . a:cmd . "\<CR>"
       return winnr()
     else
-      echoerr 'eblook-vim: 新規ウィンドウを開くための空きがありません(' . a:cmd . ')'
+      echoerr 'eblook-vim: 画面上の空きが足りないため新規ウィンドウを開くのに失敗しました。ウィンドウを閉じて空きを作ってください(' . a:cmd . ')'
       return -1
     endif
   endif
