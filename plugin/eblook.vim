@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-04
+" Last Change: 2012-02-05
 
 scriptencoding cp932
 
@@ -619,7 +619,7 @@ function! s:History(dir)
   else
     execute "silent normal! :edit " . s:contentbufname . ni . "\<CR>"
   endif
-  execute "normal! \<C-W>p"
+  call s:GoWindow(1)
   let s:bufindex = ni
 endfunction
 
@@ -662,7 +662,7 @@ function! s:ScrollContent(down)
   else
     execute "normal! \<PageUp>"
   endif
-  execute "normal! \<C-W>p"
+  call s:GoWindow(1)
 endfunction
 
 " entryウィンドウ/contentウィンドウに移動する
