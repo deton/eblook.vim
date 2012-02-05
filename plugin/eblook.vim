@@ -278,10 +278,10 @@ function! s:Search(key)
   if hasoldwin < 0
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
-  if s:NewBuffers() < 0
+  if s:RedirSearchCommand(a:key) < 0
     return -1
   endif
-  if s:RedirSearchCommand(a:key) < 0
+  if s:NewBuffers() < 0
     return -1
   endif
   call s:ExecuteEblook()
@@ -373,14 +373,17 @@ function! s:NewBuffers()
   let oldindex = s:bufindex
   let s:bufindex = s:NextBufIndex()
   if s:CreateBuffer(s:entrybufname, oldindex) < 0
+    let s:bufindex = oldindex
     return -1
   endif
   if s:CreateBuffer(s:contentbufname, oldindex) < 0
     call s:Quit()
+    let s:bufindex = oldindex
     return -1
   endif
   if s:GoWindow(1) < 0
     call s:Quit()
+    let s:bufindex = oldindex
     return -1
   endif
   execute g:eblook_entrywin_height . 'wincmd _'
@@ -491,6 +494,7 @@ function! s:LoadGaijiMapFile(dnum)
   else
     return gaijimap
   endif
+  let curnr = winnr()
   if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
     return gaijimap
   endif
@@ -511,6 +515,7 @@ function! s:LoadGaijiMapFile(dnum)
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
   close!
+  execute curnr . 'wincmd w'
   return gaijimap
 endfunction
 
@@ -761,8 +766,8 @@ endfunction
 " SelectWindowByName(name)
 "   Acitvate selected window by a:name.
 function! s:SelectWindowByName(name)
-  let num = bufwinnr(a:name)
-  if num >= 0 && num != winnr()
+  let num = bufwinnr('^' . a:name . '$')
+  if num > 0 && num != winnr()
     execute 'normal! ' . num . "\<C-W>\<C-W>"
   endif
   return num
