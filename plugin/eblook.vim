@@ -619,8 +619,8 @@ function! s:History(dir)
   else
     execute "silent normal! :edit " . s:contentbufname . ni . "\<CR>"
   endif
-  call s:GoWindow(1)
   let s:bufindex = ni
+  call s:GoWindow(1)
 endfunction
 
 " 次のバッファのインデックス番号を返す
