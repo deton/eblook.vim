@@ -281,7 +281,9 @@ function! s:Search(key)
   if s:NewBuffers() < 0
     return -1
   endif
-  call s:RedirSearchCommand(a:key)
+  if s:RedirSearchCommand(a:key) < 0
+    return -1
+  endif
   call s:ExecuteEblook()
 
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
@@ -328,7 +330,9 @@ endfunction
 
 " eblookプログラムにリダイレクトするための検索コマンドファイルを作成する
 function! s:RedirSearchCommand(key)
-  new
+  if s:OpenWindow('new') < 0
+    return -1
+  endif
   setlocal nobuflisted
   let prev_book = ''
   let i = 1
@@ -349,6 +353,7 @@ function! s:RedirSearchCommand(key)
   endwhile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
   close!
+  return 0
 endfunction
 
 " eblookプログラムを実行する
@@ -394,7 +399,7 @@ function! s:CreateBuffer(bufname, oldindex)
     let bufexists = 0
   endif
   if s:SelectWindowByName(oldbufname) < 0
-    if s:OpenWindow(newbufname) < 0
+    if s:OpenWindow('split ' . newbufname) < 0
       return -1
     endif
   else
@@ -424,7 +429,7 @@ function! s:GetContent()
   endif
 
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    if s:OpenWindow(s:contentbufname . s:bufindex) < 0
+    if s:OpenWindow('split ' . s:contentbufname . s:bufindex) < 0
       return -1
     endif
   endif
@@ -486,7 +491,9 @@ function! s:LoadGaijiMapFile(dnum)
   else
     return gaijimap
   endif
-  execute 'silent normal! :sview ++enc=' . enc . ' ' . mapfile . "\<CR>"
+  if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
+    return gaijimap
+  endif
   setlocal nobuflisted
   for line in getline(1, '$')
     if line !~ '^[hzcg][[:xdigit:]]\{4}'
@@ -571,7 +578,7 @@ endfunction
 " @param refid 表示する内容を示す文字列。''の場合はリストの最初のものを表示
 function! s:FollowReference(refid)
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    if s:OpenWindow(s:contentbufname . s:bufindex) < 0
+    if s:OpenWindow('split ' . s:contentbufname . s:bufindex) < 0
       return
     endif
   endif
@@ -630,12 +637,12 @@ function! s:History(dir)
     endif
   endif
   if s:SelectWindowByName(s:entrybufname . s:bufindex) < 0
-    call s:OpenWindow(s:entrybufname . ni)
+    call s:OpenWindow('split ' . s:entrybufname . ni)
   else
     execute "silent normal! :edit " . s:entrybufname . ni . "\<CR>"
   endif
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    call s:OpenWindow(s:contentbufname . ni)
+    call s:OpenWindow('split ' . s:contentbufname . ni)
   else
     execute "silent normal! :edit " . s:contentbufname . ni . "\<CR>"
   endif
@@ -696,7 +703,7 @@ function! s:GoWindow(to_entry_buf)
     let bufname = s:contentbufname . s:bufindex
   endif
   if s:SelectWindowByName(bufname) < 0
-    if s:OpenWindow(bufname) < 0
+    if s:OpenWindow('split ' . bufname) < 0
       return -1
     endif
   endif
@@ -762,9 +769,9 @@ function! s:SelectWindowByName(name)
 endfunction
 
 " 新しいウィンドウを開く
-function! s:OpenWindow(name)
+function! s:OpenWindow(cmd)
   if winheight(0) > 2
-    execute "silent normal! :split " . a:name . "\<CR>"
+    execute "silent normal! :" . a:cmd . "\<CR>"
     return winnr()
   else
     " 'noequalalways'の場合、高さが足りずにsplitがE36エラーになる場合あるので、
@@ -780,10 +787,10 @@ function! s:OpenWindow(name)
     endfor
     if maxnr > 0
       execute maxnr . 'wincmd w'
-      execute "silent normal! :split " . a:name . "\<CR>"
+      execute "silent normal! :" . a:cmd . "\<CR>"
       return winnr()
     else
-      echoerr 'eblook-vim: 新規ウィンドウを開くための空きがありません(' . a:name . ')'
+      echoerr 'eblook-vim: 新規ウィンドウを開くための空きがありません(' . a:cmd . ')'
       return -1
     endif
   endif
