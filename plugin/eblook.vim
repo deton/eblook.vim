@@ -494,7 +494,10 @@ function! s:LoadGaijiMapFile(dnum)
   else
     return gaijimap
   endif
-  let curnr = winnr()
+  " 現在のウィンドウ(entry/content)の高さが足りない場合、
+  " OpenWindow()により、高さに余裕のあるウィンドウ上でsviewする可能性があるので
+  " closeした後で元のウィンドウに明示的に切り替える必要あり
+  let curbuf = bufnr('')
   if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
     return gaijimap
   endif
@@ -515,7 +518,7 @@ function! s:LoadGaijiMapFile(dnum)
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
   close!
-  execute curnr . 'wincmd w'
+  execute bufwinnr(curbuf) . 'wincmd w'
   return gaijimap
 endfunction
 
