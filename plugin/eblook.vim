@@ -254,7 +254,7 @@ endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
 function! s:SearchInput()
-  let str = input('eblook: ')
+  let str = input('eblook-vim: ')
   if strlen(str) == 0
     return
   endif
@@ -803,7 +803,8 @@ function! s:OpenWindow(cmd)
       execute "silent normal! :" . a:cmd . "\<CR>"
       return winnr()
     else
-      echomsg 'eblook-vim: 画面上の空きが足りないため新規ウィンドウを開くのに失敗しました。ウィンドウを閉じて空きを作ってください(' . a:cmd . ')'
+      redraw
+      echomsg 'eblook-vim: 画面上の空きが足りないため新規ウィンドウを開くのに失敗しました。ウィンドウを閉じて空きを作ってください(:' . a:cmd . ')'
       return -1
     endif
   endif
