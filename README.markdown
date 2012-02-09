@@ -47,12 +47,19 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   * 発音記号などの外字をUnicode文字列へ置換する機能を追加
     ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
   * その他の外字を_(下線)に置換するように変更
-  * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
-    辞書を引こうとすると、見出し一覧や内容表示ウィンドウが開けずに
-    エラー(E36: Not enough room)になる問題を修正。
   * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
+  * ~/.vimrcでの辞書の設定をVim7のDictionaryとListで行う形式に変更
+    (辞書の追加・削除・検索順の変更時の手間を減らすため)。
+    (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
   * `<img>`,`<snd>`,`<mov>`の非表示化(conceal syntax)
   * Vim6対応を終了。要Vim7
+  * バグ修正
+    * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
+      辞書を引こうとすると、見出し一覧や内容表示ウィンドウが開けずに
+      エラー(E36: Not enough room)になる問題を修正。
+    * appendix付きで指定した辞書の後にappendix指定無しの辞書を設定した場合、
+      eblook側でappendixが引き継がれて、意図しない外字置換が発生する問題に対処
+      (eblook 1.6.1+mediaでは修正されているので問題は発生しない)
 
 * 1.0.5 (2012-01-19)
   * katonoさん作成のsyntaxファイルを取り込み

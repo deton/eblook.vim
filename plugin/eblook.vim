@@ -16,10 +16,11 @@ scriptencoding cp932
 "   contentウィンドウに表示される。
 "
 " コマンド:
-"   :EblookSearch       指定した単語の検索を行う
-"   :EblookListDict     辞書の一覧を表示する
-"   :EblookSkipDict     指定した辞書番号の辞書を一時的に検索対象から外す
-"   :EblookNotSkipDict  指定した辞書番号の辞書を一時的に検索対象に入れる
+"   :EblookSearch         指定した単語の検索を行う
+"   :EblookListDict       辞書の一覧を表示する
+"   :EblookSkipDict       指定した辞書番号の辞書を一時的に検索対象から外す
+"   :EblookNotSkipDict    指定した辞書番号の辞書を一時的に検索対象に入れる
+"   :EblookPasteDictList  辞書設定をペーストする(eblook-vim-1.1.0への移行用)
 "
 " nmap:
 "   <Leader><C-Y>       検索単語を入力して検索を行う
@@ -80,17 +81,17 @@ scriptencoding cp932
 "      例:
 "        let eblook_dictlist =
 "        \[
-"        \  {
-"        \    'title': '広辞苑第五版',
-"        \    'book': '/usr/local/epwing/tougou99',
-"        \    'name': 'kojien',
-"        \    'skip': 0
-"        \  },
-"        \  {
-"        \    'title': 'ジーニアス英和大辞典',
-"        \    'book': '/usr/local/epwing/GENIUS /usr/local/epwing/appendix/genius2-1.1',
-"        \    'name': 'genius'
-"        \  }
+"          \{
+"            \'title': '広辞苑第五版',
+"            \'book': '/usr/local/epwing/tougou99',
+"            \'name': 'kojien',
+"            \'skip': 0
+"          \},
+"          \{
+"            \'title': 'ジーニアス英和大辞典',
+"            \'book': '/usr/local/epwing/GENIUS /usr/local/epwing/appendix/genius2-1.1',
+"            \'name': 'genius'
+"          \}
 "        \]
 "
 "    'eblook_entrywin_height'
@@ -156,6 +157,7 @@ command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
 command! EblookListDict call <SID>ListDict()
 command! -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
 command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
+command! EblookPasteDictList call <SID>PasteDictList()
 
 " </reference=>で指定されるentryのpattern
 let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
@@ -193,6 +195,7 @@ execute "autocmd BufEnter " . s:entrybufname . "* call <SID>Entry_BufEnter()"
 execute "autocmd BufEnter " . s:contentbufname . "* call <SID>Content_BufEnter()"
 augroup END
 
+" eblook-vim-1.0.5までの辞書指定形式を読み込む
 if !exists("g:eblook_dictlist")
   let g:eblook_dictlist = []
   let s:i = 1
@@ -222,10 +225,8 @@ while s:i < len(g:eblook_dictlist)
   if !exists('dict.title')
     let dict.title = s:i . dict.name
   endif
-  " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
-  " (XXX: eblook 1.6.1+media版では対処されているので不要)
-  if dict.book !~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
-    let dict.book = dict.book . ' ' . dict.book
+  if dict.book =~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
+    let dict.hasappendix = 1
   endif
   let s:i = s:i + 1
 endwhile
@@ -367,7 +368,7 @@ function! s:RedirSearchCommand(key)
       continue
     endif
     if exists('dict.book') && dict.book !=# prev_book
-      execute 'normal! obook ' . dict.book . "\<Esc>"
+      execute 'normal! obook ' . s:MakeBookArgument(dict) . "\<Esc>"
       let prev_book = dict.book
     endif
     execute 'normal! oselect ' . dict.name . "\<CR>"
@@ -378,6 +379,19 @@ function! s:RedirSearchCommand(key)
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
   close!
   return 0
+endfunction
+
+" eblookのbookに指定するための引数値を作る
+" @param {Dictionary} dict 辞書情報
+" @return {String} bookに指定する引数
+function! s:MakeBookArgument(dict)
+  " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
+  " (XXX: eblook 1.6.1+media版では対処されているので不要)
+  if get(a:dict, 'hasappendix')
+    return a:dict.book
+  else
+    return a:dict.book . ' ' . a:dict.book
+  endif
 endfunction
 
 " eblookプログラムを実行する
@@ -463,11 +477,12 @@ function! s:GetContent()
 
   silent execute "normal! :%d _\<CR>"
   let b:dictnum = dnum
+  let dict = g:eblook_dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
-  if exists("g:eblook_dictlist[b:dictnum].book")
-    silent echo 'book ' . g:eblook_dictlist[b:dictnum].book
+  if exists("dict.book")
+    silent echo 'book ' . s:MakeBookArgument(dict)
   endif
-  silent echo 'select ' . g:eblook_dictlist[b:dictnum].name
+  silent echo 'select ' . dict.name
   silent echo 'content ' . refid . "\n"
   redir END
   call s:ExecuteEblook()
@@ -764,6 +779,7 @@ endfunction
 
 " 辞書一覧を表示する
 function! s:ListDict()
+  " EblookSkipDict等では辞書番号を指定するので、辞書番号付きで表示する
   let i = 0
   while i < len(g:eblook_dictlist)
     let dict = g:eblook_dictlist[i]
@@ -827,4 +843,25 @@ endfunction
 
 " 空のバッファを作る
 function! s:Empty_BufReadCmd()
+endfunction
+
+" eblook-vim-1.1.0からの辞書指定形式をペーストする。
+" eblook-vim-1.0.5からの形式変換用。
+function! s:PasteDictList()
+  let save_paste = &paste
+  let &paste = 1
+  execute 'normal! olet eblook_dictlist =' . "\<CR>"
+    \ . '\[' . "\<Esc>"
+  for dict in g:eblook_dictlist
+    let skip = get(dict, 'skip')
+    execute 'normal! o'
+      \ . "  \\{\<CR>"
+      \ . "    \\'title': '" . dict.title . "',\<CR>"
+      \ . "    \\'book': '" . dict.book . "',\<CR>"
+      \ . "    \\'name': '" . dict.name . "',\<CR>"
+      \ . "    \\'skip': " . skip . ",\<CR>"
+      \ . "  \\},\<Esc>"
+  endfor
+  execute 'normal! o\]' . "\<Esc>"
+  let &paste = save_paste
 endfunction
