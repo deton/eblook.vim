@@ -160,7 +160,7 @@ command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
 command! EblookPasteDictList call <SID>PasteDictList()
 
 " </reference=>で指定されるentryのpattern
-let s:refpat = '[[:xdigit:]]\+:[[:xdigit:]]\+'
+let s:refpat = '\x\+:\x\+'
 " eblookにリダイレクトするコマンドを保持する一時ファイル名
 let s:cmdfile = tempname()
 " entryバッファ名のベース
@@ -547,7 +547,7 @@ function! s:LoadGaijiMapFile(dnum)
   endif
   setlocal nobuflisted
   for line in getline(1, '$')
-    if line !~ '^[hzcg][[:xdigit:]]\{4}'
+    if line !~ '^[hzcg]\x\{4}'
       continue
     endif
     " 例: hA121	u00E0	a	# comment
@@ -557,7 +557,7 @@ function! s:LoadGaijiMapFile(dnum)
     let ascii = get(lst, 2, '')
     if &encoding ==# 'utf-8'
       let unicode = substitute(unicode, ',', '', 'g')
-      let unicode = substitute(unicode, 'u\([[:xdigit:]]\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
+      let unicode = substitute(unicode, 'u\(\x\{4}\)', '\=nr2char("0x" . submatch(1))', 'g')
     endif
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
