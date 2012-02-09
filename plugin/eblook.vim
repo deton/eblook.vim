@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-06
+" Last Change: 2012-02-09
 
 scriptencoding cp932
 
@@ -92,7 +92,7 @@ scriptencoding cp932
 "
 "
 "    'eblook_entrywin_height'
-"       entryウィンドウの行数。省略値: 4
+"       entryウィンドウの行数(目安)。省略値: 4
 "
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
@@ -191,16 +191,39 @@ execute "autocmd BufEnter " . s:entrybufname . "* call <SID>Entry_BufEnter()"
 execute "autocmd BufEnter " . s:contentbufname . "* call <SID>Content_BufEnter()"
 augroup END
 
-" 辞書のtitleが設定されていなかったら、辞書番号とnameを設定しておく
-let s:i = 1
-while exists("g:eblook_dict{s:i}_name")
-  if !exists("g:eblook_dict{s:i}_title")
-    let g:eblook_dict{s:i}_title = s:i . g:eblook_dict{s:i}_name
+if !exists("g:eblook_dictlist")
+  let g:eblook_dictlist = []
+  let s:i = 1
+  while exists("g:eblook_dict{s:i}_name")
+    let dict = { 'name': g:eblook_dict{s:i}_name }
+    if exists("g:eblook_dict{s:i}_book")
+      let dict.book = g:eblook_dict{s:i}_book
+    endif
+    if exists("g:eblook_dict{s:i}_title")
+      let dict.title = g:eblook_dict{s:i}_title
+    endif
+    if exists("g:eblook_dict{s:i}_skip")
+      let dict.skip = g:eblook_dict{s:i}_skip
+    else
+      let dict.skip = 0
+    endif
+    call add(g:eblook_dictlist, dict)
+    let s:i = s:i + 1
+  endwhile
+  unlet s:i
+endif
+
+let s:i = 0
+while s:i < len(g:eblook_dictlist)
+  let dict = g:eblook_dictlist[s:i]
+  " 辞書のtitleが設定されていなかったら、辞書番号とnameを設定しておく
+  if !exists('dict.title')
+    let dict.title = s:i . dict.name
   endif
   " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
   " (XXX: eblook 1.6.1+media版では対処されているので不要)
-  if g:eblook_dict{s:i}_book !~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
-    let g:eblook_dict{s:i}_book = g:eblook_dict{s:i}_book . ' ' . g:eblook_dict{s:i}_book
+  if dict.book !~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
+    let dict.book = dict.book . ' ' . dict.book
   endif
   let s:i = s:i + 1
 endwhile
@@ -298,19 +321,18 @@ function! s:Search(key)
       endif
     endif
   endwhile
-  let i = 1
-  while exists("g:eblook_dict{i}_name")
-    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+  let i = 0
+  while i < len(g:eblook_dictlist)
+    let dict = g:eblook_dictlist[i]
+    if get(dict, 'skip')
       let i = i + 1
       continue
     endif
-    let dname = g:eblook_dict{i}_name
-    let title = g:eblook_dict{i}_title
     if index(gaijidnums, i) >= 0
       let gaijimap = s:GetGaijiMap(i)
       silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
     endif
-    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
+    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . dict.title . "\t"
     let i = i + 1
   endwhile
   silent! :g/eblook.*> /s///g
@@ -335,18 +357,18 @@ function! s:RedirSearchCommand(key)
   endif
   setlocal nobuflisted
   let prev_book = ''
-  let i = 1
-  while exists("g:eblook_dict{i}_name")
-    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+  let i = 0
+  while i < len(g:eblook_dictlist)
+    let dict = g:eblook_dictlist[i]
+    if get(dict, 'skip')
       let i = i + 1
       continue
     endif
-    let dname = g:eblook_dict{i}_name
-    if exists("g:eblook_dict{i}_book") && g:eblook_dict{i}_book !=# prev_book
-      execute 'normal! obook ' . g:eblook_dict{i}_book . "\<Esc>"
-      let prev_book = g:eblook_dict{i}_book
+    if exists('dict.book') && dict.book !=# prev_book
+      execute 'normal! obook ' . dict.book . "\<Esc>"
+      let prev_book = dict.book
     endif
-    execute 'normal! oselect ' . dname . "\<CR>"
+    execute 'normal! oselect ' . dict.name . "\<CR>"
       \ . 'set prompt "eblook-' . i . '> "' . "\<CR>"
       \ . 'search "' . a:key . '"' . "\<CR>\<Esc>"
     let i = i + 1
@@ -423,7 +445,7 @@ function! s:GetContent()
     return -1
   endif
   let dnum = s:GetDictNumFromTitle(title)
-  if dnum <= 0
+  if dnum < 0
     return -1
   endif
   let refid = matchstr(str, s:refpat)
@@ -440,10 +462,10 @@ function! s:GetContent()
   silent execute "normal! :%d _\<CR>"
   let b:dictnum = dnum
   execute 'redir! >' . s:cmdfile
-  if exists("g:eblook_dict{b:dictnum}_book")
-    silent echo 'book ' . g:eblook_dict{b:dictnum}_book
+  if exists("g:eblook_dictlist[b:dictnum].book")
+    silent echo 'book ' . g:eblook_dictlist[b:dictnum].book
   endif
-  silent echo 'select ' . g:eblook_dict{b:dictnum}_name
+  silent echo 'select ' . g:eblook_dictlist[b:dictnum].name
   silent echo 'content ' . refid . "\n"
   redir END
   call s:ExecuteEblook()
@@ -468,15 +490,15 @@ endfunction
 " @param dnum 辞書番号
 " @return 外字置換表
 function! s:GetGaijiMap(dnum)
-  if !exists("g:eblook_dict{a:dnum}_gaijimap")
+  if !exists("g:eblook_dictlist[a:dnum].gaijimap")
     try
-      let g:eblook_dict{a:dnum}_gaijimap = s:LoadGaijiMapFile(a:dnum)
+      let g:eblook_dictlist[a:dnum].gaijimap = s:LoadGaijiMapFile(a:dnum)
     catch /load-error/
       " ウィンドウを閉じて空きを作って再度検索し直した時に外字取得できるように
       return {}
     endtry
   endif
-  return g:eblook_dict{a:dnum}_gaijimap
+  return g:eblook_dictlist[a:dnum].gaijimap
 endfunction
 
 " EBWin形式の外字定義ファイルを読み込む
@@ -484,8 +506,8 @@ endfunction
 " @param dnum 辞書番号
 " @return 読み込んだ外字置換表。{'ha121':[unicode, ascii], ...}
 function! s:LoadGaijiMapFile(dnum)
-  let name = g:eblook_dict{a:dnum}_name
-  let dir = matchstr(g:eblook_dict{a:dnum}_book, '"\zs[^"]\+\ze"\|\S\+')
+  let name = g:eblook_dictlist[a:dnum].name
+  let dir = matchstr(g:eblook_dictlist[a:dnum].book, '"\zs[^"]\+\ze"\|\S\+')
   " "{dir}/{NAME}_{encoding}.map"が無ければ"{dir}/{NAME}.map"をcp932で読み込み
   let mapfilebase = dir . '/' . toupper(name)
   let encmapfile = mapfilebase . '_' . &encoding . '.map'
@@ -534,11 +556,11 @@ endfunction
 function! s:GetGaiji(gaijimap, key)
   " XXX:GetGaiji()内からGetGaijiMap()を呼びたいが、
   " substitute()で\=が再帰的に呼ばれる形になってしまうため動作せず
-  let gaiji = get(a:gaijimap, a:key)
-  if !gaiji
+  if !exists("a:gaijimap[a:key]")
     return '_'
     "return '_' . a:key . '_'     " DEBUG
   endif
+  let gaiji = a:gaijimap[a:key]
   if &encoding ==# 'utf-8'
     let res = gaiji[0]
     if res ==# 'null'
@@ -602,16 +624,16 @@ function! s:FollowReference(refid)
   " バッファ冒頭の検索対象文字列にヒットしないので、末尾からwrap aroundして検索
   normal! G$
   let searchflag = 'w'
-  let i = 1
+  let label = []
+  let entry = []
   while search('<reference>', searchflag) > 0
     let line = getline('.')
     let col = col('.') - 1
-    let label{i} = matchstr(line, '<reference>\zs.\{-}\ze</reference', col)
-    let entry{i} = matchstr(line, s:refpat, col)
-    let i = i + 1
+    call add(label, matchstr(line, '<reference>\zs.\{-}\ze</reference', col))
+    call add(entry, matchstr(line, s:refpat, col))
     let searchflag = 'W'
   endwhile
-  if i <= 1
+  if len(label) == 0
     return
   endif
   execute 'normal! ' . save_line . 'G' . save_col . '|'
@@ -619,9 +641,10 @@ function! s:FollowReference(refid)
   if s:NewBuffers() < 0
     return -1
   endif
-  let j = 1
-  while j < i
-    execute 'normal! o' . g:eblook_dict{dnum}_title . "\<C-V>\<Tab>" . entry{j} . "\<C-V>\<Tab>" . label{j} . "\<Esc>"
+  let title = g:eblook_dictlist[dnum].title
+  let j = 0
+  while j < len(label)
+    execute 'normal! o' . title . "\<C-V>\<Tab>" . entry[j] . "\<C-V>\<Tab>" . label[j] . "\<Esc>"
     let j = j + 1
   endwhile
   silent! :g/^$/d _
@@ -727,9 +750,9 @@ endfunction
 " @param title 辞書のtitle文字列
 " @return 辞書番号
 function! s:GetDictNumFromTitle(title)
-  let i = 1
-  while exists("g:eblook_dict{i}_title")
-    if a:title ==# g:eblook_dict{i}_title
+  let i = 0
+  while i < len(g:eblook_dictlist)
+    if a:title ==# g:eblook_dictlist[i].title
       return i
     endif
     let i = i + 1
@@ -739,19 +762,15 @@ endfunction
 
 " 辞書一覧を表示する
 function! s:ListDict()
-  let i = 1
-  while exists("g:eblook_dict{i}_name")
+  let i = 0
+  while i < len(g:eblook_dictlist)
+    let dict = g:eblook_dictlist[i]
     let skip = ''
-    if exists("g:eblook_dict{i}_skip") && g:eblook_dict{i}_skip
+    if get(dict, 'skip')
       let skip = 'skip'
     endif
-    let title = g:eblook_dict{i}_title
-    let dname = g:eblook_dict{i}_name
-    let book = ''
-    if exists("g:eblook_dict{i}_book")
-      let book = g:eblook_dict{i}_book
-    endif
-    echo skip . "\t" . i . "\t" . title . "\t" . dname . "\t" . book
+    let book = get(dict, 'book', '')
+    echo skip . "\t" . i . "\t" . dict.title . "\t" . dict.name . "\t" . book
     let i = i + 1
   endwhile
 endfunction
@@ -760,15 +779,9 @@ endfunction
 " @param is_skip スキップするかどうか。1:スキップする, 0:スキップしない
 " @param ... 辞書番号のリスト
 function! s:SetDictSkip(is_skip, ...)
-  let i = 1
-  while i <= a:0
-    if a:is_skip
-      let g:eblook_dict{a:{i}}_skip = 1
-    else
-      unlet! g:eblook_dict{a:{i}}_skip
-    endif
-    let i = i + 1
-  endwhile
+  for dnum in a:000
+    let g:eblook_dictlist[dnum].skip = a:is_skip
+  endfor
 endfunction
 
 " SelectWindowByName(name)
