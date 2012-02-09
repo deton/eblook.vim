@@ -54,42 +54,44 @@ scriptencoding cp932
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
 "
 " オプション:
-"    'eblook_dict{n}_title'
-"    'eblook_dict{n}_book'
-"    'eblook_dict{n}_name'
-"    'eblook_dict{n}_skip'
-"       EPWING辞書の設定。{n}は1, 2, 3, ...。使いたい辞書分指定する。
-"       ここで指定した数字(辞書番号)の順に検索を行う。
-"       数字は連続している必要がある。
-"       eblook_dict{n}_skip以外は必須。
+"    'eblook_dictlist'
+"      EPWING辞書の|List|。Listの各要素は以下のkeyを持つ|Dictionary|。
 "
-"      'eblook_dict{n}_title'
+"      'title'
 "         辞書の識別子を指定。entryウィンドウ中で辞書を識別するために使う。
 "         (eblook.vim内部では辞書番号かtitleで辞書を識別する。)
 "         辞書を識別するために使うだけなので、
 "         他の辞書とぶつからない文字列を適当につける。
-"         例:
-"           let eblook_dict1_title = '広辞苑第五版'
 "
-"      'eblook_dict{n}_book'
+"      'book'
 "         eblookプログラムの`book'コマンドに渡すパラメータ。
 "         辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定。
 "         Appendixがある場合は、
 "         辞書ディレクトリに続けてAppendixディレクトリを指定。
-"         例:
-"           let eblook_dict1_book = '/usr/local/epwing'
 "
-"      'eblook_dict{n}_name'
+"      'name'
 "         eblookプログラムの`select'コマンドに渡すパラメータ。
 "         辞書名を指定。eblookプログラムのlistコマンドで調べる。
-"         例:
-"           let eblook_dict1_name = 'kojien'
 "
-"      'eblook_dict{n}_skip'
+"      'skip'
 "         0でない値を設定すると、この辞書は検索しない。
-"         例:
-"           let eblook_dict1_skip = 1
+"         ('skip'キーが未指定の場合は0とみなす)
 "
+"      例:
+"        let eblook_dictlist =
+"        \[
+"        \  {
+"        \    'title': '広辞苑第五版',
+"        \    'book': '/usr/local/epwing/tougou99',
+"        \    'name': 'kojien',
+"        \    'skip': 0
+"        \  },
+"        \  {
+"        \    'title': 'ジーニアス英和大辞典',
+"        \    'book': '/usr/local/epwing/GENIUS /usr/local/epwing/appendix/genius2-1.1',
+"        \    'name': 'genius'
+"        \  }
+"        \]
 "
 "    'eblook_entrywin_height'
 "       entryウィンドウの行数(目安)。省略値: 4

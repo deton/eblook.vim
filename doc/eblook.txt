@@ -50,27 +50,39 @@ eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく必要があります。
 	 2. furoku      付属資料
 
 (d) vimrcの設定
-  (b)でbookコマンドの引数に指定したディレクトリをeblook_dict1_bookに設定します:
-	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
-  (c)のlistコマンド実行時に表示されたsubbookをeblook_dict1_nameに設定します:
-	let eblook_dict1_name='kojien'
-  (c)のlistコマンド実行時に表示された辞書タイトルを
-   eblook_dict1_titleに設定します:
-	let eblook_dict1_title='広辞苑第五版'
+    以下のように各辞書用の|Dictionary|データを記述します。
+  (b)でbookコマンドの引数に指定したディレクトリを'book'キーに設定します。
+  (c)のlistコマンド実行時に表示されたsubbookを'name'キーに設定します。
+  (c)のlistコマンド実行時に表示された辞書タイトルを'title'キーに設定します。
+      \  {
+      \    'book': '/usr/local/epwing/iwanami/koujien',
+      \    'name': 'kojien',
+      \    'title': '広辞苑第五版',
+      \  },
 
 (e) (b)-(d)を、使いたい辞書について繰り返して、
-    eblook_dict1_, eblook_dict2_, ... に値を設定します。
+    各辞書用の|Dictionary|データを記述し、
+    各Dictionaryデータを要素として持つ
+    eblook_diclistの|List|データを初期化します。
 
-例:
-	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
-	let eblook_dict1_name='kojien'
-	let eblook_dict1_title='広辞苑第五版'
-	let eblook_dict2_book='/usr/local/epwing/kenkyush/chujisnd'
-	let eblook_dict2_name='chujiten'
-	let eblook_dict2_title='研究社　新英和・和英中辞典'
-	let eblook_dict3_book='/usr/local/epwing/kenkyush/plus'
-	let eblook_dict3_name='plus'
-	let eblook_dict3_title='研究社リーダーズ＋プラスＶ２'
+    let eblook_dictlist =
+    \[
+    \  {
+    \    'book': '/usr/local/epwing/iwanami/koujien',
+    \    'name': 'kojien',
+    \    'title': '広辞苑第五版',
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/kenkyush/chujisnd',
+    \    'name': 'chujiten',
+    \    'title': '研究社　新英和・和英中辞典'
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/kenkyush/plus',
+    \    'name': 'plus',
+    \    'title': '研究社リーダーズ＋プラスＶ２',
+    \  },
+    \]
 
 準備: 外字置換設定			*eblook-setup-gaiji*
 ------------------
@@ -227,51 +239,59 @@ R                   reference一覧を表示する
 ==============================================================================
 5. オプション					*eblook-option*
 
-EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
-(book, name, title, skip)で設定します。bookとnameは必須です。
-{n}の部分は辞書番号で、具体的には1, 2, 3, ...を入れて設定します。
-指定した辞書番号の順に検索を行います。辞書番号は連続している必要があります。
+EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
+を要素として持つ|List|データとして設定します。bookとnameは必須です。
 
-|'eblook_dict{n}_book'|		辞書ディレクトリ。(eblookのbookコマンドの引数)
-|'eblook_dict{n}_name'|		辞書名。(eblookのselectコマンドの引数)
-|'eblook_dict{n}_title'|	辞書識別子
-|'eblook_dict{n}_skip'|		この辞書を検索対象にするかどうか
+    let eblook_dictlist =
+    \[
+    \  {
+    \    'book': '/usr/local/epwing/iwanami/koujien',
+    \    'name': 'kojien',
+    \    'title': '広辞苑第五版',
+    \    'skip': 0,
+    \  },
+    \]
 
-'eblook_dict{n}_book'				*'eblook_dict{n}_book'*
+'book'		辞書ディレクトリ。(eblookのbookコマンドの引数)
+'name'		辞書名。(eblookのselectコマンドの引数)
+'title' 	辞書識別子
+'skip'		この辞書を検索対象にするかどうか
+
+'book'
   辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
   eblookプログラムの`book'コマンドに渡すパラメータです。
   Appendixがある場合は、辞書ディレクトリに続けてAppendixディレクトリを
   指定します。
   パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
   例:
-    let eblook_dict1_book = '"C:/Program Files/epwing/iwanami/koujien"'
+    'book': '"C:/Program Files/epwing/iwanami/koujien"',
 
-'eblook_dict{n}_name'				*'eblook_dict{n}_name'*
+'name'
   辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
   eblookプログラムのlistコマンドで調べてください。
   例:
-    let eblook_dict1_name = 'kojien'
+    'name': 'kojien',
 
-'eblook_dict{n}_title'				*'eblook_dict{n}_title'*
+'title'
   辞書の識別子を指定します。デフォルトでは、
-  辞書番号とeblook_dict{n}_nameを組み合わせたものが設定されます。
+  辞書番号とnameを組み合わせたものが設定されます。
   entryウィンドウ内で辞書を識別するために使われます。
   辞書を識別するのに使うだけなので、
   eblookプログラムのlistコマンドで表示される文字列など、
   他の辞書とぶつからない文字列を適当に指定します。
   例:
-    let eblook_dict1_title = '広辞苑第五版'
+    'title': '広辞苑第五版',
 
-'eblook_dict{n}_skip'				*'eblook_dict{n}_skip'*
+'skip'
   0でない値を設定すると、この辞書は検索しません。
   skipする設定にしている辞書は、:EblookNotSkipDictコマンドを使って
   検索対象にすることができます。
   例:
-    let eblook_dict1_skip = 1
+    'skip': 1,
 
 
 'eblook_entrywin_height'			*'eblook_entrywin_height'*
-  entryウィンドウの行数。省略値: 4
+  entryウィンドウの行数(目安)。省略値: 4
 
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
@@ -297,28 +317,43 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 ------
 辞書の設定例です。
 
-	let eblook_dict1_book='/usr/local/epwing/iwanami/koujien'
-	let eblook_dict1_name='kojien'
-	let eblook_dict1_title='広辞苑第五版'
-	let eblook_dict2_book='/usr/local/epwing/kenkyush/chujisnd'
-	let eblook_dict2_name='chujiten'
-	let eblook_dict2_title='研究社　新英和・和英中辞典'
-	let eblook_dict3_book='/usr/local/epwing/kenkyush/plus /usr/local/epwing/appendix/plus-2.0'
-	let eblook_dict3_name='plus'
-	let eblook_dict3_title='研究社リーダーズ＋プラスＶ２'
-	let eblook_dict3_skip=0
-	let eblook_dict4_book='/usr/local/epwing/gakken/kanjigen'
-	let eblook_dict4_name='kanjigen'
-	let eblook_dict4_title='漢字源'
-	let eblook_dict4_skip=1
-	let eblook_dict5_book='/usr/local/epwing/jiyukok/gendai99'
-	let eblook_dict5_name='gn99ep01'
-	let eblook_dict5_title='現代用語の基礎知識１９９９年版'
-	let eblook_dict5_skip=1
-	let eblook_dict6_book='/usr/local/epwing/jiyukok/gendai99'
-	let eblook_dict6_name='gn99ep02'
-	let eblook_dict6_title='最新日本語活用事典'
-	let eblook_dict6_skip=1
+    let eblook_dictlist =
+    \[
+    \  {
+    \    'book': '/usr/local/epwing/iwanami/koujien',
+    \    'name': 'kojien',
+    \    'title': '広辞苑第五版',
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/kenkyush/chujisnd',
+    \    'name': 'chujiten',
+    \    'title': '研究社　新英和・和英中辞典'
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/kenkyush/plus /usr/local/epwing/appendix/plus-2.0',
+    \    'name': 'plus',
+    \    'title': '研究社リーダーズ＋プラスＶ２',
+    \    'skip': 0,
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/gakken/kanjigen'
+    \    'name': 'kanjigen'
+    \    'title': '漢字源'
+    \    'skip': 1
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/jiyukok/gendai99'
+    \    'name': 'gn99ep01'
+    \    'title': '現代用語の基礎知識１９９９年版'
+    \    'skip': 1
+    \  },
+    \  {
+    \    'book': '/usr/local/epwing/jiyukok/gendai99'
+    \    'name': 'gn99ep02'
+    \    'title': '最新日本語活用事典'
+    \    'skip': 1
+    \  },
+    \]
 
 ==============================================================================
 6. コマンド					*eblook-command*
@@ -328,16 +363,16 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのオプション
 
 :EblookListDict					*:EblookListDict*
   辞書の一覧を表示します。
-  'eblook_dict{n}_name'等に設定されている内容を表示します。
+  'eblook_dictlist'に設定されている内容を表示します。
 
 :EblookSkipDict					*:EblookSkipDict*
   引数で指定した辞書番号の辞書を一時的に検索対象から外します。
-  'eblook_dict{n}_skip'を1に設定するのと同じです。
+  'eblook_dictlist[n].skip'を1に設定するのと同じです。
   複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
 
 :EblookNotSkipDict				*:EblookNotSkipDict*
   引数で指定した辞書番号の辞書を一時的に検索対象に入れます。
-  'eblook_dict{n}_skip'を0に設定するのと同じです。
+  'eblook_dictlist[n].skip'を0に設定するのと同じです。
   複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
 
 ==============================================================================
