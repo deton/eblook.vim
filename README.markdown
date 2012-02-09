@@ -51,12 +51,13 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   * ~/.vimrcでの辞書の設定をVim7のDictionaryとListで行う形式に変更
     (辞書の追加・削除・検索順の変更時の手間を減らすため)。
     (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
+  * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
   * `<img>`,`<snd>`,`<mov>`の非表示化(conceal syntax)
   * Vim6対応を終了。要Vim7
   * バグ修正
     * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
       辞書を引こうとすると、見出し一覧や内容表示ウィンドウが開けずに
-      エラー(E36: Not enough room)になる問題を修正。
+      エラー(E36: Not enough room)になる問題を修正
     * appendix付きで指定した辞書の後にappendix指定無しの辞書を設定した場合、
       eblook側でappendixが引き継がれて、意図しない外字置換が発生する問題に対処
       (eblook 1.6.1+mediaでは修正されているので問題は発生しない)

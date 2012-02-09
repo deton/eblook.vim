@@ -107,6 +107,17 @@ scriptencoding cp932
 "       eblookプログラムの出力を読み込むときのエンコーディング。
 "       設定可能な値は|'encoding'|参照。省略値: &encoding
 "
+"    '<Plug>EblookInput'
+"       検索単語を入力して検索を行うためのキー。省略値: <Leader><C-Y>
+"       <Leader><C-Y>を指定する場合の例:
+"         map <Leader><C-Y> <Plug>EblookInput
+"
+"    '<Plug>EblookSearch'
+"       カーソル位置にある単語(nmap)/選択した文字列(vmap)を検索するためのキー。
+"       省略値: <Leader>y
+"       <Leader>yを指定する場合の例:
+"         map <Leader>y <Plug>EblookSearch
+"
 "    'mapleader'
 "       キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
 "       CTRL-Kを指定する場合の例:
@@ -119,6 +130,9 @@ scriptencoding cp932
 if exists('plugin_eblook_disable')
   finish
 endif
+
+let s:save_cpo = &cpo
+set cpo&vim
 
 " entryウィンドウの行数
 if !exists('eblook_entrywin_height')
@@ -153,11 +167,21 @@ if has_key(s:eblookenc2opt, eblookenc)
 endif
 unlet s:eblookenc2opt
 
-command! -nargs=1 EblookSearch call <SID>Search(<q-args>)
-command! EblookListDict call <SID>ListDict()
-command! -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
-command! -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
-command! EblookPasteDictList call <SID>PasteDictList()
+if !exists(":EblookSearch")
+  command -nargs=1 EblookSearch call <SID>Search(<q-args>)
+endif
+if !exists(":EblookListDict")
+  command EblookListDict call <SID>ListDict()
+endif
+if !exists(":EblookSkipDict")
+  command -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
+endif
+if !exists(":EblookNotSkipDict")
+  command -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
+endif
+if !exists(":EblookPasteDictList")
+  command EblookPasteDictList call <SID>PasteDictList()
+endif
 
 " </reference=>で指定されるentryのpattern
 let s:refpat = '\x\+:\x\+'
@@ -178,10 +202,21 @@ if !exists('g:mapleader')
   let g:mapleader = "\<C-K>"
   let s:set_mapleader = 1
 endif
-nnoremap <silent> <Leader><C-Y> :<C-U>call <SID>SearchInput()<CR>
-nnoremap <silent> <Leader>y :<C-U>call <SID>Search(expand('<cword>'))<CR>
-vnoremap <silent> <Leader>y :<C-U>call <SID>SearchVisual()<CR>
-"vnoremap <silent> <Leader>y ""y:<C-U>call <SID>Search("<C-R>"")<CR>
+if !hasmapto('<Plug>EblookInput')
+  map <unique> <Leader><C-Y> <Plug>EblookInput
+endif
+noremap <unique> <script> <Plug>EblookInput <SID>Input
+noremap <SID>Input :<C-U>call <SID>SearchInput()<CR>
+if !hasmapto('<Plug>EblookSearch', 'n')
+  nmap <unique> <Leader>y <Plug>EblookSearch
+endif
+nnoremap <unique> <script> <Plug>EblookSearch <SID>SearchN
+nnoremap <silent> <SID>SearchN :<C-U>call <SID>Search(expand('<cword>'))<CR>
+if !hasmapto('<Plug>EblookSearch', 'v')
+  vmap <unique> <Leader>y <Plug>EblookSearch
+endif
+vnoremap <unique> <script> <Plug>EblookSearch <SID>SearchV
+vnoremap <silent> <SID>SearchV :<C-U>call <SID>SearchVisual()<CR>
 if s:set_mapleader
   unlet g:mapleader
 endif
@@ -865,3 +900,5 @@ function! s:PasteDictList()
   execute 'normal! o\]' . "\<Esc>"
   let &paste = save_paste
 endfunction
+
+let &cpo = s:save_cpo

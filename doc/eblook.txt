@@ -304,6 +304,17 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
   eblookプログラムの出力を読み込むときのエンコーディング。
   設定可能な値は|'encoding'|参照。省略値: &encoding
 
+'<Plug>EblookInput'				*'<Plug>EblookInput'*
+  検索単語を入力して検索を行うためのキー。省略値: <Leader><C-Y>
+  <Leader><C-Y>を指定する場合の例:
+    map <Leader><C-Y> <Plug>EblookInput
+
+'<Plug>EblookSearch'				*'<Plug>EblookSearch'*
+  カーソル位置にある単語(nmap)/選択した文字列(vmap)を検索するためのキー。
+  省略値: <Leader>y
+  <Leader>yを指定する場合の例:
+    map <Leader>y <Plug>EblookSearch
+
 'mapleader'
   キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
   CTRL-Kを指定する場合の例:
