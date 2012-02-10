@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-09
+" Last Change: 2012-02-10
 
 scriptencoding cp932
 
@@ -202,6 +202,8 @@ if !exists('g:mapleader')
   let g:mapleader = "\<C-K>"
   let s:set_mapleader = 1
 endif
+" (<Plug>EblookSearch‚Æ<Plug>EblookSearchInput‚É‚·‚é‚ÆA
+"  <Plug>EblookSearch‚Ì•û‚ª|'timeout'|‘Ò‚¿‚É‚È‚é)
 if !hasmapto('<Plug>EblookInput')
   map <unique> <Leader><C-Y> <Plug>EblookInput
 endif
@@ -842,7 +844,7 @@ endfunction
 function! s:SelectWindowByName(name)
   let num = bufwinnr('^' . a:name . '$')
   if num > 0 && num != winnr()
-    execute 'normal! ' . num . "\<C-W>\<C-W>"
+    execute num . 'wincmd w'
   endif
   return num
 endfunction
