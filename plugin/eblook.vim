@@ -130,6 +130,10 @@ scriptencoding cp932
 if exists('plugin_eblook_disable')
   finish
 endif
+if exists("g:loaded_eblook")
+  finish
+endif
+let g:loaded_eblook = 1
 
 let s:save_cpo = &cpo
 set cpo&vim
