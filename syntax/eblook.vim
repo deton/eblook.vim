@@ -13,38 +13,39 @@ endif
 
 if has("conceal")
   syn match ebEntRef	"\(\d\+\. \)\?\x\+:\x\+\t" conceal
-  syn match ebRefBeg	"<reference>" contained conceal
-  syn match ebRefEnd	"</reference=[^>]*>" contained conceal
-  syn match ebImgBeg	"<img=[^>]*>" contained conceal cchar=<
-  syn match ebImgEnd	"</img=[^>]*>" contained conceal cchar=>
-  syn match ebInlineBeg	"<inline=[^>]*>" contained conceal cchar=<
-  syn match ebInlineEnd	"</inline=[^>]*>" contained conceal cchar=>
-  syn match ebSndBeg	"<snd=[^>]*>" contained conceal cchar=[
-  syn match ebSndEnd	"</snd>" contained conceal cchar=]
-  syn match ebMovBeg	"<mov=[^>]*>" contained conceal cchar=[
-  syn match ebMovEnd	"</mov>" contained conceal cchar=]
-  syn region ebRefLink	start="<reference>" end="</reference=[^>]*>" contains=ebRefBeg,ebRefEnd keepend concealends
-  syn region ebImg	start="<img=[^>]*>" end="</img=[^>]*>" contains=ebImgBeg,ebImgEnd keepend concealends
-  syn region ebInline	start="<inline=[^>]*>" end="</inline=[^>]*>" contains=ebInlineBeg,ebInlineEnd keepend concealends
-  syn region ebSnd	start="<snd=[^>]*>" end="</snd>" contains=ebSndBeg,ebSndEnd keepend concealends
-  syn region ebMov	start="<mov=[^>]*>" end="</mov>" contains=ebMovBeg,ebMovEnd keepend concealends
+  syn region ebRefLink matchgroup=ebRefBeg start="<reference>" matchgroup=ebRefEnd end="</reference=[^>]*>" concealends
+  syn region ebImg matchgroup=ebImgBeg start="<img=[^>]*>" matchgroup=ebImgEnd end="</img=[^>]*>" concealends
+  syn region ebInline matchgroup=ebInlineBeg start="<inline=[^>]*>" matchgroup=ebInlineEnd end="</inline=[^>]*>" concealends
+  syn region ebSnd matchgroup=ebSndBeg start="<snd=[^>]*>" matchgroup=ebSndEnd end="</snd>" concealends
+  syn region ebMov matchgroup=ebMovBeg start="<mov=[^>]*>" matchgroup=ebMovEnd end="</mov>" concealends
+  " cf. helpIgnore in syntax/help.vim
+  syn match ebRefBeg	"." contained conceal
+  syn match ebRefEnd	"." contained conceal
+  syn match ebImgBeg	"." contained conceal
+  syn match ebImgEnd	"." contained conceal
+  syn match ebInlineBeg	"." contained conceal
+  syn match ebInlineEnd	"." contained conceal
+  syn match ebSndBeg	"." contained conceal
+  syn match ebSndEnd	"." contained conceal
+  syn match ebMovBeg	"." contained conceal
+  syn match ebMovEnd	"." contained conceal
 else
   syn match ebEntRef	"\(\d\+\. \)\?\x\+:\x\+\t"
-  syn match ebRefBeg	"<reference>" contained
-  syn match ebRefEnd	"</reference=[^>]*>" contained
-  syn match ebImgBeg	"<img=[^>]*>" contained
-  syn match ebImgEnd	"</img=[^>]*>" contained
-  syn match ebInlineBeg	"<inline=[^>]*>" contained
-  syn match ebInlineEnd	"</inline=[^>]*>" contained
-  syn match ebSndBeg	"<snd=[^>]*>" contained
-  syn match ebSndEnd	"</snd>" contained
-  syn match ebMovBeg	"<mov=[^>]*>" contained
-  syn match ebMovEnd	"</mov>" contained
-  syn region ebRefLink	start="<reference>" end="</reference=[^>]*>" contains=ebRefBeg,ebRefEnd keepend
-  syn region ebImg	start="<img=[^>]*>" end="</img=[^>]*>" contains=ebImgBeg,ebImgEnd keepend
-  syn region ebInline	start="<inline=[^>]*>" end="</inline=[^>]*>" contains=ebInlineBeg,ebInlineEnd keepend
-  syn region ebSnd	start="<snd=[^>]*>" end="</snd>" contains=ebSndBeg,ebSndEnd keepend
-  syn region ebMov	start="<mov=[^>]*>" end="</mov>" contains=ebMovBeg,ebMovEnd keepend
+  syn region ebRefLink matchgroup=ebRefBeg start="<reference>" matchgroup=ebRefEnd end="</reference=[^>]*>"
+  syn region ebImg matchgroup=ebImgBeg start="<img=[^>]*>" matchgroup=ebImgEnd end="</img=[^>]*>"
+  syn region ebInline matchgroup=ebInlineBeg start="<inline=[^>]*>" matchgroup=ebInlineEnd end="</inline=[^>]*>"
+  syn region ebSnd matchgroup=ebSndBeg start="<snd=[^>]*>" matchgroup=ebSndEnd end="</snd>"
+  syn region ebMov matchgroup=ebMovBeg start="<mov=[^>]*>" matchgroup=ebMovEnd end="</mov>"
+  syn match ebRefBeg	"." contained
+  syn match ebRefEnd	"." contained
+  syn match ebImgBeg	"." contained
+  syn match ebImgEnd	"." contained
+  syn match ebInlineBeg	"." contained
+  syn match ebInlineEnd	"." contained
+  syn match ebSndBeg	"." contained
+  syn match ebSndEnd	"." contained
+  syn match ebMovBeg	"." contained
+  syn match ebMovEnd	"." contained
 endif
 syn match ebPrevBeg	"<prev>"
 if has("conceal")
