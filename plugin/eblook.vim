@@ -461,34 +461,6 @@ function! s:ExecuteEblook()
   endif
 
   silent! :g/^Warning: you should specify a book directory first$/d _
-  " captionが空の場合は補完:
-  " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
-  " 数式部分でcaptionが空の<inline>が出現。非表示にすると
-  " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
-  silent! :g;\(<reference=[^>]*>\)\(</reference=[^>]*>\);s;;\1参照\2;g
-  silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'img');g
-  silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'inline');g
-  silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:FormatCaption(submatch(0), 'snd');g
-  silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), 'mov');g
-endfunction
-
-" <img>等のcaptionを〈〉等でくくる。
-" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
-" (|:syn-cchar|では目立ちすぎて気になる)
-" @param caption caption文字列。空文字列の可能性あり
-" @param type captionの種類:'inline','img','snd','mov'
-" @return 整形後の文字列
-function! s:FormatCaption(caption, type)
-  let len = strlen(a:caption)
-  if a:type ==# 'img' || a:type ==# 'inline'
-    return '〈' . (len ? a:caption : '画像') . '〉'
-  elseif a:type ==# 'snd'
-    return '《' . (len ? a:caption : '音声') . '》'
-  elseif a:type ==# 'mov'
-    return '《' . (len ? a:caption : '動画') . '》'
-  else
-    return a:caption
-  endif
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
@@ -578,6 +550,7 @@ function! s:GetContent()
     call s:ReplaceGaiji(dnum)
   endif
   silent! :g/^$/d _
+  call s:FormatContent()
   normal! 1G
   call s:GoWindow(1)
   return 0
@@ -679,6 +652,38 @@ function! s:GetGaiji(gaijimap, key)
     "return '_' . a:key . '_'     " DEBUG
   endif
   return res
+endfunction
+
+" contentバッファを整形する
+function! s:FormatContent()
+  " captionが空の場合は補完:
+  " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
+  " 数式部分でcaptionが空の<inline>が出現。非表示にすると
+  " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
+  silent! :g;\(<reference=[^>]*>\)\(</reference=[^>]*>\);s;;\1参照\2;g
+  silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'img');g
+  silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'inline');g
+  silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:FormatCaption(submatch(0), 'snd');g
+  silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), 'mov');g
+endfunction
+
+" <img>等のcaptionを〈〉等でくくる。
+" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
+" (|:syn-cchar|では目立ちすぎて気になる)
+" @param caption caption文字列。空文字列の可能性あり
+" @param type captionの種類:'inline','img','snd','mov'
+" @return 整形後の文字列
+function! s:FormatCaption(caption, type)
+  let len = strlen(a:caption)
+  if a:type ==# 'img' || a:type ==# 'inline'
+    return '〈' . (len ? a:caption : '画像') . '〉'
+  elseif a:type ==# 'snd'
+    return '《' . (len ? a:caption : '音声') . '》'
+  elseif a:type ==# 'mov'
+    return '《' . (len ? a:caption : '動画') . '》'
+  else
+    return a:caption
+  endif
 endfunction
 
 " contentバッファ中のカーソル位置付近の<reference>を抽出して、
