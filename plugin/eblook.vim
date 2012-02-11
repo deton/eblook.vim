@@ -472,7 +472,9 @@ function! s:ExecuteEblook()
   silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), 'mov');g
 endfunction
 
-" <img>等のcaptionを〈〉等でくくる
+" <img>等のcaptionを〈〉等でくくる。
+" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
+" (|:syn-cchar|では目立ちすぎて気になる)
 " @param caption caption文字列。空文字列の可能性あり
 " @param type captionの種類:'inline','img','snd','mov'
 " @return 整形後の文字列
