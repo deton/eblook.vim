@@ -11,38 +11,21 @@ elseif exists("b:current_syntax")
 endif
 
 
-"syn match ebGaiji		"<gaiji=[^>]*>"
-"syn match ebGaiji		"<gaiji=[^>]*>" contained
 if has("conceal")
-  syn match ebRefBeg		"<reference>" contained conceal
-  syn match ebRefEnd		"</reference=[^>]*>" conceal
-  syn match ebImgBeg		"<img=[^>]*>" contained conceal
-  syn match ebImgEnd		"</img=[^>]*>" contained conceal
-  syn match ebInlineBeg		"<inline=[^>]*>" contained conceal
-  syn match ebInlineEnd		"</inline=[^>]*>" contained conceal
-  syn match ebSndBeg		"<snd=[^>]*>" contained conceal
-  syn match ebSndEnd		"</snd>" contained conceal
-  syn match ebMovBeg		"<mov=[^>]*>" contained conceal
-  syn match ebMovEnd		"</mov>" contained conceal
+  syn region ebRefLink matchgroup=ebRefBeg start="<reference>" matchgroup=ebRefEnd end="</reference=[^>]*>" concealends
+  syn region ebImg matchgroup=ebImgBeg start="<img=[^>]*>" matchgroup=ebImgEnd end="</img=[^>]*>" concealends
+  syn region ebInline matchgroup=ebInlineBeg start="<inline=[^>]*>" matchgroup=ebInlineEnd end="</inline=[^>]*>" concealends
+  syn region ebSnd matchgroup=ebSndBeg start="<snd=[^>]*>" matchgroup=ebSndEnd end="</snd>" concealends
+  syn region ebMov matchgroup=ebMovBeg start="<mov=[^>]*>" matchgroup=ebMovEnd end="</mov>" concealends
   syn match ebEntRef		"\(\d\+\. \)\?\x\+:\x\+\t" conceal
 else
-  syn match ebRefBeg		"<reference>" contained
-  syn match ebRefEnd		"</reference=[^>]*>"
-  syn match ebImgBeg		"<img=[^>]*>" contained
-  syn match ebImgEnd		"</img=[^>]*>" contained
-  syn match ebInlineBeg		"<inline=[^>]*>" contained
-  syn match ebInlineEnd		"</inline=[^>]*>" contained
-  syn match ebSndBeg		"<snd=[^>]*>" contained
-  syn match ebSndEnd		"</snd>" contained
-  syn match ebMovBeg		"<mov=[^>]*>" contained
-  syn match ebMovEnd		"</mov>" contained
+  syn region ebRefLink matchgroup=ebRefBeg start="<reference>" matchGroup=ebRefEnd end="</reference=[^>]*>"
+  syn region ebImg matchgroup=ebImgBeg start="<img=[^>]*>" matchgroup=ebImgEnd end="</img=[^>]*>"
+  syn region ebInline matchgroup=ebInlineBeg start="<inline=[^>]*>" matchgroup=ebInlineEnd end="</inline=[^>]*>"
+  syn region ebSnd matchgroup=ebSndBeg start="<snd=[^>]*>" matchgroup=ebSndEnd end="</snd>"
+  syn region ebMov matchgroup=ebMovBeg start="<mov=[^>]*>" matchgroup=ebMovEnd end="</mov>"
   syn match ebEntRef		"\(\d\+\. \)\?\x\+:\x\+\t"
 endif
-syn region ebRefLink start="<reference>" end="</reference"me=e-11 contains=ebRefBeg,ebRefEnd,ebGaiji
-syn region ebImg start="<img=[^>]*>" end="</img=[^>]*>" contains=ebImgBeg,ebImgEnd keepend
-syn region ebInline start="<inline=[^>]*>" end="</inline=[^>]*>" contains=ebInlineBeg,ebInlineEnd keepend
-syn region ebSnd		start="<snd=" end="</snd>" contains=ebSndBeg,ebSndEnd keepend
-syn region ebMov		start="<mov=" end="</mov>" contains=ebMovBeg,ebMovEnd keepend
 syn match ebPrevBeg		"<prev>"
 if has("conceal")
   syn match ebPrevEnd		"</prev>" conceal
@@ -58,22 +41,35 @@ endif
 
 command -nargs=+ HiLink hi def link <args>
 HiLink ebRefLink	Underlined
-HiLink ebRefBeg		Ignore
-HiLink ebRefEnd		Ignore
-HiLink ebImgBeg		Ignore
-HiLink ebImgEnd		Ignore
-HiLink ebInlineBeg	Ignore
-HiLink ebInlineEnd	Ignore
-HiLink ebSndBeg		Ignore
-HiLink ebSndEnd		Ignore
-HiLink ebMovBeg		Ignore
-HiLink ebMovEnd		Ignore
+if has("conceal")
+  HiLink ebRefBeg	Conceal
+  HiLink ebRefEnd	Conceal
+  HiLink ebImgBeg	Conceal
+  HiLink ebImgEnd	Conceal
+  HiLink ebInlineBeg	Conceal
+  HiLink ebInlineEnd	Conceal
+  HiLink ebSndBeg	Conceal
+  HiLink ebSndEnd	Conceal
+  HiLink ebMovBeg	Conceal
+  HiLink ebMovEnd	Conceal
+  HiLink ebEntRef	Conceal
+else
+  HiLink ebRefBeg	Ignore
+  HiLink ebRefEnd	Ignore
+  HiLink ebImgBeg	Ignore
+  HiLink ebImgEnd	Ignore
+  HiLink ebInlineBeg	Ignore
+  HiLink ebInlineEnd	Ignore
+  HiLink ebSndBeg	Ignore
+  HiLink ebSndEnd	Ignore
+  HiLink ebMovBeg	Ignore
+  HiLink ebMovEnd	Ignore
+  HiLink ebEntRef	Ignore
+endif
 HiLink ebInline		Special
 HiLink ebImg		Special
 HiLink ebSnd		Special
 HiLink ebMov		Special
-HiLink ebEntRef		Ignore
-"HiLink ebGaiji		NonText
 HiLink ebPrevBeg	NonText
 HiLink ebPrevEnd	NonText
 HiLink ebNextBeg	NonText
