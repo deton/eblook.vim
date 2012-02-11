@@ -604,6 +604,8 @@ function! s:LoadGaijiMapFile(dnum)
   if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
     throw 'load-error'
   endif
+  setlocal buftype=nowrite
+  setlocal bufhidden=wipe
   setlocal nobuflisted
   for line in getline(1, '$')
     if line !~ '^[hzcg]\x\{4}'
