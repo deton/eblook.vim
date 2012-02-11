@@ -465,15 +465,30 @@ function! s:ExecuteEblook()
   " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
   " 数式部分でcaptionが空の<inline>が出現。非表示にすると
   " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
-  silent! :g,\(<inline=[^>]*>\)\(</inline=[^>]*>\),s,,\1画像\2,g
-  silent! :g,\(<img=[^>]*>\)\(</img=[^>]*>\),s,,\1画像\2,g
-  silent! :g,\(<snd=[^>]*>\)\(</snd>\),s,,\1音声\2,g
-  silent! :g,\(<mov=[^>]*>\)\(</mov>\),s,,\1動画\2,g
-  silent! :g,\(<reference=[^>]*>\)\(</reference=[^>]*>\),s,,\1参照\2,g
-  silent! :g,<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>,s,,〈&〉,g
-  silent! :g,<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>,s,,〈&〉,g
-  silent! :g,<snd=[^>]*>\zs\_.\{-}\ze</snd>,s,,《&》,g
-  silent! :g,<mov=[^>]*>\zs\_.\{-}\ze</mov>,s,,《&》,g
+  silent! :g;\(<reference=[^>]*>\)\(</reference=[^>]*>\);s;;\1参照\2;g
+  silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:FormatCaption(submatch(0), '画像', 'img');g
+  silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:FormatCaption(submatch(0), '画像', 'inline');g
+  silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:FormatCaption(submatch(0), '音声', 'snd');g
+  silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), '動画', 'mov');g
+endfunction
+
+" <img>等のcaptionを〈〉等でくくる
+" @param caption caption文字列。空文字列の可能性あり
+" @param default captionが空文字列の場合に使用する文字列
+" @param type captionの種類:'inline','img','snd','mov'
+" @return 整形後の文字列
+function! s:FormatCaption(caption, default, type)
+  let str = a:caption
+  if strlen(str) == 0
+    let str = a:default
+  endif
+  if a:type ==# 'img' || a:type ==# 'inline'
+    return '〈' . str . '〉'
+  elseif a:type ==# 'snd' || a:type ==# 'mov'
+    return '《' . str . '》'
+  else
+    return str
+  endif
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
