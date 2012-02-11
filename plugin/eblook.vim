@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-10
+" Last Change: 2012-02-11
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -461,6 +461,15 @@ function! s:ExecuteEblook()
   endif
 
   silent! :g/^Warning: you should specify a book directory first$/d _
+  " captionが空の場合は補完:
+  " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
+  " 数式部分でcaptionが空の<inline>が出現。非表示にすると
+  " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
+  silent! :g,\(<inline=[^>]*>\)\(</inline=[^>]*>\),s,,\1[画像]\2,g
+  silent! :g,\(<img=[^>]*>\)\(</img=[^>]*>\),s,,\1[画像]\2,g
+  silent! :g,\(<snd=[^>]*>\)\(</snd>\),s,,\1[音声]\2,g
+  silent! :g,\(<mov=[^>]*>\)\(</mov>\),s,,\1[動画]\2,g
+  silent! :g,\(<reference=[^>]*>\)\(</reference=[^>]*>\),s,,\1[参照]\2,g
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。

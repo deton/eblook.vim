@@ -2,9 +2,7 @@
 " Language:     eblook.vim用syntax
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-02-10
-
-" このファイルをvimfiles/syntaxにコピーしてください。
+" Last Change:  2012-02-11
 
 if version < 600
   syntax clear
@@ -16,24 +14,35 @@ endif
 "syn match ebGaiji		"<gaiji=[^>]*>"
 "syn match ebGaiji		"<gaiji=[^>]*>" contained
 if has("conceal")
-  syn region ebImg		start="<img=[^>]*>" end="</img=[^>]*>" conceal
-  syn region ebMov		start="<mov=[^>]*>" end="</mov>" conceal
-  syn match ebSnd		"<snd=[^>]*>.*</snd>" conceal
   syn match ebRefBeg		"<reference>" contained conceal
   syn match ebRefEnd		"</reference=[^>]*>" conceal
-  syn match ebEntRef		"\([[:digit:]]\+\. \)\?[[:xdigit:]]\+:[[:xdigit:]]\+\t" conceal
+  syn match ebImgBeg		"<img=[^>]*>" contained conceal
+  syn match ebImgEnd		"</img=[^>]*>" contained conceal
+  syn match ebInlineBeg		"<inline=[^>]*>" contained conceal
+  syn match ebInlineEnd		"</inline=[^>]*>" contained conceal
+  syn match ebSndBeg		"<snd=[^>]*>" contained conceal
+  syn match ebSndEnd		"</snd>" contained conceal
+  syn match ebMovBeg		"<mov=[^>]*>" contained conceal
+  syn match ebMovEnd		"</mov>" contained conceal
+  syn match ebEntRef		"\(\d\+\. \)\?\x\+:\x\+\t" conceal
 else
-  syn region ebImg		start="<img=[^>]*>" end="</img=[^>]*>"
-  syn region ebMov		start="<mov=[^>]*>" end="</mov>"
-  syn match ebSnd		"<snd=[^>]*>.*</snd>"
   syn match ebRefBeg		"<reference>" contained
   syn match ebRefEnd		"</reference=[^>]*>"
+  syn match ebImgBeg		"<img=[^>]*>" contained
+  syn match ebImgEnd		"</img=[^>]*>" contained
+  syn match ebInlineBeg		"<inline=[^>]*>" contained
+  syn match ebInlineEnd		"</inline=[^>]*>" contained
+  syn match ebSndBeg		"<snd=[^>]*>" contained
+  syn match ebSndEnd		"</snd>" contained
+  syn match ebMovBeg		"<mov=[^>]*>" contained
+  syn match ebMovEnd		"</mov>" contained
+  syn match ebEntRef		"\(\d\+\. \)\?\x\+:\x\+\t"
 endif
-" eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
-" 数式部分で<inline>が出現。非表示にすると文章がつながらなくなる。
-" (+media無しのeblookの場合は<img>で出現)
-syn match ebInline		"<inline=[^>]*>.*</inline=[^>]*>"
 syn region ebRefLink start="<reference>" end="</reference"me=e-11 contains=ebRefBeg,ebRefEnd,ebGaiji
+syn region ebImg start="<img=[^>]*>" end="</img=[^>]*>" contains=ebImgBeg,ebImgEnd keepend
+syn region ebInline start="<inline=[^>]*>" end="</inline=[^>]*>" contains=ebInlineBeg,ebInlineEnd keepend
+syn region ebSnd		start="<snd=" end="</snd>" contains=ebSndBeg,ebSndEnd keepend
+syn region ebMov		start="<mov=" end="</mov>" contains=ebMovBeg,ebMovEnd keepend
 syn match ebPrevBeg		"<prev>"
 if has("conceal")
   syn match ebPrevEnd		"</prev>" conceal
@@ -51,11 +60,19 @@ command -nargs=+ HiLink hi def link <args>
 HiLink ebRefLink	Underlined
 HiLink ebRefBeg		Ignore
 HiLink ebRefEnd		Ignore
-HiLink ebEntRef		Ignore
-HiLink ebImg		Ignore
-HiLink ebMov		Ignore
-HiLink ebSnd		Ignore
+HiLink ebImgBeg		Ignore
+HiLink ebImgEnd		Ignore
+HiLink ebInlineBeg	Ignore
+HiLink ebInlineEnd	Ignore
+HiLink ebSndBeg		Ignore
+HiLink ebSndEnd		Ignore
+HiLink ebMovBeg		Ignore
+HiLink ebMovEnd		Ignore
 HiLink ebInline		Special
+HiLink ebImg		Special
+HiLink ebSnd		Special
+HiLink ebMov		Special
+HiLink ebEntRef		Ignore
 "HiLink ebGaiji		NonText
 HiLink ebPrevBeg	NonText
 HiLink ebPrevEnd	NonText
@@ -64,4 +81,3 @@ HiLink ebNextEnd	NonText
 delcommand HiLink
 
 let b:current_syntax = "eblook"
-

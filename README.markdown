@@ -52,7 +52,8 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
     (辞書の追加・削除・検索順の変更時の手間を減らすため)。
     (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
   * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
-  * `<img>`,`<snd>`,`<mov>`の非表示化(conceal syntax)
+  * `<img>`,`<snd>`,`<mov>`,`<inline>`はキャプションのみ表示するように変更
+    (conceal syntax)
   * Vim6対応を終了。要Vim7
   * バグ修正
     * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
