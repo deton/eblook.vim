@@ -39,41 +39,39 @@ else
   syn match ebNextEnd		"</next>"
 endif
 
-command -nargs=+ HiLink hi def link <args>
-HiLink ebRefLink	Underlined
+hi def link ebRefLink	Underlined
 if has("conceal")
-  HiLink ebRefBeg	Conceal
-  HiLink ebRefEnd	Conceal
-  HiLink ebImgBeg	Conceal
-  HiLink ebImgEnd	Conceal
-  HiLink ebInlineBeg	Conceal
-  HiLink ebInlineEnd	Conceal
-  HiLink ebSndBeg	Conceal
-  HiLink ebSndEnd	Conceal
-  HiLink ebMovBeg	Conceal
-  HiLink ebMovEnd	Conceal
-  HiLink ebEntRef	Conceal
+  hi def link ebRefBeg	Conceal
+  hi def link ebRefEnd	Conceal
+  hi def link ebImgBeg	Conceal
+  hi def link ebImgEnd	Conceal
+  hi def link ebInlineBeg	Conceal
+  hi def link ebInlineEnd	Conceal
+  hi def link ebSndBeg	Conceal
+  hi def link ebSndEnd	Conceal
+  hi def link ebMovBeg	Conceal
+  hi def link ebMovEnd	Conceal
+  hi def link ebEntRef	Conceal
 else
-  HiLink ebRefBeg	Ignore
-  HiLink ebRefEnd	Ignore
-  HiLink ebImgBeg	Ignore
-  HiLink ebImgEnd	Ignore
-  HiLink ebInlineBeg	Ignore
-  HiLink ebInlineEnd	Ignore
-  HiLink ebSndBeg	Ignore
-  HiLink ebSndEnd	Ignore
-  HiLink ebMovBeg	Ignore
-  HiLink ebMovEnd	Ignore
-  HiLink ebEntRef	Ignore
+  hi def link ebRefBeg	Ignore
+  hi def link ebRefEnd	Ignore
+  hi def link ebImgBeg	Ignore
+  hi def link ebImgEnd	Ignore
+  hi def link ebInlineBeg	Ignore
+  hi def link ebInlineEnd	Ignore
+  hi def link ebSndBeg	Ignore
+  hi def link ebSndEnd	Ignore
+  hi def link ebMovBeg	Ignore
+  hi def link ebMovEnd	Ignore
+  hi def link ebEntRef	Ignore
 endif
-HiLink ebInline		Special
-HiLink ebImg		Special
-HiLink ebSnd		Special
-HiLink ebMov		Special
-HiLink ebPrevBeg	NonText
-HiLink ebPrevEnd	NonText
-HiLink ebNextBeg	NonText
-HiLink ebNextEnd	NonText
-delcommand HiLink
+hi def link ebInline	Special
+hi def link ebImg	Special
+hi def link ebSnd	Special
+hi def link ebMov	Special
+hi def link ebPrevBeg	NonText
+hi def link ebPrevEnd	NonText
+hi def link ebNextBeg	NonText
+hi def link ebNextEnd	NonText
 
 let b:current_syntax = "eblook"
