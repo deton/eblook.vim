@@ -312,6 +312,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
   nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
+  nnoremap <buffer> <silent> O :call <SID>GetAndFormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
@@ -335,6 +336,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<reference/<CR>
+  nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>FollowReference('')<CR>
@@ -534,10 +536,8 @@ function! s:GetContent()
     return -1
   endif
 
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    if s:OpenWindow('split ' . s:contentbufname . s:bufindex) < 0
-      return -1
-    endif
+  if s:GoWindow(0) < 0
+    return -1
   endif
 
   silent execute "normal! :%d _\<CR>"
@@ -557,7 +557,10 @@ function! s:GetContent()
     call s:ReplaceGaiji(dnum)
   endif
   silent! :g/^$/d _
-  call s:FormatContent()
+  call s:FormatCaption()
+  if g:eblook_format
+    call s:FormatContent()
+  endif
   normal! 1G
   call s:GoWindow(1)
   return 0
@@ -663,22 +666,50 @@ function! s:GetGaiji(gaijimap, key)
   return res
 endfunction
 
-" contentバッファを整形する
-function! s:FormatContent()
+" contentバッファ中の<img>等のcaptionを整形する
+function! s:FormatCaption()
   " captionが空の場合は補完:
   " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
   " 数式部分でcaptionが空の<inline>が出現。非表示にすると
   " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
   silent! :g;\(<reference=[^>]*>\)\(</reference=[^>]*>\);s;;\1参照\2;g
-  silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'img');g
-  silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'inline');g
-  silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:FormatCaption(submatch(0), 'snd');g
-  silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), 'mov');g
+  silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:MakeCaptionString(submatch(0), 'img');g
+  silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:MakeCaptionString(submatch(0), 'inline');g
+  silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:MakeCaptionString(submatch(0), 'snd');g
+  silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:MakeCaptionString(submatch(0), 'mov');g
+endfunction
 
-  if !g:eblook_format
-    return
+" <img>等のcaptionを〈〉等でくくる。
+" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
+" (|:syn-cchar|では目立ちすぎて気になる)
+" @param caption caption文字列。空文字列の可能性あり
+" @param type captionの種類:'inline','img','snd','mov'
+" @return 整形後の文字列
+function! s:MakeCaptionString(caption, type)
+  let len = strlen(a:caption)
+  if a:type ==# 'img' || a:type ==# 'inline'
+    return '〈' . (len ? a:caption : '画像') . '〉'
+  elseif a:type ==# 'snd'
+    return '《' . (len ? a:caption : '音声') . '》'
+  elseif a:type ==# 'mov'
+    return '《' . (len ? a:caption : '動画') . '》'
+  else
+    return a:caption
   endif
+endfunction
 
+" entryバッファ上からcontentバッファを整形する
+function! s:GetAndFormatContent()
+  if s:GetContent() < 0
+    return -1
+  endif
+  call s:GoWindow(0)
+  call s:FormatContent()
+  call s:GoWindow(1)
+endfunction
+
+" contentバッファを整形する
+function! s:FormatContent()
   let tw = &textwidth
   if tw == 0 && &wrapmargin
     let tw = winwidth(0) - &wrapmargin
@@ -692,7 +723,7 @@ function! s:FormatContent()
   " 長い行を分割する
   normal! 1G$
   while 1
-    if col('.') > tw
+    if virtcol('.') > tw
       call s:FormatLine(tw, 0)
     endif
     if line('.') == line('$')
@@ -700,25 +731,7 @@ function! s:FormatContent()
     endif
     normal! j$
   endwhile
-endfunction
-
-" <img>等のcaptionを〈〉等でくくる。
-" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
-" (|:syn-cchar|では目立ちすぎて気になる)
-" @param caption caption文字列。空文字列の可能性あり
-" @param type captionの種類:'inline','img','snd','mov'
-" @return 整形後の文字列
-function! s:FormatCaption(caption, type)
-  let len = strlen(a:caption)
-  if a:type ==# 'img' || a:type ==# 'inline'
-    return '〈' . (len ? a:caption : '画像') . '〉'
-  elseif a:type ==# 'snd'
-    return '《' . (len ? a:caption : '音声') . '》'
-  elseif a:type ==# 'mov'
-    return '《' . (len ? a:caption : '動画') . '》'
-  else
-    return a:caption
-  endif
+  normal! 1G
 endfunction
 
 " 長い行を分割する。
@@ -735,7 +748,7 @@ function! s:FormatLine(width, joined)
   " <reference>が行をまたいだ場合には未対応のため、1行に収める:
   " <reference>直前に改行を入れて次の行と結合した後、再度分割し直す。
   if search('<reference>[^<]*$', 'cW', last) > 0
-    let c = col('.')
+    let c = virtcol('.')
     if c > 1
       execute "normal! i\<CR>\<Esc>"
     endif
@@ -745,7 +758,7 @@ function! s:FormatLine(width, joined)
     if a:joined && c == 1
       return
     endif
-    if col('.') > a:width
+    if virtcol('.') > a:width
       call s:FormatLine(a:width, 1)
     endif
   endif
@@ -777,7 +790,9 @@ endfunction
 
 " entryバッファでカーソル行のエントリに含まれる<reference>のリストを表示
 function! s:ListReferences()
-  call s:GetContent()
+  if s:GetContent() < 0
+    return -1
+  endif
   call s:FollowReference('')
 endfunction
 
@@ -785,10 +800,8 @@ endfunction
 " 指定された<reference>の内容をcontentバッファに表示する。
 " @param refid 表示する内容を示す文字列。''の場合はリストの最初のものを表示
 function! s:FollowReference(refid)
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    if s:OpenWindow('split ' . s:contentbufname . s:bufindex) < 0
-      return
-    endif
+  if s:GoWindow(0) < 0
+    return
   endif
   let dnum = b:dictnum
   let save_line = line('.')
