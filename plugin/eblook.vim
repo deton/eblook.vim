@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-11
+" Last Change: 2012-02-12
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -666,6 +666,39 @@ function! s:FormatContent()
   silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:FormatCaption(submatch(0), 'inline');g
   silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:FormatCaption(submatch(0), 'snd');g
   silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), 'mov');g
+
+  let tw = &textwidth
+  if tw == 0 && &wrapmargin
+    let tw = winwidth(0) - &wrapmargin
+  else
+    let tw = winwidth(0) - 1
+  endif
+  if tw <= 0
+    return
+  endif
+
+  " 長い行を分割する
+  normal! 1G$
+  while 1
+    if col('.') > tw
+      normal! gqq
+    endif
+    if line('.') == line('$')
+      break
+    endif
+    normal! j$
+  endwhile
+
+  " <reference>が行をまたいだ場合には未対応のため、1行に収める:
+  " <reference>直前に改行を行れて次の行と結合。
+  " XXX:再度分割し直さないと長すぎる行になる。
+  " XXX:本当は長い行を分割する時点で、分割不可とみなして処理する必要あり
+  normal! G$
+  let searchflag = 'w'
+  while search('<reference>[^<]*$', searchflag) > 0
+    execute "normal! i\<CR>\<Esc>J"
+    let searchflag = 'W'
+  endwhile
 endfunction
 
 " <img>等のcaptionを〈〉等でくくる。
