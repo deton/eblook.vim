@@ -681,23 +681,12 @@ function! s:FormatContent()
   normal! 1G$
   while 1
     if col('.') > tw
-      normal! gqq
+      call s:FormatLine(tw)
     endif
     if line('.') == line('$')
       break
     endif
     normal! j$
-  endwhile
-
-  " <reference>が行をまたいだ場合には未対応のため、1行に収める:
-  " <reference>直前に改行を行れて次の行と結合。
-  " XXX:再度分割し直さないと長すぎる行になる。
-  " XXX:本当は長い行を分割する時点で、分割不可とみなして処理する必要あり
-  normal! G$
-  let searchflag = 'w'
-  while search('<reference>[^<]*$', searchflag) > 0
-    execute "normal! i\<CR>\<Esc>J"
-    let searchflag = 'W'
   endwhile
 endfunction
 
@@ -717,6 +706,27 @@ function! s:FormatCaption(caption, type)
     return '《' . (len ? a:caption : '動画') . '》'
   else
     return a:caption
+  endif
+endfunction
+
+" 長い行を分割する。
+" @param width 上限幅
+function! s:FormatLine(width)
+  let first = line('.')
+  normal! gqq
+  let last = line('.')
+  if last == first
+    return
+  endif
+  call cursor(first, 1)
+  " <reference>が行をまたいだ場合には未対応のため、1行に収める:
+  " <reference>直前に改行を行れて次の行と結合した後、再度分割し直す。
+  if search('<reference>[^<]*$', 'W', last) > 0
+    let n = last - line('.') + 1
+    execute "normal! i\<CR>\<Esc>" . n . "J$"
+    if col('.') > a:width
+      call s:FormatLine(a:width)
+    endif
   endif
 endfunction
 
