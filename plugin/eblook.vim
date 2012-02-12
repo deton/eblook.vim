@@ -61,6 +61,7 @@ scriptencoding cp932
 "   R                   reference一覧を表示する
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
+"   O                   contentウィンドウ内の長い行を|gq|で整形する
 "
 " contentバッファのnmap
 "   <CR>                カーソル位置のreferenceを表示する
@@ -73,6 +74,7 @@ scriptencoding cp932
 "   R                   reference一覧を表示する
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
+"   O                   contentウィンドウ内の長い行を|gq|で整形する
 "
 " オプション:
 "    'eblook_dictlist'
@@ -99,7 +101,7 @@ scriptencoding cp932
 "         ('skip'キーが未指定の場合は0とみなす)
 "
 "      'autoformat'
-"         contentウィンドウ内の長い行を|gq|で整形するかどうか。
+"         content表示時に長い行を|gq|で整形するかどうか。
 "         ('autoformat'キーが未指定の場合は0とみなす)
 "
 "      例:
