@@ -205,7 +205,8 @@ if !exists(":EblookPasteDictList")
 endif
 
 " </reference=>で指定されるentryのpattern
-let s:refpat = '\x\+:\x\+'
+let s:entrypat = '\x\+:\x\+'
+let s:refpat = '</reference=\zs\x\+:\x\+\ze>'
 " eblookにリダイレクトするコマンドを保持する一時ファイル名
 let s:cmdfile = tempname()
 " entryバッファ名のベース
@@ -311,7 +312,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
-  execute 'nnoremap <buffer> <silent> <Tab> /' . s:refpat . '<CR>'
+  execute 'nnoremap <buffer> <silent> <Tab> /' . s:entrypat . '<CR>'
 endfunction
 
 " contentバッファに入った時に実行。set nobuflistedする。
@@ -522,7 +523,7 @@ function! s:GetContent()
   if dnum < 0
     return -1
   endif
-  let refid = matchstr(str, s:refpat)
+  let refid = matchstr(str, s:entrypat)
   if strlen(refid) == 0
     return -1
   endif
