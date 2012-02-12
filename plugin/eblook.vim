@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-12
+" Last Change: 2012-02-13
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -98,6 +98,10 @@ scriptencoding cp932
 "         0でない値を設定すると、この辞書は検索しない。
 "         ('skip'キーが未指定の場合は0とみなす)
 "
+"      'autoformat'
+"         contentウィンドウ内の長い行を|gq|で整形するかどうか。
+"         ('autoformat'キーが未指定の場合は0とみなす)
+"
 "      例:
 "        let eblook_dictlist =
 "        \[
@@ -105,13 +109,19 @@ scriptencoding cp932
 "            \'title': '広辞苑第五版',
 "            \'book': '/usr/local/epwing/tougou99',
 "            \'name': 'kojien',
-"            \'skip': 0
 "          \},
 "          \{
 "            \'title': 'ジーニアス英和大辞典',
 "            \'book': '/usr/local/epwing/GENIUS /usr/local/epwing/appendix/genius2-1.1',
 "            \'name': 'genius'
-"          \}
+"          \},
+"          \{
+"            \'title': '現代用語の基礎知識',
+"            \'book': '/usr/local/epwing/tougou99',
+"            \'name': 'gn99ep01',
+"            \'skip': 1,
+"            \'autoformat': 1,
+"          \},
 "        \]
 "
 "    'eblook_entrywin_height'
@@ -119,9 +129,6 @@ scriptencoding cp932
 "
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
-"
-"    'eblook_format'
-"       contentウィンドウ内の長い行を|gq|で整形するかどうか。省略値: 0
 "
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
@@ -166,11 +173,6 @@ endif
 " 保持しておく過去の検索バッファ数の上限
 if !exists('eblook_history_max')
   let eblook_history_max = 10
-endif
-
-" contentウィンドウ内の長い行を|gq|で整形するかどうか
-if !exists('eblook_format')
-  let eblook_format = 0
 endif
 
 " eblookプログラムの名前
@@ -558,7 +560,7 @@ function! s:GetContent()
   endif
   silent! :g/^$/d _
   call s:FormatCaption()
-  if g:eblook_format
+  if get(dict, 'autoformat')
     call s:FormatContent()
   endif
   normal! 1G

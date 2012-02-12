@@ -257,6 +257,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 'name'		辞書名。(eblookのselectコマンドの引数)
 'title' 	辞書識別子
 'skip'		この辞書を検索対象にするかどうか
+'autoformat'	content表示時に長い行を|gq|で整形するかどうか
 
 'book'						*'eblook_dictlist[n].book'*
   辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
@@ -290,17 +291,15 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
   例:
     'skip': 1,
 
+'autoformat'				*'eblook_dictlist[n].autoformat'*
+  content表示時に長い行を|gq|で整形するかどうか。
+
 
 'eblook_entrywin_height'			*'eblook_entrywin_height'*
   entryウィンドウの行数(目安)。省略値: 4
 
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
-
-'eblook_format'					*'eblook_format'*
-  contentウィンドウ内の長い行を|gq|で整形するかどうか。省略値: 0
-  整形する場合は以下のように設定してください。
-    let eblook_format = 1
 
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"
