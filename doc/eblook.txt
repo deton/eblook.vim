@@ -297,8 +297,13 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 
+'eblook_format'					*'eblook_format'*
+  contentウィンドウ内の長い行を|gq|で整形するかどうか。省略値: 0
+  整形する場合は以下のように設定してください。
+    let eblook_format = 1
+
 'eblookprg'					*'eblookprg'*
-  スクリプトから呼び出すeblookプログラムの名前。省略値: eblook
+  スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"
 
 'eblookenc'					*'eblookenc'*
   eblookプログラムの出力を読み込むときのエンコーディング。
