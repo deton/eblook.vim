@@ -268,8 +268,6 @@ if !exists("g:eblook_dictlist")
     endif
     if exists("g:eblook_dict{s:i}_skip")
       let dict.skip = g:eblook_dict{s:i}_skip
-    else
-      let dict.skip = 0
     endif
     call add(g:eblook_dictlist, dict)
     let s:i = s:i + 1
@@ -947,13 +945,16 @@ function! s:PasteDictList()
   execute 'normal! olet eblook_dictlist =' . "\<CR>"
     \ . '\[' . "\<Esc>"
   for dict in g:eblook_dictlist
-    let skip = get(dict, 'skip')
     execute 'normal! o'
       \ . "  \\{\<CR>"
       \ . "    \\'title': '" . dict.title . "',\<CR>"
       \ . "    \\'book': '" . dict.book . "',\<CR>"
-      \ . "    \\'name': '" . dict.name . "',\<CR>"
-      \ . "    \\'skip': " . skip . ",\<CR>"
+      \ . "    \\'name': '" . dict.name . "',\<Esc>"
+    if exists('dict.skip')
+      execute 'normal! o'
+      \ . "    \\'skip': " . dict.skip . ",\<Esc>"
+    endif
+    execute 'normal! o'
       \ . "  \\},\<Esc>"
   endfor
   execute 'normal! o\]' . "\<Esc>"
