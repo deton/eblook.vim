@@ -745,36 +745,21 @@ function! s:FormatLine(width, joined)
     return
   endif
   call cursor(first, 1)
-  " <reference>が行をまたいだ場合には未対応のため、1行に収める。
+  " <reference>が行をまたいだ場合には未対応のため、1行に収める:
+  " <reference>直前に改行を入れて次の行と結合した後、再度分割し直す。
   if search('<reference>[^<]*$', 'cW', last) > 0
-    let save_cursor = getpos('.')
-    let n = last - line('.') + 1
-    execute "normal! " . n . "J"
-    call setpos('.', save_cursor)
-    if search('</reference=') == 0
-      return " 何か変
+    let c = virtcol('.')
+    if c > 1
+      execute "normal! i\<CR>\<Esc>"
     endif
-    " </reference=の直前までは収まる→>直後に改行を入れる
-    let endc = virtcol('.')
-    if endc <= a:width
-      execute "normal! f>a\<CR>\<Esc>$"
-      let stoprecur = 0
-    else
-      " <reference>直前に改行を入れる
-      call setpos('.', save_cursor)
-      let c = virtcol('.')
-      if c > 1
-	execute "normal! i\<CR>\<Esc>"
-      endif
-      " 行結合後、再帰呼び出しされてて、<reference>が行頭→さらに再帰しても無駄
-      if a:joined && c == 1
-	return
-      endif
-      let stoprecur = 1
-      normal! $
+    let n = last - line('.') + 1
+    execute "normal! " . n . "J$"
+    " 行結合後、再帰呼び出しされてて、<reference>が行頭→これ以上再帰しても無駄
+    if a:joined && c == 1
+      return
     endif
     if virtcol('.') > a:width
-      call s:FormatLine(a:width, stoprecur)
+      call s:FormatLine(a:width, 1)
     endif
   endif
 endfunction
