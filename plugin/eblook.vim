@@ -120,6 +120,9 @@ scriptencoding cp932
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 "
+"    'eblook_format'
+"       contentウィンドウ内の長い行を|gq|で整形するかどうか。省略値: 0
+"
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
 "
@@ -163,6 +166,11 @@ endif
 " 保持しておく過去の検索バッファ数の上限
 if !exists('eblook_history_max')
   let eblook_history_max = 10
+endif
+
+" contentウィンドウ内の長い行を|gq|で整形するかどうか
+if !exists('eblook_format')
+  let eblook_format = 0
 endif
 
 " eblookプログラムの名前
@@ -667,6 +675,10 @@ function! s:FormatContent()
   silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:FormatCaption(submatch(0), 'snd');g
   silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:FormatCaption(submatch(0), 'mov');g
 
+  if !g:eblook_format
+    return
+  endif
+
   let tw = &textwidth
   if tw == 0 && &wrapmargin
     let tw = winwidth(0) - &wrapmargin
@@ -681,7 +693,7 @@ function! s:FormatContent()
   normal! 1G$
   while 1
     if col('.') > tw
-      call s:FormatLine(tw)
+      call s:FormatLine(tw, 0)
     endif
     if line('.') == line('$')
       break
@@ -711,7 +723,8 @@ endfunction
 
 " 長い行を分割する。
 " @param width 上限幅
-function! s:FormatLine(width)
+" @param joined 直前に行を結合したかどうか
+function! s:FormatLine(width, joined)
   let first = line('.')
   normal! gqq
   let last = line('.')
@@ -720,12 +733,20 @@ function! s:FormatLine(width)
   endif
   call cursor(first, 1)
   " <reference>が行をまたいだ場合には未対応のため、1行に収める:
-  " <reference>直前に改行を行れて次の行と結合した後、再度分割し直す。
-  if search('<reference>[^<]*$', 'W', last) > 0
+  " <reference>直前に改行を入れて次の行と結合した後、再度分割し直す。
+  if search('<reference>[^<]*$', 'cW', last)
+    let c = col('.')
+    if c > 1
+      execute "normal! i\<CR>\<Esc>"
+    endif
     let n = last - line('.') + 1
-    execute "normal! i\<CR>\<Esc>" . n . "J$"
+    execute "normal! " . n . "J$"
+    " 行結合後、再帰呼び出しされてて、<reference>が行頭→これ以上再帰しても無駄
+    if a:joined && c == 1
+      return
+    endif
     if col('.') > a:width
-      call s:FormatLine(a:width)
+      call s:FormatLine(a:width, 1)
     endif
   endif
 endfunction
