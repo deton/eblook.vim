@@ -751,12 +751,13 @@ function! s:FormatLine(width, joined)
   call cursor(first, 1)
   " <reference>が行をまたいだ場合には未対応のため、1行に収める:
   " <reference>直前に改行を入れて次の行と結合した後、再度分割し直す。
-  if search('<reference>[^<]*$', 'cW', last) > 0
+  let openrefline = search('<reference>[^<]*$', 'cW', last)
+  if openrefline > 0
     let c = virtcol('.')
     if c > 1
       execute "normal! i\<CR>\<Esc>"
     endif
-    let n = last - line('.') + 1
+    let n = last - openrefline + 1
     execute "normal! " . n . "J$"
     " 行結合後、再帰呼び出しされてて、<reference>が行頭→これ以上再帰しても無駄
     if a:joined && c == 1
