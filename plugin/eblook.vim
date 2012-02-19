@@ -201,19 +201,19 @@ endif
 unlet s:eblookenc2opt
 
 if !exists(":EblookSearch")
-  command -nargs=1 EblookSearch call <SID>Search(<q-args>)
+  command -count=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>)
 endif
 if !exists(":EblookListDict")
-  command EblookListDict call <SID>ListDict()
+  command -count=0 EblookListDict call <SID>ListDict(<count>)
 endif
 if !exists(":EblookSkipDict")
-  command -nargs=* EblookSkipDict call <SID>SetDictSkip(1, <f-args>)
+  command -count=0 -nargs=* EblookSkipDict call <SID>SetDictSkip(<count>, 1, <f-args>)
 endif
 if !exists(":EblookNotSkipDict")
-  command -nargs=* EblookNotSkipDict call <SID>SetDictSkip(0, <f-args>)
+  command -count=0 -nargs=* EblookNotSkipDict call <SID>SetDictSkip(<count>, 0, <f-args>)
 endif
 if !exists(":EblookPasteDictList")
-  command EblookPasteDictList call <SID>PasteDictList()
+  command -count=0 EblookPasteDictList call <SID>PasteDictList(<count>)
 endif
 
 " </reference=>で指定されるentryのpattern
@@ -242,17 +242,17 @@ if !hasmapto('<Plug>EblookInput')
   map <unique> <Leader><C-Y> <Plug>EblookInput
 endif
 noremap <unique> <script> <Plug>EblookInput <SID>Input
-noremap <SID>Input :<C-U>call <SID>SearchInput()<CR>
+noremap <SID>Input :<C-U>call <SID>SearchInput(v:count)<CR>
 if !hasmapto('<Plug>EblookSearch', 'n')
   nmap <unique> <Leader>y <Plug>EblookSearch
 endif
 nnoremap <unique> <script> <Plug>EblookSearch <SID>SearchN
-nnoremap <silent> <SID>SearchN :<C-U>call <SID>Search(expand('<cword>'))<CR>
+nnoremap <silent> <SID>SearchN :<C-U>call <SID>Search(v:count, expand('<cword>'))<CR>
 if !hasmapto('<Plug>EblookSearch', 'v')
   vmap <unique> <Leader>y <Plug>EblookSearch
 endif
 vnoremap <unique> <script> <Plug>EblookSearch <SID>SearchV
-vnoremap <silent> <SID>SearchV :<C-U>call <SID>SearchVisual()<CR>
+vnoremap <silent> <SID>SearchV :<C-U>call <SID>SearchVisual(v:count)<CR>
 if s:set_mapleader
   unlet g:mapleader
 endif
@@ -277,6 +277,9 @@ if !exists("g:eblook_dictlist")
     endif
     if exists("g:eblook_dict{s:i}_title")
       let dict.title = g:eblook_dict{s:i}_title
+    else
+      " 辞書のtitleが設定されていなかったら、辞書番号とnameを設定しておく
+      let dict.title = s:i . dict.name
     endif
     if exists("g:eblook_dict{s:i}_skip")
       let dict.skip = g:eblook_dict{s:i}_skip
@@ -286,20 +289,6 @@ if !exists("g:eblook_dictlist")
   endwhile
   unlet s:i
 endif
-
-let s:i = 0
-while s:i < len(g:eblook_dictlist)
-  let dict = g:eblook_dictlist[s:i]
-  " 辞書のtitleが設定されていなかったら、辞書番号とnameを設定しておく
-  if !exists('dict.title')
-    let dict.title = s:i . dict.name
-  endif
-  if dict.book =~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
-    let dict.hasappendix = 1
-  endif
-  let s:i = s:i + 1
-endwhile
-unlet s:i
 
 " entryバッファに入った時に実行。set nobuflistedする。
 function! s:Entry_BufEnter()
@@ -320,7 +309,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
-  nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
+  nnoremap <buffer> <silent> s :call <SID>SearchInput(b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
   execute 'nnoremap <buffer> <silent> <Tab> /' . s:entrypat . '<CR>'
@@ -344,41 +333,48 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>FollowReference('')<CR>
-  nnoremap <buffer> <silent> s :call <SID>SearchInput()<CR>
+  nnoremap <buffer> <silent> s :call <SID>SearchInput(b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
 endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
-function! s:SearchInput()
-  let str = input('eblook-vim: ')
+" @param {Number} group 対象の辞書グループ番号
+function! s:SearchInput(group)
+  let str = input('eblook-vim(' . a:group . '): ')
   if strlen(str) == 0
     return
   endif
-  call s:Search(str)
+  call s:Search(a:group, str)
 endfunction
 
 " Visual modeで選択されている文字列を検索する
-function! s:SearchVisual()
+" @param {Number} group 対象の辞書グループ番号
+function! s:SearchVisual(group)
   let save_reg = @@
   silent execute 'normal! `<' . visualmode() . '`>y'
-  call s:Search(substitute(@@, '\n', '', 'g'))
+  call s:Search(a:group, substitute(@@, '\n', '', 'g'))
   let @@ = save_reg
 endfunction
 
 " 指定された単語の検索を行う。
 " entryバッファに検索結果のリストを表示し、
 " そのうち先頭のentryの内容をcontentバッファに表示する。
-" @param key 検索する単語
-function! s:Search(key)
+" @param {Number} group 対象の辞書グループ番号
+" @param {String} key 検索する単語
+function! s:Search(group, key)
+  if a:group > 0 && !exists("g:eblook_dictlist{a:group}")
+    echomsg 'eblook-vim: 辞書グループ(g:eblook_dictlist' . a:group . ')は未定義です'
+    return -1
+  endif
   let hasoldwin = bufwinnr(s:entrybufname . s:bufindex)
   if hasoldwin < 0
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
-  if s:RedirSearchCommand(a:key) < 0
+  if s:RedirSearchCommand(a:group, a:key) < 0
     return -1
   endif
-  if s:NewBuffers() < 0
+  if s:NewBuffers(a:group) < 0
     return -1
   endif
   call s:ExecuteEblook()
@@ -395,18 +391,25 @@ function! s:Search(key)
       endif
     endif
   endwhile
+  let dictlist = s:GetDictList(a:group)
   let i = 0
-  while i < len(g:eblook_dictlist)
-    let dict = g:eblook_dictlist[i]
+  while i < len(dictlist)
+    let dict = dictlist[i]
     if get(dict, 'skip')
       let i = i + 1
       continue
     endif
+    let title = get(dict, 'title', '')
+    if strlen(title) == 0
+      " 辞書のtitleが設定されていなかったら、辞書番号とnameを設定する
+      let dict.title = i . dict.name
+      let title = dict.title
+    endif
     if index(gaijidnums, i) >= 0
-      let gaijimap = s:GetGaijiMap(i)
+      let gaijimap = s:GetGaijiMap(dict)
       silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
     endif
-    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . dict.title . "\t"
+    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
   silent! :g/eblook.*> /s///g
@@ -419,21 +422,24 @@ function! s:Search(key)
       if hasoldwin < 0
 	call s:Quit()
       endif
-      redraw | echomsg 'eblook-vim: 何も見つかりませんでした: <' . a:key . '>'
+      redraw | echomsg 'eblook-vim(' . a:group . '): 何も見つかりませんでした: <' . a:key . '>'
     endif
   endif
 endfunction
 
 " eblookプログラムにリダイレクトするための検索コマンドファイルを作成する
-function! s:RedirSearchCommand(key)
+" @param {Number} group 対象の辞書グループ番号
+" @param {String} key 検索する単語
+function! s:RedirSearchCommand(group, key)
   if s:OpenWindow('new') < 0
     return -1
   endif
   setlocal nobuflisted
   let prev_book = ''
   let i = 0
-  while i < len(g:eblook_dictlist)
-    let dict = g:eblook_dictlist[i]
+  let dictlist = s:GetDictList(a:group)
+  while i < len(dictlist)
+    let dict = dictlist[i]
     if get(dict, 'skip')
       let i = i + 1
       continue
@@ -452,13 +458,29 @@ function! s:RedirSearchCommand(key)
   return 0
 endfunction
 
+" 指定された辞書グループの辞書リストを取得する
+" @param {Number} group 対象の辞書グループ番号
+" @return 辞書リスト
+function! s:GetDictList(group)
+  if a:group > 0
+    if exists("g:eblook_dictlist{a:group}")
+      let dictlist = g:eblook_dictlist{a:group}
+    else
+      let dictlist = []
+    endif
+  else
+    let dictlist = g:eblook_dictlist
+  endif
+  return dictlist
+endfunction
+
 " eblookのbookに指定するための引数値を作る
 " @param {Dictionary} dict 辞書情報
 " @return {String} bookに指定する引数
 function! s:MakeBookArgument(dict)
   " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
   " (XXX: eblook 1.6.1+media版では対処されているので不要)
-  if get(a:dict, 'hasappendix')
+  if a:dict.book =~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
     return a:dict.book
   else
     return a:dict.book . ' ' . a:dict.book
@@ -477,7 +499,8 @@ function! s:ExecuteEblook()
 endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
-function! s:NewBuffers()
+" @param {Number} group 対象の辞書グループ番号
+function! s:NewBuffers(group)
   " entryバッファとcontentバッファは一対で扱う。
   let oldindex = s:bufindex
   let s:bufindex = s:NextBufIndex()
@@ -490,11 +513,13 @@ function! s:NewBuffers()
     let s:bufindex = oldindex
     return -1
   endif
+  let b:group = a:group
   if s:GoWindow(1) < 0
     call s:Quit()
     let s:bufindex = oldindex
     return -1
   endif
+  let b:group = a:group
   execute g:eblook_entrywin_height . 'wincmd _'
   return 0
 endfunction
@@ -531,7 +556,7 @@ function! s:GetContent()
   if strlen(title) == 0
     return -1
   endif
-  let dnum = s:GetDictNumFromTitle(title)
+  let dnum = s:GetDictNumFromTitle(b:group, title)
   if dnum < 0
     return -1
   endif
@@ -546,7 +571,8 @@ function! s:GetContent()
 
   silent execute "normal! :%d _\<CR>"
   let b:dictnum = dnum
-  let dict = g:eblook_dictlist[b:dictnum]
+  let dictlist = s:GetDictList(b:group)
+  let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
   if exists("dict.book")
     silent echo 'book ' . s:MakeBookArgument(dict)
@@ -558,7 +584,7 @@ function! s:GetContent()
 
   silent! :g/eblook> /s///g
   if search('<gaiji=', 'nw') != 0
-    call s:ReplaceGaiji(dnum)
+    call s:ReplaceGaiji(dict)
   endif
   silent! :g/^$/d _
   call s:FormatCaption()
@@ -571,33 +597,33 @@ function! s:GetContent()
 endfunction
 
 " <gaiji=xxxxx>を置き換える。
-function! s:ReplaceGaiji(dnum)
-  let gaijimap = s:GetGaijiMap(a:dnum)
+function! s:ReplaceGaiji(dict)
+  let gaijimap = s:GetGaijiMap(a:dict)
   silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(gaijimap, submatch(1))/g
 endfunction
 
 " 外字置換表を取得する
-" @param dnum 辞書番号
+" @param dict 辞書
 " @return 外字置換表
-function! s:GetGaijiMap(dnum)
-  if !exists("g:eblook_dictlist[a:dnum].gaijimap")
+function! s:GetGaijiMap(dict)
+  if !exists("a:dict.gaijimap")
     try
-      let g:eblook_dictlist[a:dnum].gaijimap = s:LoadGaijiMapFile(a:dnum)
+      let a:dict.gaijimap = s:LoadGaijiMapFile(a:dict)
     catch /load-error/
       " ウィンドウを閉じて空きを作って再度検索し直した時に外字取得できるように
       return {}
     endtry
   endif
-  return g:eblook_dictlist[a:dnum].gaijimap
+  return a:dict.gaijimap
 endfunction
 
 " EBWin形式の外字定義ファイルを読み込む
 " http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
-" @param dnum 辞書番号
+" @param dict 辞書
 " @return 読み込んだ外字置換表。{'ha121':[unicode, ascii], ...}
-function! s:LoadGaijiMapFile(dnum)
-  let name = g:eblook_dictlist[a:dnum].name
-  let dir = matchstr(g:eblook_dictlist[a:dnum].book, '"\zs[^"]\+\ze"\|\S\+')
+function! s:LoadGaijiMapFile(dict)
+  let name = a:dict.name
+  let dir = matchstr(a:dict.book, '"\zs[^"]\+\ze"\|\S\+')
   " "{dir}/{NAME}_{encoding}.map"が無ければ"{dir}/{NAME}.map"をcp932で読み込み
   let mapfilebase = dir . '/' . toupper(name)
   let encmapfile = mapfilebase . '_' . &encoding . '.map'
@@ -829,10 +855,11 @@ function! s:FollowReference(refid)
   endif
   execute 'normal! ' . save_line . 'G' . save_col . '|'
 
-  if s:NewBuffers() < 0
+  if s:NewBuffers(b:group) < 0
     return -1
   endif
-  let title = g:eblook_dictlist[dnum].title
+  let dictlist = s:GetDictList(b:group)
+  let title = dictlist[dnum].title
   let j = 0
   while j < len(label)
     execute 'normal! o' . title . "\<C-V>\<Tab>" . entry[j] . "\<C-V>\<Tab>" . label[j] . "\<Esc>"
@@ -940,10 +967,11 @@ endfunction
 " title文字列から辞書番号を返す
 " @param title 辞書のtitle文字列
 " @return 辞書番号
-function! s:GetDictNumFromTitle(title)
+function! s:GetDictNumFromTitle(group, title)
+  let dictlist = s:GetDictList(a:group)
   let i = 0
-  while i < len(g:eblook_dictlist)
-    if a:title ==# g:eblook_dictlist[i].title
+  while i < len(dictlist)
+    if a:title ==# dictlist[i].title
       return i
     endif
     let i = i + 1
@@ -952,11 +980,14 @@ function! s:GetDictNumFromTitle(title)
 endfunction
 
 " 辞書一覧を表示する
-function! s:ListDict()
+" @param {Number} group 対象の辞書グループ番号
+function! s:ListDict(group)
+  let dictlist = s:GetDictList(a:group)
+  echo '辞書グループ: ' . a:group
   " EblookSkipDict等では辞書番号を指定するので、辞書番号付きで表示する
   let i = 0
-  while i < len(g:eblook_dictlist)
-    let dict = g:eblook_dictlist[i]
+  while i < len(dictlist)
+    let dict = dictlist[i]
     let skip = ''
     if get(dict, 'skip')
       let skip = 'skip'
@@ -968,11 +999,13 @@ function! s:ListDict()
 endfunction
 
 " 辞書をスキップするかどうかを一時的に設定する。
+" @param {Number} group 対象の辞書グループ番号
 " @param is_skip スキップするかどうか。1:スキップする, 0:スキップしない
 " @param ... 辞書番号のリスト
-function! s:SetDictSkip(is_skip, ...)
+function! s:SetDictSkip(group, is_skip, ...)
+  let dictlist = s:GetDictList(a:group)
   for dnum in a:000
-    let g:eblook_dictlist[dnum].skip = a:is_skip
+    let dictlist[dnum].skip = a:is_skip
   endfor
 endfunction
 
@@ -1021,12 +1054,18 @@ endfunction
 
 " eblook-vim-1.1.0からの辞書指定形式をペーストする。
 " eblook-vim-1.0.5からの形式変換用。
-function! s:PasteDictList()
+" @param {Number} group 対象の辞書グループ番号
+function! s:PasteDictList(group)
+  let dictlist = s:GetDictList(a:group)
   let save_paste = &paste
   let &paste = 1
-  execute 'normal! olet eblook_dictlist =' . "\<CR>"
-    \ . '\[' . "\<Esc>"
-  for dict in g:eblook_dictlist
+  if a:group > 0
+    execute 'normal! olet eblook_dictlist' . a:group . "\<Esc>"
+  else
+    execute 'normal! olet eblook_dictlist' . "\<Esc>"
+  endif
+  execute 'normal! o\[' . "\<Esc>"
+  for dict in dictlist
     execute 'normal! o'
       \ . "  \\{\<CR>"
       \ . "    \\'title': '" . dict.title . "',\<CR>"
