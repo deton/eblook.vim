@@ -37,6 +37,7 @@ scriptencoding cp932
 "
 " コマンド:
 "   :EblookSearch         指定した単語の検索を行う
+"   :EblookGroup          count非指定時の検索対象辞書グループ番号を設定
 "   :EblookListDict       辞書の一覧を表示する
 "   :EblookSkipDict       指定した辞書番号の辞書を一時的に検索対象から外す
 "   :EblookNotSkipDict    指定した辞書番号の辞書を一時的に検索対象に入れる
@@ -77,9 +78,9 @@ scriptencoding cp932
 "   O                   contentウィンドウ内の長い行を|gq|で整形する
 "
 " オプション:
-"    'eblook_dictlist0'
-"      |count|が指定されていない時に検索対象にする辞書グループ。
-"      'eblook_dictlist{n}'のいずれか。省略値: eblook_dictlist1
+"    'eblook_group'
+"      |count|が指定されていない時に検索対象にする辞書グループ番号。
+"      省略値: 1
 "
 "    'eblook_dictlist{n}'
 "      辞書グループ{n}のEPWING辞書の|List|。{n}は1以上。
@@ -297,8 +298,8 @@ if !exists("g:eblook_dictlist1")
   unlet s:i
 endif
 
-if !exists('g:eblook_dictlist0')
-  let g:eblook_dictlist0 = g:eblook_dictlist1
+if !exists('g:eblook_group')
+  let g:eblook_group = 1
 endif
 
 " entryバッファに入った時に実行。set nobuflistedする。
@@ -352,11 +353,12 @@ endfunction
 " プロンプトを出して、ユーザから入力された文字列を検索する
 " @param {Number} group 対象の辞書グループ番号
 function! s:SearchInput(group)
-  let str = input('eblook-vim(' . a:group . '): ')
+  let gr = s:ExpandDefaultGroup(a:group)
+  let str = input('eblook-vim(' . gr . '): ')
   if strlen(str) == 0
     return
   endif
-  call s:Search(a:group, str)
+  call s:Search(gr, str)
 endfunction
 
 " Visual modeで選択されている文字列を検索する
@@ -374,9 +376,10 @@ endfunction
 " @param {Number} group 対象の辞書グループ番号
 " @param {String} key 検索する単語
 function! s:Search(group, key)
-  let dictlist = s:GetDictList(a:group)
+  let gr = s:ExpandDefaultGroup(a:group)
+  let dictlist = s:GetDictList(gr)
   if len(dictlist) == 0
-    echomsg 'eblook-vim: 辞書グループ(g:eblook_dictlist' . a:group . ')には辞書がありません'
+    echomsg 'eblook-vim: 辞書グループ(g:eblook_dictlist' . gr . ')には辞書がありません'
     return -1
   endif
   let hasoldwin = bufwinnr(s:entrybufname . s:bufindex)
@@ -386,7 +389,7 @@ function! s:Search(group, key)
   if s:RedirSearchCommand(dictlist, a:key) < 0
     return -1
   endif
-  if s:NewBuffers(a:group) < 0
+  if s:NewBuffers(gr) < 0
     return -1
   endif
   call s:ExecuteEblook()
@@ -433,7 +436,7 @@ function! s:Search(group, key)
       if hasoldwin < 0
 	call s:Quit()
       endif
-      redraw | echomsg 'eblook-vim(' . a:group . '): 何も見つかりませんでした: <' . a:key . '>'
+      redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . a:key . '>'
     endif
   endif
 endfunction
@@ -472,8 +475,9 @@ endfunction
 " @param {Number} group 対象の辞書グループ番号
 " @return 辞書リスト
 function! s:GetDictList(group)
-  if exists("g:eblook_dictlist{a:group}")
-    let dictlist = g:eblook_dictlist{a:group}
+  let gr = s:ExpandDefaultGroup(a:group)
+  if exists("g:eblook_dictlist{gr}")
+    let dictlist = g:eblook_dictlist{gr}
   else
     let dictlist = []
   endif
@@ -988,8 +992,9 @@ endfunction
 " 辞書一覧を表示する
 " @param {Number} group 対象の辞書グループ番号
 function! s:ListDict(group)
-  let dictlist = s:GetDictList(a:group)
-  echo '辞書グループ: ' . a:group
+  let gr = s:ExpandDefaultGroup(a:group)
+  let dictlist = s:GetDictList(gr)
+  echo '辞書グループ: ' . gr
   " EblookSkipDict等では辞書番号を指定するので、辞書番号付きで表示する
   let i = 0
   while i < len(dictlist)
@@ -1018,7 +1023,22 @@ endfunction
 " countが指定されていない時に検索対象にする辞書グループ番号を設定する
 " @param {Number} group 対象の辞書グループ番号
 function! s:SetDefaultGroup(group)
-  let g:eblook_dictlist0 = s:GetDictList(a:group)
+  if a:group == 0
+    echomsg 'eblook-vim: g:eblook_group=' . g:eblook_group
+  else
+    let g:eblook_group = a:group
+  endif
+endfunction
+
+" group番号が0(未指定)であれば、g:eblook_groupの値を返す。
+" (countを指定せずに操作した時に、どの辞書グループが使われたかが、
+" ユーザにわかるようにするため)
+function! s:ExpandDefaultGroup(group)
+  if a:group == 0
+    return g:eblook_group
+  else
+    return a:group
+  endif
 endfunction
 
 " SelectWindowByName(name)
@@ -1068,10 +1088,11 @@ endfunction
 " eblook-vim-1.0.5からの形式変換用。
 " @param {Number} group 対象の辞書グループ番号
 function! s:PasteDictList(group)
-  let dictlist = s:GetDictList(a:group)
+  let gr = s:ExpandDefaultGroup(a:group)
+  let dictlist = s:GetDictList(gr)
   let save_paste = &paste
   let &paste = 1
-  execute 'normal! olet eblook_dictlist' . a:group . " = [\<Esc>"
+  execute 'normal! olet eblook_dictlist' . gr . " = [\<Esc>"
   for dict in dictlist
     execute 'normal! o'
       \ . "  \\{ 'title': '" . dict.title . "',\<CR>"
