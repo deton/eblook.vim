@@ -79,7 +79,7 @@ scriptencoding cp932
 "
 " オプション:
 "    'eblook_group'
-"      |count|が指定されていない時に検索対象にする辞書グループ番号。
+"      |[count]|が指定されていない時に検索対象にする辞書グループ番号。
 "      省略値: 1
 "
 "    'eblook_dictlist{n}'

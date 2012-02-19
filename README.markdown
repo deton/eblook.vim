@@ -47,13 +47,15 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   * 発音記号などの外字をUnicode文字列へ置換する機能を追加
     ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
   * その他の外字を_(下線)に置換するように変更
-  * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
   * ~/.vimrcでの辞書の設定をVim7のDictionaryとListで行う形式に変更
     (辞書の追加・削除・検索順の変更時の手間を減らすため)。
     (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
-  * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
+  * 辞書をグループ化して登録、検索する機能を追加。
+    検索時に[count]で辞書グループ番号を指定。
   * contentウィンドウ内の長い行を|gq|で整形する機能を追加
     (行が長く、ウィンドウの高さが狭い場合でも、問題なく表示できるように)
+  * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
+  * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
   * `<img>`,`<snd>`,`<mov>`,`<inline>`はキャプションのみ表示するように変更
     (conceal syntax)
   * Vim6対応を終了。要Vim7
