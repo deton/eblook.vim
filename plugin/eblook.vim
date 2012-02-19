@@ -206,7 +206,7 @@ endif
 unlet s:eblookenc2opt
 
 if !exists(":EblookSearch")
-  command -count=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>)
+  command -range=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>)
 endif
 if !exists(":EblookGroup")
   command -count=0 EblookGroup call <SID>SetDefaultGroup(<count>)
@@ -215,10 +215,10 @@ if !exists(":EblookListDict")
   command -count=0 EblookListDict call <SID>ListDict(<count>)
 endif
 if !exists(":EblookSkipDict")
-  command -count=0 -nargs=* EblookSkipDict call <SID>SetDictSkip(<count>, 1, <f-args>)
+  command -range=0 -nargs=* EblookSkipDict call <SID>SetDictSkip(<count>, 1, <f-args>)
 endif
 if !exists(":EblookNotSkipDict")
-  command -count=0 -nargs=* EblookNotSkipDict call <SID>SetDictSkip(<count>, 0, <f-args>)
+  command -range=0 -nargs=* EblookNotSkipDict call <SID>SetDictSkip(<count>, 0, <f-args>)
 endif
 if !exists(":EblookPasteDictList")
   command -count=0 EblookPasteDictList call <SID>PasteDictList(<count>)
