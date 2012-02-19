@@ -215,10 +215,10 @@ if !exists(":EblookListDict")
   command -count=0 EblookListDict call <SID>ListDict(<count>)
 endif
 if !exists(":EblookSkipDict")
-  command -range=0 -nargs=* EblookSkipDict call <SID>SetDictSkip(<count>, 1, <f-args>)
+  command -range=0 -nargs=+ EblookSkipDict call <SID>SetDictSkip(<count>, 1, <f-args>)
 endif
 if !exists(":EblookNotSkipDict")
-  command -range=0 -nargs=* EblookNotSkipDict call <SID>SetDictSkip(<count>, 0, <f-args>)
+  command -range=0 -nargs=+ EblookNotSkipDict call <SID>SetDictSkip(<count>, 0, <f-args>)
 endif
 if !exists(":EblookPasteDictList")
   command -count=0 EblookPasteDictList call <SID>PasteDictList(<count>)
