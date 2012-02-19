@@ -1060,15 +1060,13 @@ function! s:PasteDictList(group)
   let save_paste = &paste
   let &paste = 1
   if a:group > 0
-    execute 'normal! olet eblook_dictlist' . a:group . "\<Esc>"
+    execute 'normal! olet eblook_dictlist' . a:group . " = [\<Esc>"
   else
-    execute 'normal! olet eblook_dictlist' . "\<Esc>"
+    execute 'normal! olet eblook_dictlist' . " = [\<Esc>"
   endif
-  execute 'normal! o\[' . "\<Esc>"
   for dict in dictlist
     execute 'normal! o'
-      \ . "  \\{\<CR>"
-      \ . "    \\'title': '" . dict.title . "',\<CR>"
+      \ . "  \\{ 'title': '" . dict.title . "',\<CR>"
       \ . "    \\'book': '" . dict.book . "',\<CR>"
       \ . "    \\'name': '" . dict.name . "',\<Esc>"
     if exists('dict.skip')
