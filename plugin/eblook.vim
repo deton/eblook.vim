@@ -77,8 +77,13 @@ scriptencoding cp932
 "   O                   contentウィンドウ内の長い行を|gq|で整形する
 "
 " オプション:
-"    'eblook_dictlist'
-"      EPWING辞書の|List|。Listの各要素は以下のkeyを持つ|Dictionary|。
+"    'eblook_dictlist0'
+"      |count|が指定されていない時に検索対象にする辞書グループ。
+"      'eblook_dictlist{n}'のいずれか。省略値: eblook_dictlist1
+"
+"    'eblook_dictlist{n}'
+"      辞書グループ{n}のEPWING辞書の|List|。{n}は1以上。
+"      Listの各要素は以下のkeyを持つ|Dictionary|。
 "
 "      'title'
 "         辞書の識別子を指定。entryウィンドウ中で辞書を識別するために使う。
@@ -105,8 +110,7 @@ scriptencoding cp932
 "         ('autoformat'キーが未指定の場合は0とみなす)
 "
 "      例:
-"        let eblook_dictlist =
-"        \[
+"        let eblook_dictlist1 = [
 "          \{
 "            \'title': '広辞苑第五版',
 "            \'book': '/usr/local/epwing/tougou99',
@@ -203,6 +207,9 @@ unlet s:eblookenc2opt
 if !exists(":EblookSearch")
   command -count=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>)
 endif
+if !exists(":EblookGroup")
+  command -count=0 EblookGroup call <SID>SetDefaultGroup(<count>)
+endif
 if !exists(":EblookListDict")
   command -count=0 EblookListDict call <SID>ListDict(<count>)
 endif
@@ -267,8 +274,8 @@ execute "autocmd BufEnter " . s:contentbufname . "* call <SID>Content_BufEnter()
 augroup END
 
 " eblook-vim-1.0.5までの辞書指定形式を読み込む
-if !exists("g:eblook_dictlist")
-  let g:eblook_dictlist = []
+if !exists("g:eblook_dictlist1")
+  let g:eblook_dictlist1 = []
   let s:i = 1
   while exists("g:eblook_dict{s:i}_name")
     let dict = { 'name': g:eblook_dict{s:i}_name }
@@ -284,10 +291,14 @@ if !exists("g:eblook_dictlist")
     if exists("g:eblook_dict{s:i}_skip")
       let dict.skip = g:eblook_dict{s:i}_skip
     endif
-    call add(g:eblook_dictlist, dict)
+    call add(g:eblook_dictlist1, dict)
     let s:i = s:i + 1
   endwhile
   unlet s:i
+endif
+
+if !exists('g:eblook_dictlist0')
+  let g:eblook_dictlist0 = g:eblook_dictlist1
 endif
 
 " entryバッファに入った時に実行。set nobuflistedする。
@@ -363,15 +374,16 @@ endfunction
 " @param {Number} group 対象の辞書グループ番号
 " @param {String} key 検索する単語
 function! s:Search(group, key)
-  if a:group > 0 && !exists("g:eblook_dictlist{a:group}")
-    echomsg 'eblook-vim: 辞書グループ(g:eblook_dictlist' . a:group . ')は未定義です'
+  let dictlist = s:GetDictList(a:group)
+  if len(dictlist) == 0
+    echomsg 'eblook-vim: 辞書グループ(g:eblook_dictlist' . a:group . ')には辞書がありません'
     return -1
   endif
   let hasoldwin = bufwinnr(s:entrybufname . s:bufindex)
   if hasoldwin < 0
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
-  if s:RedirSearchCommand(a:group, a:key) < 0
+  if s:RedirSearchCommand(dictlist, a:key) < 0
     return -1
   endif
   if s:NewBuffers(a:group) < 0
@@ -391,7 +403,6 @@ function! s:Search(group, key)
       endif
     endif
   endwhile
-  let dictlist = s:GetDictList(a:group)
   let i = 0
   while i < len(dictlist)
     let dict = dictlist[i]
@@ -428,18 +439,17 @@ function! s:Search(group, key)
 endfunction
 
 " eblookプログラムにリダイレクトするための検索コマンドファイルを作成する
-" @param {Number} group 対象の辞書グループ番号
+" @param dictlist 対象の辞書グループ
 " @param {String} key 検索する単語
-function! s:RedirSearchCommand(group, key)
+function! s:RedirSearchCommand(dictlist, key)
   if s:OpenWindow('new') < 0
     return -1
   endif
   setlocal nobuflisted
   let prev_book = ''
   let i = 0
-  let dictlist = s:GetDictList(a:group)
-  while i < len(dictlist)
-    let dict = dictlist[i]
+  while i < len(a:dictlist)
+    let dict = a:dictlist[i]
     if get(dict, 'skip')
       let i = i + 1
       continue
@@ -462,14 +472,10 @@ endfunction
 " @param {Number} group 対象の辞書グループ番号
 " @return 辞書リスト
 function! s:GetDictList(group)
-  if a:group > 0
-    if exists("g:eblook_dictlist{a:group}")
-      let dictlist = g:eblook_dictlist{a:group}
-    else
-      let dictlist = []
-    endif
+  if exists("g:eblook_dictlist{a:group}")
+    let dictlist = g:eblook_dictlist{a:group}
   else
-    let dictlist = g:eblook_dictlist
+    let dictlist = []
   endif
   return dictlist
 endfunction
@@ -1009,6 +1015,12 @@ function! s:SetDictSkip(group, is_skip, ...)
   endfor
 endfunction
 
+" countが指定されていない時に検索対象にする辞書グループ番号を設定する
+" @param {Number} group 対象の辞書グループ番号
+function! s:SetDefaultGroup(group)
+  let g:eblook_dictlist0 = s:GetDictList(a:group)
+endfunction
+
 " SelectWindowByName(name)
 "   Acitvate selected window by a:name.
 function! s:SelectWindowByName(name)
@@ -1059,11 +1071,7 @@ function! s:PasteDictList(group)
   let dictlist = s:GetDictList(a:group)
   let save_paste = &paste
   let &paste = 1
-  if a:group > 0
-    execute 'normal! olet eblook_dictlist' . a:group . " = [\<Esc>"
-  else
-    execute 'normal! olet eblook_dictlist' . " = [\<Esc>"
-  endif
+  execute 'normal! olet eblook_dictlist' . a:group . " = [\<Esc>"
   for dict in dictlist
     execute 'normal! o'
       \ . "  \\{ 'title': '" . dict.title . "',\<CR>"
