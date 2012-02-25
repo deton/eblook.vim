@@ -284,15 +284,18 @@ if !exists("g:eblook_dictlist1")
     if exists("g:eblook_dict{s:i}_book")
       let dict.book = g:eblook_dict{s:i}_book
       " appendix‚ªŽw’è‚³‚ê‚Ä‚¢‚éê‡Abook‚Æ‚Í•ª—£‚·‚é(ˆµ‚¢‚â‚·‚­‚·‚é‚½‚ß)
-      let bookapp = matchlist(dict.book, '^"\([^"]\+\)"\s\+\(.\+\)\|^\([^"]\+\)\s\+\(.\+\)')
+      let bookapp = matchlist(dict.book, '^\("[^"]\+"\)\s\+\(.\+\)\|^\([^"]\+\)\s\+\(.\+\)')
       if len(bookapp) > 1
-	let patapp = '^"\zs[^"]\+\ze"\|^[^"]\+'
 	if strlen(bookapp[1]) > 0
 	  let dict.book = bookapp[1]
-	  let dict.appendix = matchstr(bookapp[2], patapp)
+	  if strlen(bookapp[2]) > 0
+	    let dict.appendix = bookapp[2]
+	  endif
 	elseif strlen(bookapp[3]) > 0
 	  let dict.book = bookapp[3]
-	  let dict.appendix = matchstr(bookapp[4], patapp)
+	  if strlen(bookapp[4]) > 0
+	    let dict.appendix = bookapp[4]
+	  endif
 	endif
       endif
     endif
