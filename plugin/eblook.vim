@@ -370,7 +370,7 @@ endfunction
 " @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
 function! s:SearchInput(group)
   let gr = s:ExpandDefaultGroup(a:group)
-  let str = input('eblook-vim(' . gr . '): ')
+  let str = input(':' . gr . 'EblookSearch ')
   if strlen(str) == 0
     return
   endif
