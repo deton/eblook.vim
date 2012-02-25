@@ -119,7 +119,8 @@ scriptencoding cp932
 "          \},
 "          \{
 "            \'title': 'ジーニアス英和大辞典',
-"            \'book': '/usr/local/epwing/GENIUS /usr/local/epwing/appendix/genius2-1.1',
+"            \'book': '/usr/local/epwing/GENIUS',
+"            \'appendix': '/usr/local/epwing/appendix/genius2-1.1',
 "            \'name': 'genius'
 "          \},
 "          \{
@@ -282,6 +283,18 @@ if !exists("g:eblook_dictlist1")
     let dict = { 'name': g:eblook_dict{s:i}_name }
     if exists("g:eblook_dict{s:i}_book")
       let dict.book = g:eblook_dict{s:i}_book
+      " appendixが指定されている場合、bookとは分離する(扱いやすくするため)
+      let bookapp = matchlist(dict.book, '^"\([^"]\+\)"\s\+\(.\+\)\|^\([^"]\+\)\s\+\(.\+\)')
+      if len(bookapp) > 1
+	let patapp = '^"\zs[^"]\+\ze"\|^[^"]\+'
+	if strlen(bookapp[1]) > 0
+	  let dict.book = bookapp[1]
+	  let dict.appendix = matchstr(bookapp[2], patapp)
+	elseif strlen(bookapp[3]) > 0
+	  let dict.book = bookapp[3]
+	  let dict.appendix = matchstr(bookapp[4], patapp)
+	endif
+      endif
     endif
     if exists("g:eblook_dict{s:i}_title")
       let dict.title = g:eblook_dict{s:i}_title
@@ -490,8 +503,8 @@ endfunction
 function! s:MakeBookArgument(dict)
   " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
   " (XXX: eblook 1.6.1+media版では対処されているので不要)
-  if a:dict.book =~ '^"[^"]\+"\s\+\S\+\|^[^"]\+\s\+\S\+'
-    return a:dict.book
+  if exists('a:dict.appendix')
+    return a:dict.book . ' ' . a:dict.appendix
   else
     return a:dict.book . ' ' . a:dict.book
   endif
@@ -999,12 +1012,13 @@ function! s:ListDict(group)
   let i = 0
   while i < len(dictlist)
     let dict = dictlist[i]
-    let skip = ''
+    let skip = '    '
     if get(dict, 'skip')
       let skip = 'skip'
     endif
     let book = get(dict, 'book', '')
-    echo skip . "\t" . i . "\t" . dict.title . "\t" . dict.name . "\t" . book
+    let appendix = get(dict, 'appendix', '')
+    echo skip . ' ' . i . ' ' . dict.title . ' ' . dict.name . ' ' . book . ' ' . appendix
     let i = i + 1
   endwhile
 endfunction
@@ -1098,6 +1112,10 @@ function! s:PasteDictList(group)
       \ . "  \\{ 'title': '" . dict.title . "',\<CR>"
       \ . "    \\'book': '" . dict.book . "',\<CR>"
       \ . "    \\'name': '" . dict.name . "',\<Esc>"
+    if exists('dict.appendix')
+      execute 'normal! o'
+      \ . "    \\'appendix': '" . dict.appendix . "',\<Esc>"
+    endif
     if exists('dict.skip')
       execute 'normal! o'
       \ . "    \\'skip': " . dict.skip . ",\<Esc>"
