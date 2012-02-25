@@ -454,7 +454,12 @@ function! s:Search(group, key)
       if hasoldwin < 0
 	call s:Quit()
       endif
-      redraw | echomsg 'eblook-vim(' . gr . '): ‰½‚àŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½: <' . a:key . '>'
+      "redraw | echomsg 'eblook-vim(' . gr . '): ‰½‚àŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½: <' . a:key . '>'
+      let str = input(':' . gr . 'EblookSearch(‰½‚àŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½) ', a:key)
+      if strlen(str) == 0 || str ==# a:key
+	return
+      endif
+      call s:Search(gr, str)
     endif
   endif
 endfunction
