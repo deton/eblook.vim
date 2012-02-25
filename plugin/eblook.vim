@@ -95,18 +95,20 @@ scriptencoding cp932
 "      'book'
 "         eblookプログラムの`book'コマンドに渡すパラメータ。
 "         辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定。
-"         Appendixがある場合は、
-"         辞書ディレクトリに続けてAppendixディレクトリを指定。
+"
+"      'appendix' (省略可能)
+"         Appendixを使う場合は、Appendixディレクトリを指定。
+"         eblookプログラムの`book'コマンドに渡す2番目のパラメータ。
 "
 "      'name'
 "         eblookプログラムの`select'コマンドに渡すパラメータ。
 "         辞書名を指定。eblookプログラムのlistコマンドで調べる。
 "
-"      'skip'
+"      'skip' (省略可能)
 "         0でない値を設定すると、この辞書は検索しない。
 "         ('skip'キーが未指定の場合は0とみなす)
 "
-"      'autoformat'
+"      'autoformat' (省略可能)
 "         content表示時に長い行を|gq|で整形するかどうか。
 "         ('autoformat'キーが未指定の場合は0とみなす)
 "

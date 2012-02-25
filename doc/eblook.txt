@@ -111,10 +111,11 @@ http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
 (eblookコマンドの入出力エンコーディングとして-e utf8を指定しても効かない
  ようなので、eblookコマンドとのやりとりをcp932で行うように設定)
 
-euc-jp環境で置換後の丸数字等が文字化けする場合は、
+euc-jp環境で置換後の丸数字等が?@や?Aのように文字化けする場合は、
 mapファイルをnkf -eでeuc-jpに変換して、{nameの大文字}_{&encodingの値}.map
 というファイル名で上記(2)のディレクトリに置いてください。
   例: nkf -e KOJIEN.map >KOJIEN_euc-jp.map
+      nkf -e KANJIGEN.map >KANJIGEN_euc-jp.map
       nkf -e READERS2.map >READERS2_euc-jp.map
 (UNIX上のvimやiconvではエンコーディング変換に失敗するようなので、
  nkfやWindows上のvimで変換してください)
@@ -258,14 +259,13 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 'book'		辞書ディレクトリ。(eblookのbookコマンドの引数)
 'name'		辞書名。(eblookのselectコマンドの引数)
 'title' 	辞書識別子
+'appendix' 	Appendix
 'skip'		この辞書を検索対象にするかどうか
 'autoformat'	content表示時に長い行を|gq|で整形するかどうか
 
 'book'						*'eblook_dictlist{n}[m].book'*
   辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
   eblookプログラムの`book'コマンドに渡すパラメータです。
-  Appendixがある場合は、辞書ディレクトリに続けてAppendixディレクトリを
-  指定します。
   パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
   例:
     'book': '"C:/Program Files/epwing/iwanami/koujien"',
@@ -285,6 +285,12 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
   他の辞書とぶつからない文字列を適当に指定します。
   例:
     'title': '広辞苑第五版',
+
+'appendix'				*'eblook_dictlist{n}[m].appendix'*
+  Appendixを使う場合は、Appendixディレクトリを指定します。
+  パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
+  例:
+    'appendix': '"C:/Program Files/epwing/appendix/plus-2.0"',
 
 'skip'						*'eblook_dictlist{n}[m].skip'*
   0でない値を設定すると、この辞書は検索しません。
@@ -370,7 +376,8 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
         \'name': 'chujiten',
         \'title': '研究社　新英和・和英中辞典',
       \},
-      \{ 'book': '/usr/local/epwing/PLUS /usr/local/epwing/appendix/plus-2.0',
+      \{ 'book': '/usr/local/epwing/PLUS',
+        \'appendix': '/usr/local/epwing/appendix/plus-2.0',
         \'name': 'plus',
         \'title': '研究社リーダーズ＋プラスＶ２',
       \},
