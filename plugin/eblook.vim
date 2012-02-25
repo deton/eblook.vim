@@ -755,7 +755,7 @@ function! s:FormatCaption()
   " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
   " 数式部分でcaptionが空の<inline>が出現。非表示にすると
   " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
-  silent! :g;\(<reference=[^>]*>\)\(</reference=[^>]*>\);s;;\1参照\2;g
+  silent! :g;\(<reference>\)\(</reference=[^>]*>\);s;;\1参照\2;g
   silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:MakeCaptionString(submatch(0), 'img');g
   silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:MakeCaptionString(submatch(0), 'inline');g
   silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:MakeCaptionString(submatch(0), 'snd');g
