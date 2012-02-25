@@ -504,12 +504,23 @@ endfunction
 " @param {Dictionary} dict 辞書情報
 " @return {String} bookに指定する引数
 function! s:MakeBookArgument(dict)
-  " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
-  " (XXX: eblook 1.6.1+media版では対処されているので不要)
   if exists('a:dict.appendix')
     return a:dict.book . ' ' . a:dict.appendix
-  else
+  endif
+  " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
+  " (eblook 1.6.1+media版では対処されているので不要)
+  if !exists('s:has_appendix_problem')
+    let l:version = system(g:eblookprg . ' -version')
+    if match(l:version, '^eblook 1\.6\.1+media-') >= 0
+      let s:has_appendix_problem = 0
+    else
+      let s:has_appendix_problem = 1
+    endif
+  endif
+  if s:has_appendix_problem
     return a:dict.book . ' ' . a:dict.book
+  else
+    return a:dict.book
   endif
 endfunction
 
