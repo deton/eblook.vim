@@ -400,7 +400,7 @@ function! s:SearchInput(group, defgroup, uselastkey)
     let key = ''
   endif
   let str = input(':' . gr . 'EblookSearch ', key)
-  if strlen(str) == 0 || str ==# key && a:group == a:defgroup
+  if strlen(str) == 0 || str ==# key && gr == a:defgroup
     return
   endif
   call s:Search(gr, str)
