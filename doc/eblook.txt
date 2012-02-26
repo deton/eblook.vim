@@ -312,6 +312,13 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 
+'eblook_autoformat_default'			*'eblook_autoformat_default'*
+  contentウィンドウ内の長い行を|gq|で整形するかどうかのデフォルト値。
+  全辞書を常に整形したい場合向け(全辞書について'autoformat'プロパティ
+  を指定するのは面倒なので)。省略値: 0
+  全辞書を常に整形する場合は以下のように設定してください。
+    let eblook_autoformat_default = 1
+
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"
 

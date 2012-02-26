@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-13
+" Last Change: 2012-02-26
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -140,6 +140,11 @@ scriptencoding cp932
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 "
+"    'eblook_autoformat_default'
+"       contentウィンドウ内の長い行を|gq|で整形するかどうかのデフォルト値。
+"       全辞書を常に整形したい場合向け(全辞書について'autoformat'プロパティ
+"       を指定するのは面倒なので)。省略値: 0
+"
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
 "
@@ -183,6 +188,10 @@ endif
 " 保持しておく過去の検索バッファ数の上限
 if !exists('eblook_history_max')
   let eblook_history_max = 10
+endif
+
+if !exists('eblook_autoformat_default')
+  let eblook_autoformat_default = 0
 endif
 
 " eblookプログラムの名前
@@ -641,7 +650,11 @@ function! s:GetContent()
   endif
   silent! :g/^$/d _
   call s:FormatCaption()
-  if get(dict, 'autoformat')
+  if exists('dict.autoformat')
+    if dict.autoformat
+      call s:FormatContent()
+    endif
+  elseif g:eblook_autoformat_default
     call s:FormatContent()
   endif
   normal! 1G
