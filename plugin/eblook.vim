@@ -487,6 +487,7 @@ function! s:Search(group, key)
   endwhile
   silent! :g/eblook.*> /s///g
   silent! :g/^$/d _
+  setlocal nomodifiable
   normal! 1G
   if s:GetContent() < 0
     if search('.', 'w') == 0
@@ -627,6 +628,7 @@ function! s:CreateBuffer(bufname, oldindex)
   else
     execute "silent normal! :edit " . newbufname . "\<CR>"
   endif
+  setlocal modifiable
   if bufexists
     silent execute "normal! :%d _\<CR>"
   endif
@@ -654,6 +656,7 @@ function! s:GetContent()
     return -1
   endif
 
+  setlocal modifiable
   silent execute "normal! :%d _\<CR>"
   let b:dictnum = dnum
   let dictlist = s:GetDictList(b:group)
@@ -680,6 +683,7 @@ function! s:GetContent()
   elseif g:eblook_autoformat_default
     call s:FormatContent()
   endif
+  setlocal nomodifiable
   normal! 1G
   call s:GoWindow(1)
   return 0
@@ -839,6 +843,7 @@ function! s:FormatContent()
     return
   endif
 
+  setlocal modifiable
   " ’·‚¢s‚ð•ªŠ„‚·‚é
   normal! 1G$
   while 1
@@ -850,6 +855,7 @@ function! s:FormatContent()
     endif
     normal! j$
   endwhile
+  setlocal nomodifiable
   normal! 1G
 endfunction
 
@@ -955,6 +961,7 @@ function! s:FollowReference(refid)
     let j = j + 1
   endwhile
   silent! :g/^$/d _
+  setlocal nomodifiable
 
   normal! gg
   if strlen(a:refid) > 0
