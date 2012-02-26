@@ -268,7 +268,7 @@ if !hasmapto('<Plug>EblookInput')
   map <unique> <Leader><C-Y> <Plug>EblookInput
 endif
 noremap <unique> <script> <Plug>EblookInput <SID>Input
-noremap <SID>Input :<C-U>call <SID>SearchInput(v:count, 0)<CR>
+noremap <SID>Input :<C-U>call <SID>SearchInput(v:count, g:eblook_group, 0)<CR>
 if !hasmapto('<Plug>EblookSearch', 'n')
   nmap <unique> <Leader>y <Plug>EblookSearch
 endif
@@ -354,7 +354,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
-  nnoremap <buffer> <silent> s :call <SID>SearchInput(b:group, 1)<CR>
+  nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 1)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
   execute 'nnoremap <buffer> <silent> <Tab> /' . s:entrypat . '<CR>'
@@ -378,23 +378,27 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>FollowReference('')<CR>
-  nnoremap <buffer> <silent> s :call <SID>SearchInput(b:group, 1)<CR>
+  nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 1)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
 endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
 " @param {Number} group 対象の辞書グループ番号
+" @param {Number} defgroup 対象の辞書グループ番号(デフォルト)
 " @param {Boolean} uselastkey 直前の検索文字列をデフォルト文字列として入れるか
-function! s:SearchInput(group, uselastkey)
-  let gr = s:ExpandDefaultGroup(a:group)
+function! s:SearchInput(group, defgroup, uselastkey)
+  let gr = a:group
+  if a:group == 0
+    let gr = a:defgroup
+  endif
   if a:uselastkey
     let key = s:lastkey
   else
     let key = ''
   endif
   let str = input(':' . gr . 'EblookSearch ', key)
-  if strlen(str) == 0 || str ==# key
+  if strlen(str) == 0 || str ==# key && a:group == a:defgroup
     return
   endif
   call s:Search(gr, str)
