@@ -480,9 +480,9 @@ function! s:Search(group, key)
     endif
     if index(gaijidnums, i) >= 0
       let gaijimap = s:GetGaijiMap(dict)
-      silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
+      silent! execute 'g/eblook-' . i . '>/;/^eblook/-1s/<gaiji=\([^>]*\)>/\=s:GetGaiji(gaijimap, submatch(1))/g'
     endif
-    silent! execute ':g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
+    silent! execute 'g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
   silent! :g/eblook.*> /s///g
@@ -634,11 +634,11 @@ function! s:CreateBuffer(bufname, oldindex)
       return -1
     endif
   else
-    execute "silent normal! :edit " . newbufname . "\<CR>"
+    silent execute "edit " . newbufname
   endif
   setlocal modifiable
   if bufexists
-    silent execute "normal! :%d _\<CR>"
+    silent execute "%d _"
   endif
   return 0
 endfunction
@@ -665,7 +665,7 @@ function! s:GetContent()
   endif
 
   setlocal modifiable
-  silent execute "normal! :%d _\<CR>"
+  silent execute "%d _"
   let b:dictnum = dnum
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
@@ -1001,12 +1001,12 @@ function! s:History(dir)
   if s:SelectWindowByName(s:entrybufname . s:bufindex) < 0
     call s:OpenWindow('split ' . s:entrybufname . ni)
   else
-    execute "silent normal! :edit " . s:entrybufname . ni . "\<CR>"
+    silent execute "edit " . s:entrybufname . ni
   endif
   if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
     call s:OpenWindow('split ' . s:contentbufname . ni)
   else
-    execute "silent normal! :edit " . s:contentbufname . ni . "\<CR>"
+    silent execute "edit " . s:contentbufname . ni
   endif
   let s:bufindex = ni
   call s:GoWindow(1)
@@ -1187,7 +1187,7 @@ endfunction
 " 新しいウィンドウを開く
 function! s:OpenWindow(cmd)
   if winheight(0) > 2
-    execute "silent normal! :" . a:cmd . "\<CR>"
+    silent execute a:cmd
     return winnr()
   else
     " 'noequalalways'の場合、高さが足りずにsplitがE36エラーになる場合あるので、
@@ -1203,7 +1203,7 @@ function! s:OpenWindow(cmd)
     endfor
     if maxnr > 0
       execute maxnr . 'wincmd w'
-      execute "silent normal! :" . a:cmd . "\<CR>"
+      silent execute a:cmd
       return winnr()
     else
       redraw
