@@ -389,7 +389,8 @@ endfunction
 " @param {Number} group 対象の辞書グループ番号
 " @param {Number} defgroup 対象の辞書グループ番号(デフォルト)
 " @param {Boolean} uselastkey 直前の検索文字列をデフォルト文字列として入れるか
-"   (<Leader>yで取得・検索した文字列を一部変更して再検索できるように)
+"   (<Leader>yで取得・検索した文字列を一部変更して再検索できるように。
+"   input()のプロンプトで|c_CTRL-R_=|の後s:lastkeyと入力することで実現可能)
 function! s:SearchInput(group, defgroup, uselastkey)
   let gr = a:group
   if a:group == 0
