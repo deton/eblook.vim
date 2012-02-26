@@ -219,6 +219,8 @@ K                   カーソルを上の行に移動してcontentを表示する
 <BS>                contentウィンドウでPageUpを行う
 q                   entryウィンドウとcontentウィンドウを閉じる
 s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+                    検索対象の辞書グループ番号を[count]で指定可能
+S                   直前の検索語を[count]で指定する辞書グループで再検索する
 p                   contentウィンドウに移動する
 R                   reference一覧を表示する
 <C-P>               検索履歴中の一つ前のバッファを表示する
@@ -234,6 +236,8 @@ contentウィンドウでの操作			*eblook-usage-content*
 <Tab>               次のreferenceにカーソルを移動する
 q                   entryウィンドウとcontentウィンドウを閉じる
 s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+                    検索対象の辞書グループ番号を[count]で指定可能
+S                   直前の検索語を[count]で指定する辞書グループで再検索する
 p                   entryウィンドウに移動する
 R                   reference一覧を表示する
 <C-P>               検索履歴中の一つ前のバッファを表示する

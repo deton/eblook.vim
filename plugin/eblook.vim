@@ -59,6 +59,7 @@ scriptencoding cp932
 "   <BS>                contentウィンドウでPageUpを行う
 "   q                   entryウィンドウとcontentウィンドウを閉じる
 "   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+"   S                   直前の検索語を[count]で指定する辞書グループで再検索する
 "   p                   contentウィンドウに移動する
 "   R                   reference一覧を表示する
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
@@ -72,6 +73,7 @@ scriptencoding cp932
 "   <Tab>               次のreferenceにカーソルを移動する
 "   q                   entryウィンドウとcontentウィンドウを閉じる
 "   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+"   S                   直前の検索語を[count]で指定する辞書グループで再検索する
 "   p                   entryウィンドウに移動する
 "   R                   reference一覧を表示する
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
@@ -355,6 +357,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
   nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 1)<CR>
+  nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
   execute 'nnoremap <buffer> <silent> <Tab> /' . s:entrypat . '<CR>'
@@ -379,6 +382,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>FollowReference('')<CR>
   nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 1)<CR>
+  nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
 endfunction
@@ -402,6 +406,17 @@ function! s:SearchInput(group, defgroup, uselastkey)
     return
   endif
   call s:Search(gr, str)
+endfunction
+
+" (entry/contentウィンドウから)直前の検索文字列を他の辞書グループで再検索する
+" @param {Number} group 対象の辞書グループ番号
+" @param {Number} defgroup 現在の辞書グループ番号
+function! s:SearchOtherGroup(group, defgroup)
+  let gr = s:ExpandDefaultGroup(a:group)
+  if gr == a:defgroup
+    return
+  endif
+  call s:Search(gr, s:lastkey)
 endfunction
 
 " Visual modeで選択されている文字列を検索する
