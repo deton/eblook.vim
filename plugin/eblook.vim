@@ -634,11 +634,11 @@ function! s:CreateBuffer(bufname, oldindex)
       return -1
     endif
   else
-    silent execute "edit " . newbufname
+    silent execute "edit" newbufname
   endif
   setlocal modifiable
   if bufexists
-    silent execute "%d _"
+    silent %d _
   endif
   return 0
 endfunction
@@ -665,7 +665,7 @@ function! s:GetContent()
   endif
 
   setlocal modifiable
-  silent execute "%d _"
+  silent %d _
   let b:dictnum = dnum
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
