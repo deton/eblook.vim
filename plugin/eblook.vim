@@ -37,6 +37,7 @@ scriptencoding cp932
 "
 " コマンド:
 "   :EblookSearch         指定した単語の検索を行う
+"   :EblookListGroup      辞書グループの一覧を表示する
 "   :EblookGroup          count非指定時の検索対象辞書グループ番号を設定
 "   :EblookListDict       辞書の一覧を表示する
 "   :EblookSkipDict       指定した辞書番号の辞書を一時的に検索対象から外す
@@ -219,6 +220,9 @@ unlet s:eblookenc2opt
 
 if !exists(":EblookSearch")
   command -range=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>)
+endif
+if !exists(":EblookListGroup")
+  command -count=0 EblookListGroup call <SID>ListGroup(<count>)
 endif
 if !exists(":EblookGroup")
   command -count=0 EblookGroup call <SID>SetDefaultGroup(<count>)
@@ -1075,6 +1079,40 @@ function! s:SetDictSkip(group, is_skip, ...)
   for dnum in a:000
     let dictlist[dnum].skip = a:is_skip
   endfor
+endfunction
+
+" 辞書グループの一覧を表示する
+" @param {Number} max チェックする辞書グループ番号の最大値
+function! s:ListGroup(max)
+  let maxnum = a:max
+  if maxnum == 0
+    let maxnum = 99
+  endif
+  let i = 1
+  while i <= maxnum
+    if exists("g:eblook_dictlist{i}")
+      let dictlist = g:eblook_dictlist{i}
+      let titles = []
+      let skipdicts = 0
+      let j = 0
+      while j < len(dictlist)
+	let dict = dictlist[j]
+	if get(dict, 'skip')
+	  call add(titles, '(' . dict.title . ')')
+	  let skipdicts += 1
+	else
+	  call add(titles, dict.title)
+	endif
+	let j = j + 1
+      endwhile
+      let ndicts = len(dictlist)
+      if skipdicts > 0
+	let ndicts .= '(' . skipdicts . ')'
+      endif
+      echo i . ' ' . ndicts . ' ' . join(titles, ', ')
+    endif
+    let i = i + 1
+  endwhile
 endfunction
 
 " countが指定されていない時に検索対象にする辞書グループ番号を設定する
