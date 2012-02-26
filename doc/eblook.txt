@@ -152,19 +152,19 @@ ebappendixコマンドを使ってAppendixを作り直す)
 検索結果はentryウィンドウとcontentウィンドウに表示されます。
 
       テスト【test】
-      <gaiji=zb536>試験。検査。特に、学力試験。「心理―」「読解力を―する」
-      <gaiji=zb537>一般に、考えたことや試作品などを実際に試してみること。
+      (1)試験。検査。特に、学力試験。「心理―」「読解力を―する」
+      (2)一般に、考えたことや試作品などを実際に試してみること。
       「―‐ドライバー」
-      <reference><gaiji=zb655>―‐ケース【test case】</reference=2f52:27e>
-      <reference><gaiji=zb655>―‐パイロット【test pilot】</reference=2f52:3a0>
-      <reference><gaiji=zb655>―‐パターン【test pattern】</reference=2f52:400>
-      <reference><gaiji=zb655>―‐ピース【test-piece】</reference=2f52:4a4>
+      <reference>⇒―‐ケース【test case】</reference=2f52:27e>
+      <reference>⇒―‐パイロット【test pilot】</reference=2f52:3a0>
+      <reference>⇒―‐パターン【test pattern】</reference=2f52:400>
+      <reference>⇒―‐ピース【test-piece】</reference=2f52:4a4>
       ~
       ==/tmp/v584032/_eblook_content_1=========================================
-      広辞苑第五版     1. 2f52:b6     テスト【test】
-      研究社　新英和・和英中辞典       1. f936:5ec    テスト
-      研究社リーダーズ＋プラスＶ２     1. 37bca:262   　テスト <proof>
-      研究社リーダーズ＋プラスＶ２     2. 37da5:2da   　テスト <quiz>
+      広辞苑第五版    テスト【test】
+      研究社　新英和・和英中辞典      テスト
+      研究社リーダーズ＋プラスＶ２    　テスト <proof>
+      研究社リーダーズ＋プラスＶ２    　テスト <quiz>
       ==/tmp/v584032/_eblook_entry_1===========================================
 
 見出し一覧					*eblook-tutor-entry*

@@ -242,8 +242,6 @@ if !exists(":EblookPasteDictList")
   command -count=0 EblookPasteDictList call <SID>PasteDictList(<count>)
 endif
 
-" </reference=>で指定されるentryのpattern
-let s:entrypat = '\x\+:\x\+'
 let s:refpat = '</reference=\zs\x\+:\x\+\ze>'
 " eblookにリダイレクトするコマンドを保持する一時ファイル名
 let s:cmdfile = tempname()
@@ -360,7 +358,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
-  execute 'nnoremap <buffer> <silent> <Tab> /' . s:entrypat . '<CR>'
+  nnoremap <buffer> <silent> <Tab> /\t<CR>
 endfunction
 
 " contentバッファに入った時に実行。set nobuflistedする。
@@ -465,6 +463,7 @@ function! s:Search(group, key)
       endif
     endif
   endwhile
+
   let i = 0
   while i < len(dictlist)
     let dict = dictlist[i]
@@ -487,6 +486,14 @@ function! s:Search(group, key)
   endwhile
   silent! :g/eblook.*> /s///g
   silent! :g/^$/d _
+
+  " 各行のreference先を配列に格納して、バッファからは削除
+  " (concealしてもカウントされるので、行が途中で折り返されていまいちなので)
+  let refs = getline(1, '$')
+  call map(refs, 'matchstr(v:val, ''\%(\d\+\. \)\?\zs\x\+:\x\+\ze\t'')')
+  let b:refs = refs
+  silent! :g/\t.\{-}\t/s//\t/
+
   setlocal nomodifiable
   normal! 1G
   if s:GetContent() < 0
@@ -647,7 +654,7 @@ function! s:GetContent()
   if dnum < 0
     return -1
   endif
-  let refid = matchstr(str, s:entrypat)
+  let refid = get(b:refs, line('.') - 1, '')
   if strlen(refid) == 0
     return -1
   endif
@@ -957,15 +964,19 @@ function! s:FollowReference(refid)
   let title = dictlist[dnum].title
   let j = 0
   while j < len(label)
-    execute 'normal! o' . title . "\<C-V>\<Tab>" . entry[j] . "\<C-V>\<Tab>" . label[j] . "\<Esc>"
+    execute 'normal! o' . title . "\<C-V>\<Tab>" . label[j] . "\<Esc>"
     let j = j + 1
   endwhile
+  let b:refs = entry
   silent! :g/^$/d _
   setlocal nomodifiable
 
   normal! gg
   if strlen(a:refid) > 0
-    execute 'normal! /' . a:refid . "\<CR>"
+    let idx = index(b:refs, a:refid)
+    if idx >= 0
+      execute 'normal! ' . (idx + 1) . 'G/\t' . "\<CR>"
+    endif
   endif
   call s:GetContent()
 endfunction
