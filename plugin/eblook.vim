@@ -354,7 +354,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
-  nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 1)<CR>
+  nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 0)<CR>
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
@@ -379,7 +379,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :call <SID>FollowReference('')<CR>
-  nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 1)<CR>
+  nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 0)<CR>
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
@@ -389,6 +389,7 @@ endfunction
 " @param {Number} group 対象の辞書グループ番号
 " @param {Number} defgroup 対象の辞書グループ番号(デフォルト)
 " @param {Boolean} uselastkey 直前の検索文字列をデフォルト文字列として入れるか
+"   (<Leader>yで取得・検索した文字列を一部変更して再検索できるように)
 function! s:SearchInput(group, defgroup, uselastkey)
   let gr = a:group
   if a:group == 0
