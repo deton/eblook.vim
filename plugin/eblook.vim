@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-02-26
+" Last Change: 2012-03-03
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -254,7 +254,7 @@ let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 " バッファヒストリ中の現在位置
 let s:bufindex = 0
 " 直前に検索した文字列
-let s:lastkey = ''
+let s:lastword = ''
 
 " マッピング
 let s:set_mapleader = 0
@@ -388,21 +388,21 @@ endfunction
 " プロンプトを出して、ユーザから入力された文字列を検索する
 " @param {Number} group 対象の辞書グループ番号
 " @param {Number} defgroup 対象の辞書グループ番号(デフォルト)
-" @param {Boolean} uselastkey 直前の検索文字列をデフォルト文字列として入れるか
+" @param {Boolean} uselastword 直前の検索文字列をデフォルト文字列として入れるか
 "   (<Leader>yで取得・検索した文字列を一部変更して再検索できるように。
-"   input()のプロンプトで|c_CTRL-R_=|の後s:lastkeyと入力することで実現可能)
-function! s:SearchInput(group, defgroup, uselastkey)
+"   input()のプロンプトで|c_CTRL-R_=|の後s:lastwordと入力することで実現可能)
+function! s:SearchInput(group, defgroup, uselastword)
   let gr = a:group
   if a:group == 0
     let gr = a:defgroup
   endif
-  if a:uselastkey
-    let key = s:lastkey
+  if a:uselastword
+    let word = s:lastword
   else
-    let key = ''
+    let word = ''
   endif
-  let str = input(':' . gr . 'EblookSearch ', key)
-  if strlen(str) == 0 || str ==# key && gr == a:defgroup
+  let str = input(':' . gr . 'EblookSearch ', word)
+  if strlen(str) == 0 || str ==# word && gr == a:defgroup
     return
   endif
   call s:Search(gr, str)
@@ -416,7 +416,7 @@ function! s:SearchOtherGroup(group, defgroup)
   if gr == a:defgroup
     return
   endif
-  call s:Search(gr, s:lastkey)
+  call s:Search(gr, s:lastword)
 endfunction
 
 " Visual modeで選択されている文字列を検索する
@@ -432,9 +432,9 @@ endfunction
 " entryバッファに検索結果のリストを表示し、
 " そのうち先頭のentryの内容をcontentバッファに表示する。
 " @param {Number} group 対象の辞書グループ番号
-" @param {String} key 検索する単語
-function! s:Search(group, key)
-  let s:lastkey = a:key
+" @param {String} word 検索する単語
+function! s:Search(group, word)
+  let s:lastword = a:word
   let gr = s:ExpandDefaultGroup(a:group)
   let dictlist = s:GetDictList(gr)
   if len(dictlist) == 0
@@ -445,7 +445,7 @@ function! s:Search(group, key)
   if hasoldwin < 0
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
-  if s:RedirSearchCommand(dictlist, a:key) < 0
+  if s:RedirSearchCommand(dictlist, a:word) < 0
     return -1
   endif
   if s:NewBuffers(gr) < 0
@@ -505,9 +505,9 @@ function! s:Search(group, key)
       if hasoldwin < 0
 	call s:Quit()
       endif
-      "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . a:key . '>'
-      let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', a:key)
-      if strlen(str) == 0 || str ==# a:key
+      "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . a:word . '>'
+      let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', a:word)
+      if strlen(str) == 0 || str ==# a:word
 	return
       endif
       call s:Search(gr, str)
@@ -517,8 +517,8 @@ endfunction
 
 " eblookプログラムにリダイレクトするための検索コマンドファイルを作成する
 " @param dictlist 対象の辞書グループ
-" @param {String} key 検索する単語
-function! s:RedirSearchCommand(dictlist, key)
+" @param {String} word 検索する単語
+function! s:RedirSearchCommand(dictlist, word)
   if s:OpenWindow('new') < 0
     return -1
   endif
@@ -537,7 +537,7 @@ function! s:RedirSearchCommand(dictlist, key)
     endif
     execute 'normal! oselect ' . dict.name . "\<CR>"
       \ . 'set prompt "eblook-' . i . '> "' . "\<CR>"
-      \ . 'search "' . a:key . '"' . "\<CR>\<Esc>"
+      \ . 'search "' . a:word . '"' . "\<CR>\<Esc>"
     let i = i + 1
   endwhile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
