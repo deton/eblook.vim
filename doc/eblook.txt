@@ -155,10 +155,10 @@ ebappendixコマンドを使ってAppendixを作り直す)
       (1)試験。検査。特に、学力試験。「心理―」「読解力を―する」
       (2)一般に、考えたことや試作品などを実際に試してみること。
       「―‐ドライバー」
-      <reference>⇒―‐ケース【test case】</reference=2f52:27e>
-      <reference>⇒―‐パイロット【test pilot】</reference=2f52:3a0>
-      <reference>⇒―‐パターン【test pattern】</reference=2f52:400>
-      <reference>⇒―‐ピース【test-piece】</reference=2f52:4a4>
+      <1|⇒―‐ケース【test case】|>
+      <2|⇒―‐パイロット【test pilot】|>
+      <3|⇒―‐パターン【test pattern】|>
+      <4|⇒―‐ピース【test-piece】|>
       ~
       ==/tmp/v584032/_eblook_content_1=========================================
       広辞苑第五版    テスト【test】
@@ -178,8 +178,9 @@ entryウィンドウでj,kキーでカーソルを移動して、<CR>を押すと
 
 内容表示					*eblook-tutor-content*
 --------
-内容中に<reference>がある場合は、contentウィンドウの<reference>のある行で
-<CR>を押すと、<reference>の先の内容が表示されます。
+内容中に<n|...|>(nは1から始まる数字。reference番号として[count]で指定可能)
+がある場合は、contentウィンドウの<n|...|>のある行で<CR>を押すと、
+referenceの先の内容が表示されます。
 
 元の内容に戻るには、<C-P>を押して検索履歴を戻ります。
 
@@ -223,6 +224,7 @@ s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
 S                   直前の検索語を[count]で指定する辞書グループで再検索する
 p                   contentウィンドウに移動する
 R                   reference一覧を表示する
+                    [count]でcontentウィンドウ内のreference番号を指定可能
 <C-P>               検索履歴中の一つ前のバッファを表示する
 <C-N>               検索履歴中の一つ次のバッファを表示する
 O                   contentウィンドウ内の長い行を|gq|で整形する
@@ -230,7 +232,7 @@ O                   contentウィンドウ内の長い行を|gq|で整形する
 contentウィンドウでの操作			*eblook-usage-content*
 -------------------------
 
-<CR>                カーソル位置のreferenceを表示する
+<CR>                カーソル位置もしくは[count]で指定するreferenceを表示する
 <Space>             PageDownを行う
 <BS>                PageUpを行う
 <Tab>               次のreferenceにカーソルを移動する
@@ -240,6 +242,7 @@ s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
 S                   直前の検索語を[count]で指定する辞書グループで再検索する
 p                   entryウィンドウに移動する
 R                   reference一覧を表示する
+                    [count]で対象のreference番号を指定可能
 <C-P>               検索履歴中の一つ前のバッファを表示する
 <C-N>               検索履歴中の一つ次のバッファを表示する
 O                   contentウィンドウ内の長い行を|gq|で整形する

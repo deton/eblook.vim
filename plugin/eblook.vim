@@ -352,7 +352,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> O :call <SID>GetAndFormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
-  nnoremap <buffer> <silent> R :call <SID>ListReferences()<CR>
+  nnoremap <buffer> <silent> R :<C-U>call <SID>ListReferences(v:count)<CR>
   nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 0)<CR>
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
@@ -370,14 +370,14 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  nnoremap <buffer> <silent> <CR> :call <SID>SelectReference()<CR>
+  nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+\|/<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
-  nnoremap <buffer> <silent> R :call <SID>FollowReference('')<CR>
+  nnoremap <buffer> <silent> R :<C-U>call <SID>FollowReference(get(b:contentrefs, v:count, ''))<CR>
   nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 0)<CR>
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
@@ -915,35 +915,45 @@ endfunction
 
 " contentバッファ中のカーソル位置付近のreferenceを抽出して、
 " その内容を表示する。
-function! s:SelectReference()
-  let str = getline('.')
-  let refpat = '<\zs\d\+\ze|'
-  let index = matchstr(str, refpat)
-  let m1 = matchend(str, refpat)
-  if m1 < 0
-    return
-  endif
-  " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
-  let m2 = match(str, refpat, m1)
-  if m2 >= 0
-    let col = col('.')
-    let offset = strridx(strpart(str, 0, col), '<')
-    if offset >= 0
-      let index = matchstr(str, refpat, offset)
+" @param count [count]で指定された、表示対象のreferenceのindex番号
+function! s:SelectReference(count)
+  if a:count > 0
+    let index = a:count
+    if a:count > b:contentrefsindex
+      let index = b:contentrefsindex
     endif
-  endif
-  if strlen(index) == 0
-    return
+  else
+    let str = getline('.')
+    let refpat = '<\zs\d\+\ze|'
+    let index = matchstr(str, refpat)
+    let m1 = matchend(str, refpat)
+    if m1 < 0
+      return
+    endif
+    " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
+    let m2 = match(str, refpat, m1)
+    if m2 >= 0
+      let col = col('.')
+      let offset = strridx(strpart(str, 0, col), '<')
+      if offset >= 0
+	let index = matchstr(str, refpat, offset)
+      endif
+    endif
+    if strlen(index) == 0
+      return
+    endif
   endif
   call s:FollowReference(b:contentrefs[index])
 endfunction
 
 " entryバッファでカーソル行のエントリに含まれるreferenceのリストを表示
-function! s:ListReferences()
+" @param count [count]で指定された、表示対象のreferenceのindex番号
+function! s:ListReferences(count)
   if s:GetContent() < 0
     return -1
   endif
-  call s:FollowReference('')
+  call s:GoWindow(0)
+  call s:FollowReference(get(b:contentrefs, a:count, ''))
 endfunction
 
 " referenceをリストアップしてentryバッファに表示し、
