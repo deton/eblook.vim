@@ -799,21 +799,34 @@ endfunction
 
 " contentバッファ中の<reference>等を短縮形式に置換する
 function! s:FormatReference()
+  silent! :g;<img=[^>]*>\(\_.\{-}\)</img=[^>]*>;s;;\=s:MakeCaptionString(submatch(1), 'img');g
+  silent! :g;<inline=[^>]*>\(\_.\{-}\)</inline=[^>]*>;s;;\=s:MakeCaptionString(submatch(1), 'inline');g
+  silent! :g;<snd=[^>]*>\(\_.\{-}\)</snd>;s;;\=s:MakeCaptionString(submatch(1), 'snd');g
+  silent! :g;<mov=[^>]*>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(1), 'mov');g
+
   let b:contentrefs = {}
-  let i = 0
-  normal! G$
-  let tagpat = '<reference>\|<img=\|<inline=\|<snd=\|<mov='
-  let lnum = search(tagpat, 'w')
-  while lnum > 0
-    let line = getline('.')
-    let col = col('.') - 1
-    let tag = matchstr(line, '<\zs[^>=]\+', col)
-    let addr = matchstr(line, '</\?' . tag . '=\zs\x\+:\x\+\ze>', col)
-    let i += 1
-    let b:contentrefs[i] = addr
-    execute 's;<' . tag . '[^>]*>\(\_.\{-}\)</' . tag . '[^>]*>;\=s:MakeReferenceString(submatch(0), submatch(1), i, "' . tag . '");'
-    let lnum = search(tagpat, 'W')
-  endwhile
+  let b:contentrefsindex = 0
+  silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
+endfunction
+
+" <img>等のcaptionを〈〉等でくくる。
+" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
+" @param caption caption文字列。空文字列の可能性あり
+" @param tag captionの種類:'inline','img','snd','mov'
+" @return 整形後の文字列
+function! s:MakeCaptionString(caption, tag)
+  let len = strlen(a:caption)
+  " captionが空の場合は補完:
+  " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
+  " 数式部分でcaptionが空の<inline>が出現。非表示にすると
+  " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
+  if a:tag ==# 'img' || a:tag ==# 'inline'
+    return '<〈' . (len ? a:caption : '画像') . '〉>'
+  elseif a:tag ==# 'snd'
+    return '<《' . (len ? a:caption : '音声') . '》>'
+  elseif a:tag ==# 'mov'
+    return '<《' . (len ? a:caption : '動画') . '》>'
+  endif
 endfunction
 
 " '<reference>caption</reference=xxxx:xxxx>'を
@@ -821,29 +834,14 @@ endfunction
 " concealしても表示されないだけで、整形時にはカウントされているので、
 " <reference></reference=xxxx:xxxx>だと長すぎて、
 " 行の折り返しがかなり早めにされているように見えるので。
-" @param alltag captionとtagを含む変換前の文字列全体
-" @param caption alltag内のcaption文字列。空文字列の可能性あり
-" @param {Number} index captionに付ける数字
-" @param tag 'inline','img','snd','mov','reference'
+" @param caption caption文字列。空文字列の可能性あり
+" @param addr reference先アドレス文字列
 " @return 変換後の文字列
-function! s:MakeReferenceString(alltag, caption, index, tag)
+function! s:MakeReferenceString(caption, addr)
+  let b:contentrefsindex += 1
+  let b:contentrefs[b:contentrefsindex] = a:addr
   let len = strlen(a:caption)
-  if a:tag ==# 'reference'
-    return '<' . a:index . '|' . (len ? a:caption : '参照') . '|>'
-  " <img>等のcaptionは〈〉等でくくる。画像なのか音声/動画なのかを識別可能にする
-  " captionが空の場合は補完:
-  " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
-  " 数式部分でcaptionが空の<inline>が出現。非表示にすると
-  " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
-  elseif a:tag ==# 'img' || a:tag ==# 'inline'
-    return '<〈' . (len ? a:caption : '画像') . '〉>'
-  elseif a:tag ==# 'snd'
-    return '<《' . (len ? a:caption : '音声') . '》>'
-  elseif a:tag ==# 'mov'
-    return '<《' . (len ? a:caption : '動画') . '》>'
-  else
-    return a:alltag
-  endif
+  return '<' . b:contentrefsindex . '|' . (len ? a:caption : '参照') . '|>'
 endfunction
 
 " entryバッファ上からcontentバッファを整形する
