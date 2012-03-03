@@ -326,6 +326,12 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
   全辞書を常に整形する場合は以下のように設定してください。
     let eblook_autoformat_default = 1
 
+'eblook_conceal_refindex'			*'eblook_conceal_refindex'*
+  contentウィンドウ内のreference番号をconceal syntaxを使って非表示に
+  するかどうか。省略値: 0
+  reference番号を非表示にする場合は以下のように設定してください。
+    let eblook_conceal_refindex = 1
+
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"
 

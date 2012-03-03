@@ -148,6 +148,10 @@ scriptencoding cp932
 "       全辞書を常に整形したい場合向け(全辞書について'autoformat'プロパティ
 "       を指定するのは面倒なので)。省略値: 0
 "
+"    'eblook_conceal_refindex'
+"       contentウィンドウ内のreference番号をconceal syntaxを使って非表示に
+"       するかどうか。省略値: 0
+"
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
 "
@@ -195,6 +199,9 @@ endif
 
 if !exists('eblook_autoformat_default')
   let eblook_autoformat_default = 0
+endif
+if !exists('eblook_conceal_refindex')
+  let eblook_conceal_refindex = 0
 endif
 
 " eblookプログラムの名前

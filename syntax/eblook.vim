@@ -14,9 +14,13 @@ endif
 
 
 if has("conceal")
-  syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
-  syn region ebImg matchgroup=ebImgBeg start="<q" matchgroup=ebImgEnd end="r>" concealends
-  syn region ebSnd matchgroup=ebSndBeg start="<s" matchgroup=ebSndEnd end="t>" concealends
+  if g:eblook_conceal_refindex
+    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
+  else
+    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
+  endif
+  syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>" concealends
+  syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>" concealends
   " cf. helpIgnore in syntax/help.vim
   syn match ebRefBeg	"." contained conceal
   syn match ebRefEnd	"." contained conceal
@@ -26,8 +30,8 @@ if has("conceal")
   syn match ebSndEnd	"." contained conceal
 else
   syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
-  syn region ebImg matchgroup=ebImgBeg start="<q" matchgroup=ebImgEnd end="r>"
-  syn region ebSnd matchgroup=ebSndBeg start="<s" matchgroup=ebSndEnd end="t>"
+  syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>"
+  syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>"
   syn match ebRefBeg	"." contained
   syn match ebRefEnd	"." contained
   syn match ebImgBeg	"." contained
@@ -50,8 +54,13 @@ endif
 
 hi def link ebRefLink	Underlined
 if has("conceal")
-  hi def link ebRefBeg	Conceal
-  hi def link ebRefEnd	Conceal
+  if g:eblook_conceal_refindex
+    hi def link ebRefBeg	Conceal
+    hi def link ebRefEnd	Conceal
+  else
+    hi def link ebRefBeg	Ignore
+    hi def link ebRefEnd	Ignore
+  endif
   hi def link ebImgBeg	Conceal
   hi def link ebImgEnd	Conceal
   hi def link ebSndBeg	Conceal
