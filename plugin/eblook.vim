@@ -384,7 +384,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
-  nnoremap <buffer> <silent> R :<C-U>call <SID>FollowReference(get(b:contentrefs, v:count, ''))<CR>
+  nnoremap <buffer> <silent> R :<C-U>call <SID>FollowReference(v:count)<CR>
   nnoremap <buffer> <silent> s :<C-U>call <SID>SearchInput(v:count, b:group, 0)<CR>
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
@@ -811,7 +811,7 @@ function! s:FormatReference()
   silent! :g;<snd=[^>]*>\(\_.\{-}\)</snd>;s;;\=s:MakeCaptionString(submatch(1), 'snd');g
   silent! :g;<mov=[^>]*>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(1), 'mov');g
 
-  let b:contentrefs = {}
+  let b:contentrefs = []
   let b:contentrefsindex = 0
   silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
 endfunction
@@ -845,10 +845,10 @@ endfunction
 " @param addr reference先アドレス文字列
 " @return 変換後の文字列
 function! s:MakeReferenceString(caption, addr)
-  let b:contentrefsindex += 1
-  let b:contentrefs[b:contentrefsindex] = a:addr
   let len = strlen(a:caption)
-  return '<' . b:contentrefsindex . '|' . (len ? a:caption : '参照') . '|>'
+  let capstr = len ? a:caption : '参照'
+  call add(b:contentrefs, { 'addr': a:addr, 'caption': capstr })
+  return '<' . len(b:contentrefs) . '|' . capstr . '|>'
 endfunction
 
 " entryバッファ上からcontentバッファを整形する
@@ -926,8 +926,8 @@ endfunction
 function! s:SelectReference(count)
   if a:count > 0
     let index = a:count
-    if a:count > b:contentrefsindex
-      let index = b:contentrefsindex
+    if a:count > len(b:contentrefs)
+      let index = len(b:contentrefs)
     endif
   else
     let str = getline('.')
@@ -950,7 +950,7 @@ function! s:SelectReference(count)
       return
     endif
   endif
-  call s:FollowReference(b:contentrefs[index])
+  call s:FollowReference(index)
 endfunction
 
 " entryバッファでカーソル行のエントリに含まれるreferenceのリストを表示
@@ -959,38 +959,18 @@ function! s:ListReferences(count)
   if s:GetContent() < 0
     return -1
   endif
-  call s:GoWindow(0)
-  call s:FollowReference(get(b:contentrefs, a:count, ''))
+  call s:FollowReference(a:count)
 endfunction
 
 " referenceをリストアップしてentryバッファに表示し、
 " 指定されたreferenceの内容をcontentバッファに表示する。
-" @param refid 表示する内容を示す文字列。''の場合はリストの最初のものを表示
-function! s:FollowReference(refid)
+" @param count [count]で指定された、表示対象のreferenceのindex番号
+function! s:FollowReference(count)
   if s:GoWindow(0) < 0
     return
   endif
   let dnum = b:dictnum
-  let save_line = line('.')
-  let save_col = virtcol('.')
-  " ggでバッファ先頭に移動してからsearch()で検索すると、
-  " バッファ冒頭の検索対象文字列にヒットしないので、末尾からwrap aroundして検索
-  normal! G$
-  let searchflag = 'w'
-  let label = []
-  let entry = []
-  while search('<\d\+|', searchflag) > 0
-    let line = getline('.')
-    let col = col('.') - 1
-    let matches = matchlist(line, '<\(\d\+\)|\(.\{-}\)|>', col)
-    call add(entry, b:contentrefs[matches[1]])
-    call add(label, matches[2])
-    let searchflag = 'W'
-  endwhile
-  if len(label) == 0
-    return
-  endif
-  execute 'normal! ' . save_line . 'G' . save_col . '|'
+  let contentrefs = b:contentrefs
 
   if s:NewBuffers(b:group) < 0
     return -1
@@ -998,20 +978,17 @@ function! s:FollowReference(refid)
   let dictlist = s:GetDictList(b:group)
   let title = dictlist[dnum].title
   let j = 0
-  while j < len(label)
-    execute 'normal! o' . title . "\<C-V>\<Tab>" . label[j] . "\<Esc>"
+  while j < len(contentrefs)
+    execute 'normal! o' . title . "\<C-V>\<Tab>" . contentrefs[j].caption . "\<Esc>"
     let j = j + 1
   endwhile
-  let b:refs = entry
+  let b:refs = map(copy(contentrefs), 'v:val.addr')
   silent! :g/^$/d _
   setlocal nomodifiable
 
   normal! gg
-  if strlen(a:refid) > 0
-    let idx = index(b:refs, a:refid)
-    if idx >= 0
-      execute 'normal! ' . (idx + 1) . 'G/\t' . "\<CR>"
-    endif
+  if (a:count > 0)
+    execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
   endif
   call s:GetContent()
 endfunction
