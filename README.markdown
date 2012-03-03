@@ -43,7 +43,16 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
-* 1.1.0 (2012-02-XXX)
+* 1.1.1 (2012-03-XXX)
+  * `<reference>...<reference=xxxx:xxx>`を`<n|...|>`に置換するように変更
+    (nは、各contentウィンドウ内で1から始まるreference番号。
+     xxxx:xxxとの対応を取るための番号)。
+    (conceal syntaxで非表示にしても整形時にはカウントされているため、
+    行の折り返しがかなり早めにされているように見えるので、なるべく短縮)
+  * Rキーやcontentウィンドウ内での`<CR>`キーにおいて、
+    [count]で対象reference番号を指定可能にした。
+
+* 1.1.0 (2012-03-05)
   * 発音記号などの外字をUnicode文字列へ置換する機能を追加
     ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
   * その他の外字を_(下線)に置換するように変更

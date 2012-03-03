@@ -14,10 +14,10 @@ endif
 
 
 if has("conceal")
-  if g:eblook_conceal_refindex
-    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
-  else
+  if g:eblook_show_refindex
     syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
+  else
+    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
   endif
   syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>" concealends
   syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>" concealends
@@ -54,12 +54,12 @@ endif
 
 hi def link ebRefLink	Underlined
 if has("conceal")
-  if g:eblook_conceal_refindex
-    hi def link ebRefBeg	Conceal
-    hi def link ebRefEnd	Conceal
-  else
+  if g:eblook_show_refindex
     hi def link ebRefBeg	Ignore
     hi def link ebRefEnd	Ignore
+  else
+    hi def link ebRefBeg	Conceal
+    hi def link ebRefEnd	Conceal
   endif
   hi def link ebImgBeg	Conceal
   hi def link ebImgEnd	Conceal
