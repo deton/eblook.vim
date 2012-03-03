@@ -43,16 +43,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
-* 1.1.1 (2012-03-XXX)
-  * `<reference>...<reference=xxxx:xxx>`を`<n|...|>`に置換するように変更
-    (nは、各contentウィンドウ内で1から始まるreference番号。
-     xxxx:xxxとの対応を取るための番号)。
-    (conceal syntaxで非表示にしても整形時にはカウントされているため、
-    行の折り返しがかなり早めにされているように見えるので、なるべく短縮)
-  * Rキーやcontentウィンドウ内での`<CR>`キーにおいて、
-    [count]で対象reference番号を指定可能にした。
-
-* 1.1.0 (2012-03-05)
+* 1.1.0 (2012-03-XXX)
   * 発音記号などの外字をUnicode文字列へ置換する機能を追加
     ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
   * その他の外字を_(下線)に置換するように変更
@@ -63,12 +54,18 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
     (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
   * contentウィンドウ内の長い行を|gq|で整形する機能を追加
     (行が長く、ウィンドウの高さが狭い場合でも、問題なく表示できるように)
+  * `<reference>...<reference=xxxx:xxx>`を`<n|...|>`に置換するように変更
+    (nは、各contentウィンドウ内で1から始まるreference番号。
+     xxxx:xxxとの対応を取るための番号)。
+    (conceal syntaxで非表示にしても整形時にはカウントされているため、
+    行の折り返しがかなり早めにされているように見えるので、なるべく短縮)
+  * Rキーやcontentウィンドウ内での`<CR>`キーにおいて、
+    [count]で対象reference番号を指定可能にした。
   * 何も見つからなかった時に、検索語を編集して再検索するためのプロンプトを
     出すように変更。再検索したくない場合は、編集せずにそのままリターンキー。
   * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
   * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
-  * `<img>`,`<snd>`,`<mov>`,`<inline>`はキャプションのみ表示するように
-    変更(conceal syntax)
+  * `<img>`,`<snd>`,`<mov>`,`<inline>`はキャプションのみ表示するように変更
   * Vim6対応を終了。要Vim7
   * バグ修正
     * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
