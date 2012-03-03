@@ -242,7 +242,6 @@ if !exists(":EblookPasteDictList")
   command -count=0 EblookPasteDictList call <SID>PasteDictList(<count>)
 endif
 
-let s:refpat = '</reference=\zs\x\+:\x\+\ze>'
 " eblookにリダイレクトするコマンドを保持する一時ファイル名
 let s:cmdfile = tempname()
 " entryバッファ名のベース
@@ -374,7 +373,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <CR> :call <SID>SelectReference()<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
-  nnoremap <buffer> <silent> <Tab> /<reference/<CR>
+  nnoremap <buffer> <silent> <Tab> /<\d\+\|/<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
@@ -684,7 +683,7 @@ function! s:GetContent()
     call s:ReplaceGaiji(dict)
   endif
   silent! :g/^$/d _
-  call s:FormatCaption()
+  call s:FormatReference()
   if exists('dict.autoformat')
     if dict.autoformat
       call s:FormatContent()
@@ -798,35 +797,52 @@ function! s:GetGaiji(gaijimap, key)
   return res
 endfunction
 
-" contentバッファ中の<img>等のcaptionを整形する
-function! s:FormatCaption()
+" contentバッファ中の<reference>等を短縮形式に置換する
+function! s:FormatReference()
+  let b:contentrefs = {}
+  let i = 0
+  normal! G$
+  let tagpat = '<reference>\|<img=\|<inline=\|<snd=\|<mov='
+  let lnum = search(tagpat, 'w')
+  while lnum > 0
+    let line = getline('.')
+    let col = col('.') - 1
+    let tag = matchstr(line, '<\zs[^>=]\+', col)
+    let addr = matchstr(line, '</\?' . tag . '=\zs\x\+:\x\+\ze>', col)
+    let i += 1
+    let b:contentrefs[i] = addr
+    execute 's;<' . tag . '[^>]*>\(\_.\{-}\)</' . tag . '[^>]*>;\=s:MakeReferenceString(submatch(0), submatch(1), i, "' . tag . '");'
+    let lnum = search(tagpat, 'W')
+  endwhile
+endfunction
+
+" '<reference>caption</reference=xxxx:xxxx>'を
+" '<1|caption|>'だけにした文字列を返す。
+" concealしても表示されないだけで、整形時にはカウントされているので、
+" <reference></reference=xxxx:xxxx>だと長すぎて、
+" 行の折り返しがかなり早めにされているように見えるので。
+" @param alltag captionとtagを含む変換前の文字列全体
+" @param caption alltag内のcaption文字列。空文字列の可能性あり
+" @param {Number} index captionに付ける数字
+" @param tag 'inline','img','snd','mov','reference'
+" @return 変換後の文字列
+function! s:MakeReferenceString(alltag, caption, index, tag)
+  let len = strlen(a:caption)
+  if a:tag ==# 'reference'
+    return '<' . a:index . '|' . (len ? a:caption : '参照') . '|>'
+  " <img>等のcaptionは〈〉等でくくる。画像なのか音声/動画なのかを識別可能にする
   " captionが空の場合は補完:
   " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
   " 数式部分でcaptionが空の<inline>が出現。非表示にすると
   " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
-  silent! :g;\(<reference>\)\(</reference=[^>]*>\);s;;\1参照\2;g
-  silent! :g;<img=[^>]*>\zs\_.\{-}\ze</img=[^>]*>;s;;\=s:MakeCaptionString(submatch(0), 'img');g
-  silent! :g;<inline=[^>]*>\zs\_.\{-}\ze</inline=[^>]*>;s;;\=s:MakeCaptionString(submatch(0), 'inline');g
-  silent! :g;<snd=[^>]*>\zs\_.\{-}\ze</snd>;s;;\=s:MakeCaptionString(submatch(0), 'snd');g
-  silent! :g;<mov=[^>]*>\zs\_.\{-}\ze</mov>;s;;\=s:MakeCaptionString(submatch(0), 'mov');g
-endfunction
-
-" <img>等のcaptionを〈〉等でくくる。
-" <img>等のタグはconcealにするので画像なのか音声/動画なのかを識別できるように。
-" (|:syn-cchar|では目立ちすぎて気になる)
-" @param caption caption文字列。空文字列の可能性あり
-" @param type captionの種類:'inline','img','snd','mov'
-" @return 整形後の文字列
-function! s:MakeCaptionString(caption, type)
-  let len = strlen(a:caption)
-  if a:type ==# 'img' || a:type ==# 'inline'
-    return '〈' . (len ? a:caption : '画像') . '〉'
-  elseif a:type ==# 'snd'
-    return '《' . (len ? a:caption : '音声') . '》'
-  elseif a:type ==# 'mov'
-    return '《' . (len ? a:caption : '動画') . '》'
+  elseif a:tag ==# 'img' || a:tag ==# 'inline'
+    return '<〈' . (len ? a:caption : '画像') . '〉>'
+  elseif a:tag ==# 'snd'
+    return '<《' . (len ? a:caption : '音声') . '》>'
+  elseif a:tag ==# 'mov'
+    return '<《' . (len ? a:caption : '動画') . '》>'
   else
-    return a:caption
+    return a:alltag
   endif
 endfunction
 
@@ -879,9 +895,9 @@ function! s:FormatLine(width, joined)
     return
   endif
   call cursor(first, 1)
-  " <reference>が行をまたいだ場合には未対応のため、1行に収める:
-  " <reference>直前に改行を入れて次の行と結合した後、再度分割し直す。
-  let openrefline = search('<reference>[^<]*$', 'cW', last)
+  " <reference>置換後の<1|...|>が行をまたいだ場合には未対応のため、1行に収める:
+  " <1|直前に改行を入れて次の行と結合した後、再度分割し直す。
+  let openrefline = search('<\d\+|[^>]*$', 'cW', last)
   if openrefline > 0
     let c = virtcol('.')
     if c > 1
@@ -889,7 +905,7 @@ function! s:FormatLine(width, joined)
     endif
     let n = last - openrefline + 1
     execute "normal! " . n . "J$"
-    " 行結合後、再帰呼び出しされてて、<reference>が行頭→これ以上再帰しても無駄
+    " 行結合後、再帰呼び出しされてて、<1|が行頭→これ以上再帰しても無駄
     if a:joined && c == 1
       return
     endif
@@ -899,31 +915,32 @@ function! s:FormatLine(width, joined)
   endif
 endfunction
 
-" contentバッファ中のカーソル位置付近の<reference>を抽出して、
+" contentバッファ中のカーソル位置付近のreferenceを抽出して、
 " その内容を表示する。
 function! s:SelectReference()
   let str = getline('.')
-  let refid = matchstr(str, s:refpat)
-  let m1 = matchend(str, s:refpat)
+  let refpat = '<\zs\d\+\ze|'
+  let index = matchstr(str, refpat)
+  let m1 = matchend(str, refpat)
   if m1 < 0
     return
   endif
-  " <reference>が1行に2つ以上ある場合は、カーソルが位置する方を使う
-  let m2 = match(str, s:refpat, m1)
+  " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
+  let m2 = match(str, refpat, m1)
   if m2 >= 0
     let col = col('.')
     let offset = strridx(strpart(str, 0, col), '<')
     if offset >= 0
-      let refid = matchstr(str, s:refpat, offset)
+      let index = matchstr(str, refpat, offset)
     endif
   endif
-  if strlen(refid) == 0
+  if strlen(index) == 0
     return
   endif
-  call s:FollowReference(refid)
+  call s:FollowReference(b:contentrefs[index])
 endfunction
 
-" entryバッファでカーソル行のエントリに含まれる<reference>のリストを表示
+" entryバッファでカーソル行のエントリに含まれるreferenceのリストを表示
 function! s:ListReferences()
   if s:GetContent() < 0
     return -1
@@ -931,8 +948,8 @@ function! s:ListReferences()
   call s:FollowReference('')
 endfunction
 
-" <reference>をリストアップしてentryバッファに表示し、
-" 指定された<reference>の内容をcontentバッファに表示する。
+" referenceをリストアップしてentryバッファに表示し、
+" 指定されたreferenceの内容をcontentバッファに表示する。
 " @param refid 表示する内容を示す文字列。''の場合はリストの最初のものを表示
 function! s:FollowReference(refid)
   if s:GoWindow(0) < 0
@@ -947,11 +964,12 @@ function! s:FollowReference(refid)
   let searchflag = 'w'
   let label = []
   let entry = []
-  while search('<reference>', searchflag) > 0
+  while search('<\d\+|', searchflag) > 0
     let line = getline('.')
     let col = col('.') - 1
-    call add(label, matchstr(line, '<reference>\zs.\{-}\ze</reference', col))
-    call add(entry, matchstr(line, s:refpat, col))
+    let matches = matchlist(line, '<\(\d\+\)|\(.\{-}\)|>', col)
+    call add(entry, b:contentrefs[matches[1]])
+    call add(label, matches[2])
     let searchflag = 'W'
   endwhile
   if len(label) == 0
