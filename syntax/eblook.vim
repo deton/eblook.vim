@@ -2,7 +2,7 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-03-03
+" Last Change:  2012-03-04
 
 scriptencoding cp932
 
@@ -16,14 +16,16 @@ endif
 if has("conceal")
   if g:eblook_show_refindex
     syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
+    syn match ebRefBeg	"." contained
+    syn match ebRefEnd	"." contained
   else
     syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
+    syn match ebRefBeg	"." contained conceal
+    syn match ebRefEnd	"." contained conceal
   endif
   syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>" concealends
   syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>" concealends
   " cf. helpIgnore in syntax/help.vim
-  syn match ebRefBeg	"." contained conceal
-  syn match ebRefEnd	"." contained conceal
   syn match ebImgBeg	"." contained conceal
   syn match ebImgEnd	"." contained conceal
   syn match ebSndBeg	"." contained conceal
@@ -55,8 +57,8 @@ endif
 hi def link ebRefLink	Underlined
 if has("conceal")
   if g:eblook_show_refindex
-    hi def link ebRefBeg	Ignore
-    hi def link ebRefEnd	Ignore
+    hi def link ebRefBeg	Identifier
+    hi def link ebRefEnd	Identifier
   else
     hi def link ebRefBeg	Conceal
     hi def link ebRefEnd	Conceal
@@ -66,8 +68,13 @@ if has("conceal")
   hi def link ebSndBeg	Conceal
   hi def link ebSndEnd	Conceal
 else
-  hi def link ebRefBeg	Ignore
-  hi def link ebRefEnd	Ignore
+  if g:eblook_show_refindex
+    hi def link ebRefBeg	Identifier
+    hi def link ebRefEnd	Identifier
+  else
+    hi def link ebRefBeg	Ignore
+    hi def link ebRefEnd	Ignore
+  endif
   hi def link ebImgBeg	Ignore
   hi def link ebImgEnd	Ignore
   hi def link ebSndBeg	Ignore
