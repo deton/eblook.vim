@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-03
+" Last Change: 2012-03-05
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -347,10 +347,10 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
-  set filetype=eblook
-  if has("conceal")
-    setlocal conceallevel=2 concealcursor=nc
-  endif
+  "set filetype=eblook
+  "if has("conceal")
+  "  setlocal conceallevel=2 concealcursor=nc
+  "endif
   nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
