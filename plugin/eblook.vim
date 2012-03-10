@@ -533,7 +533,7 @@ function! s:Search(group, word, isstem)
 	  let word = s:stemmedwords[0]
 	endif
       elseif g:eblook_stemming
-	let s:stemmedwords = eblook#stem#stem(a:word)
+	let s:stemmedwords = eblook#stem#Stem(a:word)
 	call filter(s:stemmedwords, 'v:val !=# "' . a:word . '"')
 	if len(s:stemmedwords) > 0
 	  call insert(s:stemmedwords, a:word) " Œ³‚Ì’PŒê‚ğæ“ª‚É“ü‚ê‚Ä‚¨‚­
