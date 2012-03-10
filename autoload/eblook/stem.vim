@@ -1,3 +1,5 @@
+scriptencoding cp932
+
 function! eblook#stem#stem(word)
   if a:word =~ '[^ -~]'
     return eblook#stem#stem_ja(a:word)
@@ -10,7 +12,7 @@ function! eblook#stem#stem_ja(word)
   return []
 endfunction
 
-" ¸ìÈøÊäÀµ¥ë¡¼¥ë¥ê¥¹¥È (ebview¤ò»²¹Í¤ËºîÀ®)
+" Œê”ö•â³ƒ‹[ƒ‹ƒŠƒXƒg (ebview‚ğQl‚Éì¬)
 let g:eblook#stem#stem_en_rules = [
   \['ies$', 'y'],
   \['ied$', 'y'],
@@ -26,7 +28,7 @@ let g:eblook#stem#stem_en_rules = [
   \['s$', ''],
 \]
 
-" ±ÑÃ±¸ì¤ËÂĞ¤¹¤ë¸ì´´²½(stemming)¤ò¹Ô¤¦¡£
+" ‰p’PŒê‚É‘Î‚·‚éŒêŠ²‰»(stemming)‚ğs‚¤B
 function! eblook#stem#stem_en(word)
   let stemmed = []
   for rule in g:eblook#stem#stem_en_rules
