@@ -510,6 +510,10 @@ function! s:Search(group, word, isstem)
   let b:refs = refs
   silent! :g/\t.\{-}\t/s//\t/
 
+  if a:isstem
+    silent! execute "g/\t/s//\t[" . s:stemmedwords[0] . ' ->] /'
+  endif
+
   setlocal nomodifiable
   normal! 1G
   if s:GetContent() < 0

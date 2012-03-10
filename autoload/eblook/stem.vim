@@ -3,6 +3,7 @@ scriptencoding cp932
 function! eblook#stem#stem(word)
   if a:word =~ '[^ -~]'
     return eblook#stem#stem_using_rules(a:word, g:eblook#stem_ja#rules)
+    " TODO: Š¿Žš•”•ª‚Ì‚Ý‚É‚µ‚½‚à‚Ì‚ð’Ç‰Á‚·‚é
   else
     return eblook#stem#stem_using_rules(a:word, g:eblook#stem_en#rules)
   endif
