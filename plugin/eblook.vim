@@ -203,6 +203,9 @@ endif
 if !exists('eblook_show_refindex')
   let eblook_show_refindex = 0
 endif
+if !exists('eblook_stemming')
+  let eblook_stemming = 0
+endif
 
 " eblookプログラムの名前
 if !exists('eblookprg')
@@ -228,7 +231,7 @@ endif
 unlet s:eblookenc2opt
 
 if !exists(":EblookSearch")
-  command -range=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>)
+  command -range=0 -nargs=1 EblookSearch call <SID>Search(<count>, <q-args>, 0)
 endif
 if !exists(":EblookListGroup")
   command -count=0 EblookListGroup call <SID>ListGroup(<count>)
@@ -261,6 +264,10 @@ let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 let s:bufindex = 0
 " 直前に検索した文字列
 let s:lastword = ''
+" stemming後の検索文字列。最初の要素がstemming前の文字列
+let s:stemmedwords = []
+" stemmedwords内の検索中index
+let s:stemindex = -1
 
 " マッピング
 let s:set_mapleader = 0
@@ -279,7 +286,7 @@ if !hasmapto('<Plug>EblookSearch', 'n')
   nmap <unique> <Leader>y <Plug>EblookSearch
 endif
 nnoremap <unique> <script> <Plug>EblookSearch <SID>SearchN
-nnoremap <silent> <SID>SearchN :<C-U>call <SID>Search(v:count, expand('<cword>'))<CR>
+nnoremap <silent> <SID>SearchN :<C-U>call <SID>Search(v:count, expand('<cword>'), 0)<CR>
 if !hasmapto('<Plug>EblookSearch', 'v')
   vmap <unique> <Leader>y <Plug>EblookSearch
 endif
@@ -411,7 +418,7 @@ function! s:SearchInput(group, defgroup, uselastword)
   if strlen(str) == 0 || str ==# word && gr == a:defgroup
     return
   endif
-  call s:Search(gr, str)
+  call s:Search(gr, str, 0)
 endfunction
 
 " (entry/contentウィンドウから)直前の検索文字列を他の辞書グループで再検索する
@@ -422,7 +429,7 @@ function! s:SearchOtherGroup(group, defgroup)
   if gr == a:defgroup
     return
   endif
-  call s:Search(gr, s:lastword)
+  call s:Search(gr, s:lastword, 0)
 endfunction
 
 " Visual modeで選択されている文字列を検索する
@@ -430,7 +437,7 @@ endfunction
 function! s:SearchVisual(group)
   let save_reg = @@
   silent execute 'normal! `<' . visualmode() . '`>y'
-  call s:Search(a:group, substitute(@@, '\n', '', 'g'))
+  call s:Search(a:group, substitute(@@, '\n', '', 'g'), 0)
   let @@ = save_reg
 endfunction
 
@@ -439,7 +446,8 @@ endfunction
 " そのうち先頭のentryの内容をcontentバッファに表示する。
 " @param {Number} group 対象の辞書グループ番号
 " @param {String} word 検索する単語
-function! s:Search(group, word)
+" @param {Boolean} isstem stemmingした単語の検索中かどうか
+function! s:Search(group, word, isstem)
   let s:lastword = a:word
   let gr = s:ExpandDefaultGroup(a:group)
   let dictlist = s:GetDictList(gr)
@@ -511,12 +519,31 @@ function! s:Search(group, word)
       if hasoldwin < 0
 	call s:Quit()
       endif
-      "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . a:word . '>'
-      let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', a:word)
-      if strlen(str) == 0 || str ==# a:word
+      let word = a:word
+      if a:isstem
+	let s:stemindex += 1
+	if s:stemindex < len(s:stemmedwords)
+	  call s:Search(gr, s:stemmedwords[s:stemindex], 1)
+	  return
+	else
+	  let word = s:stemmedwords[0]
+	endif
+      elseif g:eblook_stemming
+	let s:stemmedwords = eblook#stem#stem(a:word)
+	call filter(s:stemmedwords, 'v:val !=# "' . a:word . '"')
+	if len(s:stemmedwords) > 0
+	  call insert(s:stemmedwords, a:word) " 元の単語を先頭に入れておく
+	  let s:stemindex = 1
+	  call s:Search(gr, s:stemmedwords[s:stemindex], 1)
+	  return
+	endif
+      endif
+      "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . word . '>'
+      let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', word)
+      if strlen(str) == 0 || str ==# word
 	return
       endif
-      call s:Search(gr, str)
+      call s:Search(gr, str, 0)
     endif
   endif
 endfunction
