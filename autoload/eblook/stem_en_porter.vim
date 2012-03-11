@@ -1,7 +1,9 @@
+scriptencoding cp932
+
 function! eblook#stem_en_porter#Stem(word)
   function! GetPorterStemFuncs()
-    " porter-stem.vim<https://github.com/msbmsb/porter-stem.vim>¤Î<SNR>ÈÖ¹æ¼èÆÀ
-    " :PorterStem¤Ï<SID>¤ò»È¤Ã¤Æ¤Ê¤¤¤Î¤Ç:command·ë²Ì¤«¤é¤Î¼èÆÀ¤ÏÉÔ²Ä
+    " porter-stem.vim<https://github.com/msbmsb/porter-stem.vim>‚Ì<SNR>”Ô†æ“¾
+    " :PorterStem‚Í<SID>‚ğg‚Á‚Ä‚È‚¢‚Ì‚Å:commandŒ‹‰Ê‚©‚ç‚Ìæ“¾‚Í•s‰Â
     " http://d.hatena.ne.jp/thinca/20111228
     silent! redir => sliststr
     silent! scriptnames
@@ -29,7 +31,6 @@ function! eblook#stem_en_porter#Stem(word)
       let newword = s:Step5a(a:word)
       return s:Step5b(newword)
     endfunction
-    return 0
   endfunction
 
   if len(a:word) <= 2
@@ -56,15 +57,27 @@ function! eblook#stem_en_porter#Stem(word)
   let newword3 = s:Step3(newword2)
   let newword4 = s:Step4(newword3)
   let newword5 = s:Step5(newword4)
-  let newwords = [newword1, newword2, newword3, newword4, newword5]
+
+  let newwords = [newword1]
+  call s:AddNew(newwords, newword2)
+  call s:AddNew(newwords, newword3)
+  call s:AddNew(newwords, newword4)
+  call s:AddNew(newwords, newword5)
 
   if changedY
     call map(newwords, '"y" . v:val[1:]')
   endif
 
-  function! CompareLen(i1, i2)
-    return len(a:i1) - len(a:i2)
-  endfunction
-  sort(newwords, 'CompareLen')
-  return newwords
+  return sort(newwords, 's:CompareLen')
+endfunction
+
+function! s:AddNew(lis, x)
+  if index(a:lis, a:x) == -1
+    return add(a:lis, a:x)
+  endif
+  return a:lis
+endfunction
+
+function! s:CompareLen(i1, i2)
+  return len(a:i1) - len(a:i2)
 endfunction
