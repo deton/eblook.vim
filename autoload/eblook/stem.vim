@@ -5,11 +5,7 @@ function! eblook#stem#Stem(word)
     return s:StemUsingRules(a:word, g:eblook#stem_ja#rules)
     " TODO: Š¿Žš•”•ª‚Ì‚Ý‚É‚µ‚½‚à‚Ì‚ð’Ç‰Á‚·‚é
   else
-    if g:eblook_stemming == 2 && exists(':PorterStem')
-      return eblook#stem_en_porter#Stem(a:word)
-    else
-      return s:StemUsingRules(a:word, g:eblook#stem_en#rules)
-    endif
+    return eblook#stem_en#Stem(a:word)
   endif
 endfunction
 
