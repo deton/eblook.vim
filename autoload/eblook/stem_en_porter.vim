@@ -1,7 +1,7 @@
 scriptencoding cp932
 
 function! eblook#stem_en_porter#Stem(word)
-  function! GetPorterStemFuncs()
+  function! s:GetPorterStemFuncs()
     " porter-stem.vim<https://github.com/msbmsb/porter-stem.vim>‚Ì<SNR>”Ô†æ“¾
     " :PorterStem‚Í<SID>‚ğg‚Á‚Ä‚È‚¢‚Ì‚Å:commandŒ‹‰Ê‚©‚ç‚Ìæ“¾‚Í•s‰Â
     " http://d.hatena.ne.jp/thinca/20111228
@@ -38,7 +38,7 @@ function! eblook#stem_en_porter#Stem(word)
   endif
 
   if !exists('s:Step1a')
-    call GetPorterStemFuncs()
+    call s:GetPorterStemFuncs()
   endif
 
   " copy from GetWordStem()
