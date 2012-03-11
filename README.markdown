@@ -68,6 +68,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
     また、日本語用は[EBView](http://ebview.sourceforge.net)と同様の語尾補正。
   * 何も見つからなかった時に、検索語を編集して再検索するためのプロンプトを
     出すように変更。再検索したくない場合は、編集せずにそのままリターンキー。
+  * statuslineに検索語やキャプション文字列を表示するようにした
   * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
   * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
   * `<img>`,`<snd>`,`<mov>`,`<inline>`はキャプションのみ表示するように変更
