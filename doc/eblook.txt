@@ -313,6 +313,14 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 'eblook_group'					*'eblook_group'*
   |[count]|が指定されていない時に検索対象にする辞書グループ番号。省略値: 1
 
+'eblook_stemming'				*'eblook_stemming'*
+  指定文字列で何も見つからなかった時に、活用語尾などを取り除いた
+  文字列を使って検索し直すかどうか。省略値: 0
+  語尾補正をして検索し直す場合は以下のように設定してください。
+    let eblook_stemming = 1
+  https://github.com/msbmsb/porter-stem.vim がインストール済であれば、
+  porter-stem.vimも使用します。
+
 'eblook_entrywin_height'			*'eblook_entrywin_height'*
   entryウィンドウの行数(目安)。省略値: 4
 

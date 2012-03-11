@@ -137,6 +137,10 @@ scriptencoding cp932
 "          \},
 "        \]
 "
+"    'eblook_stemming'
+"       指定文字列で何も見つからなかった時に、活用語尾などを取り除いた
+"       文字列を使って検索し直すかどうか。省略値: 0
+"
 "    'eblook_entrywin_height'
 "       entryウィンドウの行数(目安)。省略値: 4
 "

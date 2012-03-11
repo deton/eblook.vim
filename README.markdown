@@ -61,6 +61,11 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
     行の折り返しがかなり早めにされているように見えるので、なるべく短縮)
   * Rキーやcontentウィンドウ内での`<CR>`キーにおいて、
     [count]で対象reference番号を指定可能にした。
+  * stemming/語尾補正機能を追加。
+    何も見つからなかった時に、活用語尾などを取り除いて検索し直す機能を追加。
+    [porter-stem.vim](https://github.com/msbmsb/porter-stem.vim)
+    がインストール済であれば、porter-stem.vimも使用。
+    また、日本語用は[EBView](http://ebview.sourceforge.net)と同様の語尾補正。
   * 何も見つからなかった時に、検索語を編集して再検索するためのプロンプトを
     出すように変更。再検索したくない場合は、編集せずにそのままリターンキー。
   * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
