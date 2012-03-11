@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-05
+" Last Change: 2012-03-11
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
