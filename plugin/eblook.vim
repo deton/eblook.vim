@@ -358,6 +358,7 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  setlocal statusline=%{b:group}Eblook\ entry\ {%{b:word}}\ [%L]
   "set filetype=eblook
   "if has("conceal")
   "  setlocal conceallevel=2 concealcursor=nc
@@ -388,6 +389,7 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
+  setlocal statusline=%{b:group}Eblook\ content\ {%{b:caption}}
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
@@ -469,6 +471,7 @@ function! s:Search(group, word, isstem)
   if s:NewBuffers(gr) < 0
     return -1
   endif
+  let b:word = a:word
   call s:ExecuteEblook()
 
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
@@ -509,9 +512,12 @@ function! s:Search(group, word, isstem)
 
   " 各行のreference先を配列に格納して、バッファからは削除
   " (concealしてもカウントされるので、行が途中で折り返されていまいちなので)
-  let refs = getline(1, '$')
-  call map(refs, 'matchstr(v:val, ''\%(\d\+\. \)\?\zs\x\+:\x\+\ze\t'')')
-  let b:refs = refs
+  let b:refs = []
+  let lines = getline(1, '$')
+  for line in lines
+    let m = matchlist(line, '\%(\d\+\. \)\?\(\x\+:\x\+\)\t\(.*\)')
+    call add(b:refs, [m[1], m[2]])
+  endfor
   silent! :g/\t.\{-}\t/s//\t/
 
   if a:isstem
@@ -644,6 +650,7 @@ function! s:NewBuffers(group)
     let s:bufindex = oldindex
     return -1
   endif
+  let b:group = a:group
   if s:CreateBuffer(s:contentbufname, oldindex) < 0
     call s:Quit()
     let s:bufindex = oldindex
@@ -697,14 +704,16 @@ function! s:GetContent()
   if dnum < 0
     return -1
   endif
-  let refid = get(b:refs, line('.') - 1, '')
-  if strlen(refid) == 0
+  let ref = get(b:refs, line('.') - 1)
+  if type(ref) != type([])
     return -1
   endif
+  let refid = ref[0]
 
   if s:GoWindow(0) < 0
     return -1
   endif
+  let b:caption = ref[1]
 
   setlocal modifiable
   silent %d _
@@ -882,7 +891,7 @@ endfunction
 function! s:MakeReferenceString(caption, addr)
   let len = strlen(a:caption)
   let capstr = len ? a:caption : '参照'
-  call add(b:contentrefs, { 'addr': a:addr, 'caption': capstr })
+  call add(b:contentrefs, [a:addr, capstr])
   return '<' . len(b:contentrefs) . '|' . capstr . '|>'
 endfunction
 
@@ -1006,6 +1015,7 @@ function! s:FollowReference(count)
   endif
   let dnum = b:dictnum
   let contentrefs = b:contentrefs
+  let contentcaption = b:caption
 
   if s:NewBuffers(b:group) < 0
     return -1
@@ -1014,10 +1024,11 @@ function! s:FollowReference(count)
   let title = dictlist[dnum].title
   let j = 0
   while j < len(contentrefs)
-    execute 'normal! o' . title . "\<C-V>\<Tab>" . contentrefs[j].caption . "\<Esc>"
+    execute 'normal! o' . title . "\<C-V>\<Tab>" . contentrefs[j][1] . "\<Esc>"
     let j = j + 1
   endwhile
-  let b:refs = map(copy(contentrefs), 'v:val.addr')
+  let b:refs = contentrefs
+  let b:word = contentcaption
   silent! :g/^$/d _
   setlocal nomodifiable
 
