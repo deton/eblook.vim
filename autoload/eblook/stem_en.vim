@@ -12,14 +12,12 @@ function! eblook#stem_en#Stem(word)
     call s:AddNew(stemmed, w)
   endfor
 
-  if g:eblook_stemming == 2 && exists(':PorterStem')
+  if exists(':PorterStem')
     let res = s:StemPorter(lword)
-  else
-    let res = s:StemUsingRules(lword)
+    for w in res
+      call s:AddNew(stemmed, w)
+    endfor
   endif
-  for w in res
-    call s:AddNew(stemmed, w)
-  endfor
 
   return sort(stemmed, 's:CompareLen')
 endfunction
@@ -80,33 +78,6 @@ function! s:StemHeuristics(word)
     endif
   endfor
   return []
-endfunction
-
-" 語尾補正ルールを使った語尾補正を行う
-function! s:StemUsingRules(word)
-  " 語尾補正ルールリスト (ebviewを参考に作成)
-  let rules = [
-    \['ies$', 'y'],
-    \['ied$', 'y'],
-    \['es$', ''],
-    \['ting$', 'te'],
-    \['ing$', ''],
-    \['ing$', 'e'],
-    \['ed$', 'e'],
-    \['ed$', ''],
-    \['id$', 'y'],
-    \['ices$', 'ex'],
-    \['ves$', 'fe'],
-    \['s$', ''],
-  \]
-
-  let stemmed = []
-  for rule in rules
-    if a:word =~ rule[0]
-      call add(stemmed, substitute(a:word, rule[0], rule[1], ''))
-    endif
-  endfor
-  return stemmed
 endfunction
 
 " porter-stem.vimを使ったstemming
