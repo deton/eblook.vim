@@ -516,7 +516,9 @@ function! s:Search(group, word, isstem)
   let lines = getline(1, '$')
   for line in lines
     let m = matchlist(line, '\%(\d\+\. \)\?\(\x\+:\x\+\)\t\(.*\)')
-    call add(b:refs, [m[1], m[2]])
+    if len(m) >= 2
+      call add(b:refs, [m[1], m[2]])
+    endif
   endfor
   silent! :g/\t.\{-}\t/s//\t/
 
