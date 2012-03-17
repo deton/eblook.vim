@@ -31,6 +31,8 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 *   ファイル            置く場所              ファイルの説明
 * plugin/eblook.vim     'runtimepath'/plugin  プラグインスクリプト本体
+* autoload/eblook/stem_en.vim  'runtimepath'/autoload/eblook  英語stemming用
+* autoload/eblook/stem_ja.vim  'runtimepath'/autoload/eblook  日本語語尾補正用
 * syntax/eblook.vim     'runtimepath'/syntax  eblook.vim用syntaxファイル
 * doc/eblook.txt        'runtimepath'/doc     スクリプトの説明書
 
