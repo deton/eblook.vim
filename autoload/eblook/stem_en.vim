@@ -1,5 +1,6 @@
 scriptencoding cp932
 
+" 英単語のstemmingを行う
 function! eblook#stem_en#Stem(word)
   let lword = tolower(a:word)
   let stemmed = []
@@ -22,6 +23,9 @@ function! eblook#stem_en#Stem(word)
   return sort(stemmed, 's:CompareLen')
 endfunction
 
+" リストに含まれていなければ追加する
+" @param lis 追加先リスト
+" @param x 追加しようとしている要素
 function! s:AddNew(lis, x)
   if index(a:lis, a:x) == -1
     return add(a:lis, a:x)
@@ -37,7 +41,7 @@ endfunction
 " 与えられた語の原形として可能性のある語のリストを返す。
 " (lookupのstem-english.elのstem:extraからの移植)
 function! s:StemHeuristics(word)
-  let irr = get(s:irregular_verb_alist, a:word)
+  let irr = get(g:eblook#stem_en#irregular_verb_alist, a:word)
   if type(irr) == type([])
     return irr
   endif
@@ -46,29 +50,7 @@ function! s:StemHeuristics(word)
     return ['as']
   endif
 
-  let rules = [
-    \['\([^aeiou]\)\1e\%(r\|st\)$', ['\1', '\1\1e']],
-    \['\([^aeiou]\)ie\%(r\|st\)$', ['\1y', '\1ie']],
-    \['e\%(r\|st\)$', ['', 'e']],
-    \['ches$', ['ch', 'che']],
-    \['shes$', ['sh', 'che']],
-    \['ses$', ['s', 'se']],
-    \['xes$', ['x', 'xe']],
-    \['zes$', ['z', 'ze']],
-    \['ves$', ['f', 'fe']],
-    \['\([^aeiou]\)oes$', ['\1o', '\1oe']],
-    \['\([^aeiou]\)ies$', ['\1y', '\1ie']],
-    \['es$', ['', 'e']],
-    \['s$', ['']],
-    \['\([^aeiou]\)ied$', ['\1y', '\1ie']],
-    \['\([^aeiou]\)\1ed$', ['\1', '\1\1e']],
-    \['cked$', ['c', 'cke']],
-    \['ed$', ['', 'e']],
-    \['\([^aeiou]\)\1ing$', ['\1']],
-    \['ing$', ['', 'e']],
-  \]
-
-  for rule in rules
+  for rule in g:eblook#stem_en#rules
     if a:word =~ rule[0]
       let ret = []
       for sub in rule[1]
@@ -152,8 +134,33 @@ function! s:StemPorter(word)
   return newwords
 endfunction
 
+" s:StemHeuristics()で使う置換ルール
+" (lookupのstem-english.elのstem:extraからの移植)
+let g:eblook#stem_en#rules = [
+  \['\([^aeiou]\)\1e\%(r\|st\)$', ['\1', '\1\1e']],
+  \['\([^aeiou]\)ie\%(r\|st\)$', ['\1y', '\1ie']],
+  \['e\%(r\|st\)$', ['', 'e']],
+  \['ches$', ['ch', 'che']],
+  \['shes$', ['sh', 'che']],
+  \['ses$', ['s', 'se']],
+  \['xes$', ['x', 'xe']],
+  \['zes$', ['z', 'ze']],
+  \['ves$', ['f', 'fe']],
+  \['\([^aeiou]\)oes$', ['\1o', '\1oe']],
+  \['\([^aeiou]\)ies$', ['\1y', '\1ie']],
+  \['es$', ['', 'e']],
+  \['s$', ['']],
+  \['\([^aeiou]\)ied$', ['\1y', '\1ie']],
+  \['\([^aeiou]\)\1ed$', ['\1', '\1\1e']],
+  \['cked$', ['c', 'cke']],
+  \['ed$', ['', 'e']],
+  \['\([^aeiou]\)\1ing$', ['\1']],
+  \['ing$', ['', 'e']],
+\]
+
 " 不規則動詞と原形の連想配列"
-let s:irregular_verb_alist = {
+" (lookupのstem-english.elのstem:irregular-verb-alistから変換)
+let g:eblook#stem_en#irregular_verb_alist = {
   \"abode": ["abide"],
   \"abided": ["abide"],
   \"alighted": ["alight"],

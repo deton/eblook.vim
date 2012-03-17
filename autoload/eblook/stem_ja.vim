@@ -1,6 +1,17 @@
 scriptencoding cp932
 
-" 日本語用語尾補正ルールリスト (ebviewを参考に作成)
+" 語尾補正ルールを使った語尾補正を行う
+function! eblook#stem_ja#Stem(word)
+  let stemmed = []
+  for rule in g:eblook#stem_ja#rules
+    if a:word =~ rule[0]
+      call add(stemmed, substitute(a:word, rule[0], rule[1], ''))
+    endif
+  endfor
+  return stemmed
+endfunction
+
+" 日本語用語尾補正ルールリスト (ebviewのdata/endinglist-ja.xmlから変換)
 let g:eblook#stem_ja#rules = [
   \['た$', 'る'],
   \['て$', 'る'],

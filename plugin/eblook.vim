@@ -545,7 +545,7 @@ function! s:Search(group, word, isstem)
 	  let word = s:stemmedwords[0]
 	endif
       elseif g:eblook_stemming
-	let s:stemmedwords = eblook#stem#Stem(a:word)
+	let s:stemmedwords = s:Stem(a:word)
 	call filter(s:stemmedwords, 'v:val !=# "' . a:word . '"')
 	if len(s:stemmedwords) > 0
 	  call insert(s:stemmedwords, a:word) " Œ³‚Ì’PŒê‚ğæ“ª‚É“ü‚ê‚Ä‚¨‚­
@@ -561,6 +561,18 @@ function! s:Search(group, word, isstem)
       endif
       call s:Search(gr, str, 0)
     endif
+  endif
+endfunction
+
+" stemming/Œê”ö•â³‚µ‚½Œó•â•¶š—ñ‚ÌList‚ğæ“¾‚·‚é
+" @param {String} word ‘ÎÛ•¶š—ñ
+" @return Œó•â•¶š—ñ‚ÌList
+function! s:Stem(word)
+  if a:word =~ '[^ -~]'
+    return eblook#stem_ja#Stem(a:word)
+    " XXX: ebview‚Æ“¯—l‚ÉAŠ¿š•”•ª‚Ì‚İ‚ğ’Ç‰Á‚·‚é
+  else
+    return eblook#stem_en#Stem(a:word)
   endif
 endfunction
 
