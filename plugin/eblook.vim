@@ -202,8 +202,8 @@ if !exists('eblook_history_max')
 endif
 
 " 表示変更用に保持しておく訪問済リンク数の上限
-if !exists('eblook_history_visited_max')
-  let eblook_history_visited_max = 100
+if !exists('eblook_visited_max')
+  let eblook_visited_max = 100
 endif
 
 if !exists('eblook_autoformat_default')
@@ -273,8 +273,8 @@ let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 let s:bufindex = 0
 " 直前に検索した文字列
 let s:lastword = ''
-" 検索履歴(訪問済リンクの表示変更用)
-let s:history = []
+" 表示済referenceアドレスリスト(訪問済リンクの表示変更用)
+let s:visited = []
 " stemming後の検索文字列。最初の要素がstemming前の文字列
 let s:stemmedwords = []
 " stemmedwords内の検索中index
@@ -763,11 +763,11 @@ function! s:GetContent(count)
   setlocal nomodifiable
   normal! 1G
   if search('.', 'w') > 0 " any result?
-    let maxover = len(s:history) - g:eblook_history_visited_max + 1
+    let maxover = len(s:visited) - g:eblook_visited_max + 1
     if maxover > 0
-      unlet s:history[:maxover]
+      unlet s:visited[:maxover]
     endif
-    call add(s:history, b:group . ',' . b:dictnum . ',' . refid)
+    call add(s:visited, b:group . ',' . b:dictnum . ',' . refid)
   endif
   call s:GoWindow(1)
   return 0
@@ -917,10 +917,15 @@ function! s:MakeReferenceString(caption, addr)
   let len = strlen(a:caption)
   let capstr = len ? a:caption : '参照'
   call add(b:contentrefs, [a:addr, capstr])
-  if match(s:history, b:group . ',' . b:dictnum . ',' . a:addr) >= 0
-    return '<' . len(b:contentrefs) . '!' . capstr . '|>'
+  return '<' . len(b:contentrefs) . s:Visited(b:group, b:dictnum, a:addr) . capstr . '|>'
+endfunction
+
+" 訪問済リンクかどうか調べて、'!'か'|'を返す
+function! s:Visited(group, dictnum, addr)
+  if match(s:visited, a:group . ',' . a:dictnum . ',' . a:addr) >= 0
+    return '!'
   else
-    return '<' . len(b:contentrefs) . '|' . capstr . '|>'
+    return '|'
   endif
 endfunction
 
@@ -928,11 +933,7 @@ endfunction
 function! s:MakeEntryReferenceString(title, addr, caption)
   call add(b:refs, [a:addr, a:caption])
   let dnum = s:GetDictNumFromTitle(b:group, a:title)
-  if match(s:history, b:group . ',' . dnum . ',' . a:addr) >= 0
-    return a:title . "\t<" . len(b:refs) . '!' . a:caption . '|>'
-  else
-    return a:title . "\t<" . len(b:refs) . '|' . a:caption . '|>'
-  endif
+  return a:title . "\t<" . len(b:refs) . s:Visited(b:group, dnum, a:addr) . a:caption . '|>'
 endfunction
 
 " entryバッファ上からcontentバッファを整形する
@@ -1064,11 +1065,7 @@ function! s:FollowReference(count)
   let title = dictlist[dnum].title
   let j = 0
   while j < len(contentrefs)
-    if match(s:history, b:group . ',' . dnum . ',' . contentrefs[j][0]) >= 0
-      let refstr = '<' . (j + 1) . '!' . contentrefs[j][1] . '|>'
-    else
-      let refstr = '<' . (j + 1) . '|' . contentrefs[j][1] . '|>'
-    endif
+    let refstr = '<' . (j + 1) . s:Visited(b:group, dnum, contentrefs[j][0]) . contentrefs[j][1] . '|>'
     execute 'normal! o' . title . "\<C-V>\<Tab>" . refstr . "\<Esc>"
     let j = j + 1
   endwhile
