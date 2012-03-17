@@ -200,8 +200,8 @@ referenceの先の内容が表示されます。
                     Visual modeの場合は、選択した文字列を検索する。
                     検索対象の辞書グループ番号を[count]で指定可能。
 
-検索結果は、_eblook_entry_{n}と_eblook_content_{n}というウィンドウに
-表示されます。{n}は数字で、具体的には1, 2, ..., |eblook_history_max|です。
+検索結果は、{n}Eblook entryと{n}Eblook contentというウィンドウに
+表示されます。{n}は辞書グループ番号に対応する数字です。
 entryウィンドウには見出し一覧が表示されます。
 contentウィンドウには見出しに対応する内容が表示されます。
 
@@ -326,6 +326,9 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
+
+'eblook_visited_max'				*'eblook_visited_max'*
+  表示変更用に保持しておく訪問済リンク数の上限。省略値: 100
 
 'eblook_autoformat_default'			*'eblook_autoformat_default'*
   contentウィンドウ内の長い行を|gq|で整形するかどうかのデフォルト値。

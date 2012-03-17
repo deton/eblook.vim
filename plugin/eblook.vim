@@ -147,6 +147,9 @@ scriptencoding cp932
 "    'eblook_history_max'
 "       保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 "
+"    'eblook_visited_max'
+"       表示変更用に保持しておく訪問済リンク数の上限。省略値: 100
+"
 "    'eblook_autoformat_default'
 "       contentウィンドウ内の長い行を|gq|で整形するかどうかのデフォルト値。
 "       全辞書を常に整形したい場合向け(全辞書について'autoformat'プロパティ
