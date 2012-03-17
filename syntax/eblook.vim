@@ -2,7 +2,7 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-03-17
+" Last Change:  2012-03-18
 
 scriptencoding cp932
 
@@ -60,13 +60,8 @@ endif
 hi def link ebRefLink	Identifier
 hi def link ebRefLinkVisited	Special
 if has("conceal")
-  if g:eblook_show_refindex
-    hi def link ebRefBeg	Type
-    hi def link ebRefEnd	Type
-  else
-    hi def link ebRefBeg	Conceal
-    hi def link ebRefEnd	Conceal
-  endif
+  hi def link ebRefBeg	Type
+  hi def link ebRefEnd	Type
   hi def link ebImgBeg	Conceal
   hi def link ebImgEnd	Conceal
   hi def link ebSndBeg	Conceal
