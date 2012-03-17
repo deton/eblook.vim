@@ -201,6 +201,11 @@ if !exists('eblook_history_max')
   let eblook_history_max = 10
 endif
 
+" 表示変更用に保持しておく訪問済リンク数の上限
+if !exists('eblook_history_visited_max')
+  let eblook_history_visited_max = 100
+endif
+
 if !exists('eblook_autoformat_default')
   let eblook_autoformat_default = 0
 endif
@@ -758,6 +763,10 @@ function! s:GetContent(count)
   setlocal nomodifiable
   normal! 1G
   if search('.', 'w') > 0 " any result?
+    let maxover = len(s:history) - g:eblook_history_visited_max
+    if maxover > 0
+      unlet s:history[:maxover]
+    endif
     call add(s:history, b:group . ',' . b:dictnum . ',' . refid)
   endif
   call s:GoWindow(1)
