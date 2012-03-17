@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-11
+" Last Change: 2012-03-17
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -268,6 +268,8 @@ let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 let s:bufindex = 0
 " 直前に検索した文字列
 let s:lastword = ''
+" 検索履歴
+let s:history = []
 " stemming後の検索文字列。最初の要素がstemming前の文字列
 let s:stemmedwords = []
 " stemmedwords内の検索中index
@@ -393,7 +395,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
-  nnoremap <buffer> <silent> <Tab> /<\d\+\|/<CR>
+  nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
@@ -758,6 +760,9 @@ function! s:GetContent()
   endif
   setlocal nomodifiable
   normal! 1G
+  if search('.', 'w') > 0 " any result?
+    call add(s:history, b:group . ',' . b:dictnum . ',' . refid)
+  endif
   call s:GoWindow(1)
   return 0
 endfunction
@@ -906,7 +911,11 @@ function! s:MakeReferenceString(caption, addr)
   let len = strlen(a:caption)
   let capstr = len ? a:caption : '参照'
   call add(b:contentrefs, [a:addr, capstr])
-  return '<' . len(b:contentrefs) . '|' . capstr . '|>'
+  if match(s:history, b:group . ',' . b:dictnum . ',' . a:addr) >= 0
+    return '<' . len(b:contentrefs) . '!' . capstr . '|>'
+  else
+    return '<' . len(b:contentrefs) . '|' . capstr . '|>'
+  endif
 endfunction
 
 " entryバッファ上からcontentバッファを整形する
@@ -960,7 +969,7 @@ function! s:FormatLine(width, joined)
   call cursor(first, 1)
   " <reference>置換後の<1|...|>が行をまたいだ場合には未対応のため、1行に収める:
   " <1|直前に改行を入れて次の行と結合した後、再度分割し直す。
-  let openrefline = search('<\d\+|[^>]*$', 'cW', last)
+  let openrefline = search('<\d\+[|!][^>]*$', 'cW', last)
   if openrefline > 0
     let c = virtcol('.')
     if c > 1
@@ -989,7 +998,7 @@ function! s:SelectReference(count)
     endif
   else
     let str = getline('.')
-    let refpat = '<\zs\d\+\ze|'
+    let refpat = '<\zs\d\+\ze[|!]'
     let index = matchstr(str, refpat)
     let m1 = matchend(str, refpat)
     if m1 < 0

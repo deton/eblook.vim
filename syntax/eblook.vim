@@ -16,10 +16,12 @@ endif
 if has("conceal")
   if g:eblook_show_refindex
     syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
+    syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>"
     syn match ebRefBeg	"." contained
     syn match ebRefEnd	"." contained
   else
     syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
+    syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" concealends
     syn match ebRefBeg	"." contained conceal
     syn match ebRefEnd	"." contained conceal
   endif
@@ -32,6 +34,7 @@ if has("conceal")
   syn match ebSndEnd	"." contained conceal
 else
   syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
+  syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>"
   syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>"
   syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>"
   syn match ebRefBeg	"." contained
@@ -54,11 +57,12 @@ else
   syn match ebNextEnd	"</next>"
 endif
 
-hi def link ebRefLink	Underlined
+hi def link ebRefLink	Identifier
+hi def link ebRefLinkVisited	Special
 if has("conceal")
   if g:eblook_show_refindex
-    hi def link ebRefBeg	Identifier
-    hi def link ebRefEnd	Identifier
+    hi def link ebRefBeg	Type
+    hi def link ebRefEnd	Type
   else
     hi def link ebRefBeg	Conceal
     hi def link ebRefEnd	Conceal
@@ -69,8 +73,8 @@ if has("conceal")
   hi def link ebSndEnd	Conceal
 else
   if g:eblook_show_refindex
-    hi def link ebRefBeg	Identifier
-    hi def link ebRefEnd	Identifier
+    hi def link ebRefBeg	Type
+    hi def link ebRefEnd	Type
   else
     hi def link ebRefBeg	Ignore
     hi def link ebRefEnd	Ignore
@@ -80,8 +84,8 @@ else
   hi def link ebSndBeg	Ignore
   hi def link ebSndEnd	Ignore
 endif
-hi def link ebImg	Special
-hi def link ebSnd	Special
+hi def link ebImg	Constant
+hi def link ebSnd	Constant
 hi def link ebPrevBeg	NonText
 hi def link ebPrevEnd	NonText
 hi def link ebNextBeg	NonText
