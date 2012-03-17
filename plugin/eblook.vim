@@ -268,7 +268,7 @@ let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 let s:bufindex = 0
 " 直前に検索した文字列
 let s:lastword = ''
-" 検索履歴
+" 検索履歴(訪問済リンクの表示変更用)
 let s:history = []
 " stemming後の検索文字列。最初の要素がstemming前の文字列
 let s:stemmedwords = []
@@ -361,10 +361,10 @@ function! s:Entry_BufEnter()
   set noswapfile
   set nobuflisted
   setlocal statusline=%{b:group}Eblook\ entry\ {%{b:word}%<}\ [%L]
-  "set filetype=eblook
-  "if has("conceal")
-  "  setlocal conceallevel=2 concealcursor=nc
-  "endif
+  set filetype=eblook
+  if has("conceal")
+    setlocal conceallevel=2 concealcursor=nc
+  endif
   nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
@@ -515,14 +515,7 @@ function! s:Search(group, word, isstem)
   " 各行のreference先を配列に格納して、バッファからは削除
   " (concealしてもカウントされるので、行が途中で折り返されていまいちなので)
   let b:refs = []
-  let lines = getline(1, '$')
-  for line in lines
-    let m = matchlist(line, '\%(\d\+\. \)\?\(\x\+:\x\+\)\t\(.*\)')
-    if len(m) >= 2
-      call add(b:refs, [m[1], m[2]])
-    endif
-  endfor
-  silent! :g/\t.\{-}\t/s//\t/
+  silent! :g/^\(.\{-}\)\t *\d\+\. \(\x\+:\x\+\)\t\(.*\)/s//\=s:MakeEntryReferenceString(submatch(1), submatch(2), submatch(3))/
 
   if a:isstem
     silent! execute "g/\t/s//\t[" . s:stemmedwords[0] . ' ->] /'
@@ -918,6 +911,17 @@ function! s:MakeReferenceString(caption, addr)
   endif
 endfunction
 
+" entryバッファの参照先文字列の置換用関数
+function! s:MakeEntryReferenceString(title, addr, caption)
+  call add(b:refs, [a:addr, a:caption])
+  let dnum = s:GetDictNumFromTitle(b:group, a:title)
+  if match(s:history, b:group . ',' . dnum . ',' . a:addr) >= 0
+    return a:title . "\t<" . len(b:refs) . '!' . a:caption . '|>'
+  else
+    return a:title . "\t<" . len(b:refs) . '|' . a:caption . '|>'
+  endif
+endfunction
+
 " entryバッファ上からcontentバッファを整形する
 function! s:GetAndFormatContent()
   if s:GetContent() < 0
@@ -1047,7 +1051,12 @@ function! s:FollowReference(count)
   let title = dictlist[dnum].title
   let j = 0
   while j < len(contentrefs)
-    execute 'normal! o' . title . "\<C-V>\<Tab>" . contentrefs[j][1] . "\<Esc>"
+    if match(s:history, b:group . ',' . dnum . ',' . contentrefs[j][0]) >= 0
+      let refstr = '<' . (j + 1) . '!' . contentrefs[j][1] . '|>'
+    else
+      let refstr = '<' . (j + 1) . '|' . contentrefs[j][1] . '|>'
+    endif
+    execute 'normal! o' . title . "\<C-V>\<Tab>" . refstr . "\<Esc>"
     let j = j + 1
   endwhile
   let b:refs = contentrefs

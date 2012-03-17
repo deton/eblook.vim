@@ -2,7 +2,7 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-03-04
+" Last Change:  2012-03-17
 
 scriptencoding cp932
 
