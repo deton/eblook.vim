@@ -365,9 +365,9 @@ function! s:Entry_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  nnoremap <buffer> <silent> <CR> :call <SID>GetContent()<CR>
-  nnoremap <buffer> <silent> J j:call <SID>GetContent()<CR>
-  nnoremap <buffer> <silent> K k:call <SID>GetContent()<CR>
+  nnoremap <buffer> <silent> <CR> :<C-U>call <SID>GetContent(v:count)<CR>
+  nnoremap <buffer> <silent> J j:call <SID>GetContent(0)<CR>
+  nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
   nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
   nnoremap <buffer> <silent> O :call <SID>GetAndFormatContent()<CR>
@@ -522,8 +522,7 @@ function! s:Search(group, word, isstem)
   endif
 
   setlocal nomodifiable
-  normal! 1G
-  if s:GetContent() < 0
+  if s:GetContent(1) < 0
     if search('.', 'w') == 0
       bwipeout!
       silent! call s:History(-1)
@@ -701,10 +700,15 @@ function! s:CreateBuffer(bufname, oldindex)
   return 0
 endfunction
 
-" entryバッファのカーソル行に対応する内容をcontentバッファに表示する
+" entryバッファの指定行に対応する内容をcontentバッファに表示する
+" @param count 対象の行番号。0の場合は現在行
 " @return -1:content表示失敗, 0:表示成功
-function! s:GetContent()
-  let str = getline('.')
+function! s:GetContent(count)
+  if (a:count > 0)
+    execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
+  endif
+  let lnum = line('.')
+  let str = getline(lnum)
   let title = matchstr(str, '^[^\t]\+')
   if strlen(title) == 0
     return -1
@@ -713,7 +717,7 @@ function! s:GetContent()
   if dnum < 0
     return -1
   endif
-  let ref = get(b:refs, line('.') - 1)
+  let ref = get(b:refs, lnum - 1)
   if type(ref) != type([])
     return -1
   endif
@@ -924,7 +928,7 @@ endfunction
 
 " entryバッファ上からcontentバッファを整形する
 function! s:GetAndFormatContent()
-  if s:GetContent() < 0
+  if s:GetContent(0) < 0
     return -1
   endif
   call s:GoWindow(0)
@@ -1027,7 +1031,7 @@ endfunction
 " entryバッファでカーソル行のエントリに含まれるreferenceのリストを表示
 " @param count [count]で指定された、表示対象のreferenceのindex番号
 function! s:ListReferences(count)
-  if s:GetContent() < 0
+  if s:GetContent(0) < 0
     return -1
   endif
   call s:FollowReference(a:count)
@@ -1065,10 +1069,7 @@ function! s:FollowReference(count)
   setlocal nomodifiable
 
   normal! gg
-  if (a:count > 0)
-    execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
-  endif
-  call s:GetContent()
+  call s:GetContent(a:count)
 endfunction
 
 " バッファのヒストリをたどる。
