@@ -763,7 +763,7 @@ function! s:GetContent(count)
   setlocal nomodifiable
   normal! 1G
   if search('.', 'w') > 0 " any result?
-    let maxover = len(s:history) - g:eblook_history_visited_max
+    let maxover = len(s:history) - g:eblook_history_visited_max + 1
     if maxover > 0
       unlet s:history[:maxover]
     endif
