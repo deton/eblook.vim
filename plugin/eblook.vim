@@ -358,7 +358,7 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
-  setlocal statusline=%{b:group}Eblook\ entry\ {%{b:word}}\ [%L]
+  setlocal statusline=%{b:group}Eblook\ entry\ {%{b:word}%<}\ [%L]
   "set filetype=eblook
   "if has("conceal")
   "  setlocal conceallevel=2 concealcursor=nc
@@ -389,7 +389,7 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  setlocal statusline=%{b:group}Eblook\ content\ {%{b:caption}}
+  setlocal statusline=%{b:group}Eblook\ content\ {%{b:caption}%<}
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
