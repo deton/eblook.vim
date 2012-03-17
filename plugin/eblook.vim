@@ -713,7 +713,7 @@ endfunction
 " @return -1:content•\Ž¦Ž¸”s, 0:•\Ž¦¬Œ÷
 function! s:GetContent(count)
   if (a:count > 0)
-    execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
+    silent! execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
   endif
   let lnum = line('.')
   let str = getline(lnum)
