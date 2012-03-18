@@ -239,6 +239,10 @@ if !exists('eblookprg')
   let eblookprg = 'eblook'
 endif
 
+if !exists('eblook_imgprg')
+  let eblook_imgprg = 'xli'
+endif
+
 " eblookプログラムの出力を読み込むときのエンコーディング
 if !exists('eblookenc')
   let eblookenc = &encoding
@@ -424,6 +428,7 @@ function! s:Content_BufEnter()
     setlocal statusline=
   endif
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
+  nnoremap <buffer> <silent> x :call <SID>ShowMedia()<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
@@ -902,10 +907,14 @@ endfunction
 
 " contentバッファ中の<reference>等を短縮形式に置換する
 function! s:FormatReference()
-  silent! :g;<img=[^>]*>\(\_.\{-}\)</img=[^>]*>;s;;\=s:MakeCaptionString(submatch(1), 'img');g
-  silent! :g;<inline=[^>]*>\(\_.\{-}\)</inline=[^>]*>;s;;\=s:MakeCaptionString(submatch(1), 'inline');g
-  silent! :g;<snd=[^>]*>\(\_.\{-}\)</snd>;s;;\=s:MakeCaptionString(submatch(1), 'snd');g
-  silent! :g;<mov=[^>]*>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(1), 'mov');g
+  let b:contentrefsm = []
+  " <img=jpeg>...</img=589:334>
+  silent! :g;<img=\([^>]*\)>\(\_.\{-}\)</img=\([^>]*\)>;s;;\=s:MakeCaptionString(submatch(2), 'img', submatch(1), submatch(3));g
+  silent! :g;<inline=\([^>]*\)>\(\_.\{-}\)</inline=\([^>]*\)>;s;;\=s:MakeCaptionString(submatch(2), 'inline', submatch(1), submatch(3));g
+  " <snd=wav:433:2032-535:111>
+  silent! :g;<snd=\(.\{-}\):\([^>]*\)>\(\_.\{-}\)</snd>;s;;\=s:MakeCaptionString(submatch(3), 'snd', submatch(1), submatch(2));g
+  " <mov=mpg:590357301,590357297,590488370,590684976>
+  silent! :g;<mov=\(.\{-}\):\([^>]*\)>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(3), 'mov', submatch(1), submatch(2));g
 
   let b:contentrefs = []
   silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
@@ -916,19 +925,29 @@ endfunction
 " @param caption caption文字列。空文字列の可能性あり
 " @param tag captionの種類:'inline','img','snd','mov'
 " @return 整形後の文字列
-function! s:MakeCaptionString(caption, tag)
+function! s:MakeCaptionString(caption, tag, ftype, addr)
   let len = strlen(a:caption)
   " captionが空の場合は補完:
   " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
   " 数式部分でcaptionが空の<inline>が出現。非表示にすると
   " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
   if a:tag ==# 'img' || a:tag ==# 'inline'
-    return '<〈' . (len ? a:caption : '画像') . '〉>'
+    let markbeg = '〈'
+    let capstr = (len ? a:caption : '画像')
+    let markend = '〉'
   elseif a:tag ==# 'snd'
-    return '<《' . (len ? a:caption : '音声') . '》>'
+    let markbeg = '《'
+    let capstr = (len ? a:caption : '音声')
+    let markend = '》'
   elseif a:tag ==# 'mov'
-    return '<《' . (len ? a:caption : '動画') . '》>'
+    let markbeg = '《'
+    let capstr = (len ? a:caption : '動画')
+    let markend = '》'
+  else
+    return a:cation
   endif
+  call add(b:contentrefsm, [a:ftype, a:addr, capstr])
+  return '<' . len(b:contentrefsm) . markbeg . capstr . markend . '>'
 endfunction
 
 " '<reference>caption</reference=xxxx:xxxx>'を
@@ -1102,6 +1121,57 @@ function! s:FollowReference(count)
 
   normal! gg
   call s:GetContent(a:count)
+endfunction
+
+" contentバッファ中のカーソル位置付近のimg等を抽出して、
+" その内容を外部プログラムで表示する。
+function! s:ShowMedia()
+  let str = getline('.')
+  let refpat = '<\zs\d\+\ze[〈《]'
+  let index = matchstr(str, refpat)
+  let m1 = matchend(str, refpat)
+  if m1 < 0
+    return
+  endif
+  " img等が1行に2つ以上ある場合は、カーソルが位置する方を使う
+  let m2 = match(str, refpat, m1)
+  if m2 >= 0
+    let col = col('.')
+    let offset = strridx(strpart(str, 0, col), '<')
+    if offset >= 0
+      let index = matchstr(str, refpat, offset)
+    endif
+  endif
+  if strlen(index) == 0
+    return
+  endif
+
+  let ref = get(b:contentrefsm, index - 1)
+  if type(ref) != type([])
+    return
+  endif
+  let refid = ref[1]
+
+  let dictlist = s:GetDictList(b:group)
+  let dict = dictlist[b:dictnum]
+  execute 'redir! >' . s:cmdfile
+  if exists("dict.book")
+    silent echo 'book ' . s:MakeBookArgument(dict)
+  endif
+  silent echo 'select ' . dict.name
+  " TODO: support mono/bmp/wav/mpeg
+  let tmpfname = fnamemodify(s:cmdfile, ':p:h') . '/tmp.jpeg'
+  let tmpfname = substitute(tmpfname, '\\', '/', 'g')
+  silent echo 'jpeg ' . refid . ' ' . tmpfname
+  redir END
+  call system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
+
+  if match(g:eblook_imgprg, '%s') >= 0
+    let viewer = substitute(g:eblook_imgprg, '%s', shellescape(tmpfname), '')
+  else
+    let viewer = g:eblook_imgprg . ' ' . shellescape(tmpfname)
+  endif
+  call system(viewer)
 endfunction
 
 " バッファのヒストリをたどる。
