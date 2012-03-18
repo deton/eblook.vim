@@ -772,6 +772,7 @@ function! s:GetContent(count)
   silent echo 'content ' . refid . "\n"
   redir END
   call s:ExecuteEblook()
+  "return 0 " DEBUG: 整形前の内容を確認する
 
   silent! :g/eblook> /s///g
   if search('<gaiji=', 'nw') != 0
