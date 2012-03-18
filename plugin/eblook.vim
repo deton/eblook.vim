@@ -908,7 +908,6 @@ function! s:FormatReference()
   silent! :g;<mov=[^>]*>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(1), 'mov');g
 
   let b:contentrefs = []
-  let b:contentrefsindex = 0
   silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
 endfunction
 
