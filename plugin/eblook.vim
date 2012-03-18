@@ -374,11 +374,11 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  setlocal statusline=%!EblookGetStatusLineEntry()
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  call s:SetStatusLineEntry()
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>GetContent(v:count)<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
@@ -405,7 +405,7 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  call s:SetStatusLineContent()
+  setlocal statusline=%!EblookGetStatusLineContent()
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
@@ -420,45 +420,38 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
 endfunction
 
-" entryウィンドウ用statuslineを設定する。
-" &rulerや&rulerformatが設定されてれば加味。
-function! s:SetStatusLineEntry()
-  if !exists('g:eblook_statusline_entry')
-    let default = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
-    if &ruler
-      if strlen(&rulerformat) > 0
-	let g:eblook_statusline_entry = default . '%=' . &rulerformat
-      else
-	let g:eblook_statusline_entry = default . '%=%-14.(%l,%c%V%) %P'
-      endif
-    else
-      let g:eblook_statusline_entry = default
-    endif
+" entryウィンドウ用statuslineを返す。&rulerや&rulerformatが設定されてれば加味。
+function! EblookGetStatusLineEntry()
+  " XXX: s:にすると以下のエラーが出るので何も無しで。
+  " E120: Using <SID> not in a script context: <SID>EblookGetStatusLineEntry
+  if exists('g:eblook_statusline_entry')
+    return g:eblook_statusline_entry
   endif
-  if strlen(g:eblook_statusline_entry) > 0
-    setlocal statusline=%!g:eblook_statusline_entry
+  let default = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
+  if &ruler
+    if strlen(&rulerformat) > 0
+      return default . '%=' . &rulerformat
+    else
+      return default . '%=%-14.(%l,%c%V%) %P'
+    endif
   else
-    setlocal statusline=
+    return default
   endif
 endfunction
 
-function! s:SetStatusLineContent()
-  if !exists('g:eblook_statusline_content')
-    let default = '%{b:group}Eblook content {%{b:caption}%<}'
-    if &ruler
-      if strlen(&rulerformat) > 0
-	let g:eblook_statusline_content = default . '%=' . &rulerformat
-      else
-	let g:eblook_statusline_content = default . '%=%-14.(%l,%c%V%) %P'
-      endif
-    else
-      let g:eblook_statusline_content = default
-    endif
+function! EblookGetStatusLineContent()
+  if exists('g:eblook_statusline_content')
+    return g:eblook_statusline_content
   endif
-  if strlen(g:eblook_statusline_content) > 0
-    setlocal statusline=%!g:eblook_statusline_content
+  let default = '%{b:group}Eblook content {%{b:caption}%<}'
+  if &ruler
+    if strlen(&rulerformat) > 0
+      return default . '%=' . &rulerformat
+    else
+      return default . '%=%-14.(%l,%c%V%) %P'
+    endif
   else
-    setlocal statusline=
+    return default
   endif
 endfunction
 
