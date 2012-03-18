@@ -337,13 +337,26 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
   全辞書を常に整形する場合は以下のように設定してください。
     let eblook_autoformat_default = 1
 
-'eblook_show_refindex'			*'eblook_show_refindex'*
+'eblook_show_refindex'				*'eblook_show_refindex'*
   contentウィンドウ内のreference番号を表示するかどうか。省略値: 0
   デフォルトでは、conceal syntaxを使って非表示にします。
   Rキーやcontentウィンドウ内での<CR>キーにおいて、
   [count]で対象reference番号を指定したい場合は、
   以下のように設定してreference番号を表示するようにしてください。
     let eblook_show_refindex = 1
+
+'eblook_statusline_entry'			*'eblook_statusline_entry'*
+  entryウィンドウ用の|statusline|。
+  省略値: %{b:group}Eblook entry {%{b:word}%<} [%L]
+  |'ruler'|を追加したい場合は以下のように設定してください
+  (参考:|statusline|のヘルプのExamples)。
+    let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}%<} [%L]%=%-14.(%l,%c%V%) %P'
+
+'eblook_statusline_content'			*'eblook_statusline_content'*
+  contentウィンドウ用の|statusline|。
+  省略値: %{b:group}Eblook content {%{b:caption}%<}
+  |'ruler'|を追加したい場合は以下のように設定してください。
+    let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<}%=%-14.(%l,%c%V%) %P'
 
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"

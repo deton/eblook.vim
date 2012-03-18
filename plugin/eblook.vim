@@ -160,10 +160,12 @@ scriptencoding cp932
 "       するかどうか。省略値: 0
 "
 "    'eblook_statusline_entry'
-"       entryウィンドウ用のstatusline
+"       entryウィンドウ用のstatusline。
+"       省略値: %{b:group}Eblook entry {%{b:word}%<} [%L]
 "
 "    'eblook_statusline_content'
-"       contentウィンドウ用のstatusline
+"       contentウィンドウ用のstatusline。
+"       省略値: %{b:group}Eblook content {%{b:caption}%<}
 "
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
@@ -385,7 +387,11 @@ function! s:Entry_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  setlocal statusline=%!g:eblook_statusline_entry
+  if strlen(g:eblook_statusline_entry) > 0
+    setlocal statusline=%!g:eblook_statusline_entry
+  else
+    setlocal statusline=
+  endif
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>GetContent(v:count)<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
@@ -412,7 +418,11 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  setlocal statusline=%!g:eblook_statusline_content
+  if strlen(g:eblook_statusline_content) > 0
+    setlocal statusline=%!g:eblook_statusline_content
+  else
+    setlocal statusline=
+  endif
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
