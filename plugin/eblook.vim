@@ -427,41 +427,6 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
 endfunction
 
-" entryウィンドウ用statuslineを返す。&rulerや&rulerformatが設定されてれば加味。
-function! EblookGetStatusLineEntry()
-  " XXX: s:にすると以下のエラーが出るので何も無しで。
-  " E120: Using <SID> not in a script context: <SID>EblookGetStatusLineEntry
-  if exists('g:eblook_statusline_entry')
-    return g:eblook_statusline_entry
-  endif
-  let default = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
-  if &ruler
-    if strlen(&rulerformat) > 0
-      return default . '%=' . &rulerformat
-    else
-      return default . '%=%-14.(%l,%c%V%) %P'
-    endif
-  else
-    return default
-  endif
-endfunction
-
-function! EblookGetStatusLineContent()
-  if exists('g:eblook_statusline_content')
-    return g:eblook_statusline_content
-  endif
-  let default = '%{b:group}Eblook content {%{b:caption}%<}'
-  if &ruler
-    if strlen(&rulerformat) > 0
-      return default . '%=' . &rulerformat
-    else
-      return default . '%=%-14.(%l,%c%V%) %P'
-    endif
-  else
-    return default
-  endif
-endfunction
-
 " プロンプトを出して、ユーザから入力された文字列を検索する
 " @param {Number} group 対象の辞書グループ番号
 " @param {Number} defgroup 対象の辞書グループ番号(デフォルト)
