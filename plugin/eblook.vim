@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-17
+" Last Change: 2012-03-18
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -158,6 +158,12 @@ scriptencoding cp932
 "    'eblook_show_refindex'
 "       contentウィンドウ内のreference番号をconceal syntaxを使って非表示に
 "       するかどうか。省略値: 0
+"
+"    'eblook_statusline_entry'
+"       entryウィンドウ用のstatusline
+"
+"    'eblook_statusline_content'
+"       contentウィンドウ用のstatusline
 "
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
@@ -368,11 +374,11 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
-  setlocal statusline=%{b:group}Eblook\ entry\ {%{b:word}%<}\ [%L]
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
+  call s:SetStatusLineEntry()
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>GetContent(v:count)<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
@@ -399,7 +405,7 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  setlocal statusline=%{b:group}Eblook\ content\ {%{b:caption}%<}
+  call s:SetStatusLineContent()
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
@@ -412,6 +418,48 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+endfunction
+
+" entryウィンドウ用statuslineを設定する。
+" &rulerや&rulerformatが設定されてれば加味。
+function! s:SetStatusLineEntry()
+  if !exists('g:eblook_statusline_entry')
+    let default = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
+    if &ruler
+      if strlen(&rulerformat) > 0
+	let g:eblook_statusline_entry = default . '%=' . &rulerformat
+      else
+	let g:eblook_statusline_entry = default . '%=%-14.(%l,%c%V%) %P'
+      endif
+    else
+      let g:eblook_statusline_entry = default
+    endif
+  endif
+  if strlen(g:eblook_statusline_entry) > 0
+    setlocal statusline=%!g:eblook_statusline_entry
+  else
+    setlocal statusline=
+  endif
+endfunction
+
+function! s:SetStatusLineContent()
+  if !exists('g:eblook_statusline_content')
+    let default = '%{b:group}Eblook content {%{b:caption}%<}'
+    if &ruler
+      if strlen(&rulerformat) > 0
+	let g:eblook_statusline_content = default . '%=' . &rulerformat
+      else
+	let g:eblook_statusline_content = default . '%=%-14.(%l,%c%V%) %P'
+      endif
+    else
+      let g:eblook_statusline_content = default
+    endif
+  endif
+  if strlen(g:eblook_statusline_content) > 0
+    setlocal statusline=%!g:eblook_statusline_content
+  else
+    setlocal statusline=
+  endif
 endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
