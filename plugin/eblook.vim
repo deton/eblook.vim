@@ -225,6 +225,13 @@ if !exists('eblook_stemming')
   let eblook_stemming = 0
 endif
 
+if !exists('eblook_statusline_content')
+  let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<}'
+endif
+if !exists('eblook_statusline_entry')
+  let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
+endif
+
 " eblookƒvƒƒOƒ‰ƒ€‚Ì–¼‘O
 if !exists('eblookprg')
   let eblookprg = 'eblook'
@@ -374,11 +381,11 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
-  setlocal statusline=%!EblookGetStatusLineEntry()
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
+  setlocal statusline=%!g:eblook_statusline_entry
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>GetContent(v:count)<CR>
   nnoremap <buffer> <silent> J j:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
@@ -405,7 +412,7 @@ function! s:Content_BufEnter()
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
   endif
-  setlocal statusline=%!EblookGetStatusLineContent()
+  setlocal statusline=%!g:eblook_statusline_content
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
