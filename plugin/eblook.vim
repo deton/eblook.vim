@@ -241,18 +241,19 @@ endif
 
 if !exists('eblook_viewers')
   if has('win32') || has('win64')
+    " 第1引数に""を指定しないとコマンドプロンプトが開くだけ
     let eblook_viewers = {
       \'jpeg': ' start ""',
-      \'xbm': ' start ""',
       \'bmp': ' start ""',
+      \'xbm': ' start ""',
       \'wav': ' start ""',
       \'mpg': ' start ""',
     \}
   else
     let eblook_viewers = {
       \'jpeg': 'xdg-open',
-      \'xbm': 'xdg-open',
       \'bmp': 'xdg-open',
+      \'xbm': 'xdg-open',
       \'wav': 'xdg-open',
       \'mpg': 'xdg-open',
     \}
@@ -1178,7 +1179,9 @@ function! s:ShowMedia(count)
   if tmpext ==# 'mono'
     let tmpext = 'xbm'
   endif
+  " mspaintはパス区切りが\でないと駄目
   let tmpfshell = tempname() . '.' . tmpext
+  " eblook内ではパス区切りは\では駄目
   let tmpfeb = substitute(tmpfshell, '\\', '/', 'g')
 
   let dictlist = s:GetDictList(b:group)
@@ -1225,6 +1228,7 @@ function! s:ShowMedia(count)
   else
     let cmdline = viewer . ' ' . shellescape(tmpfshell)
   endif
+  " hit-enter promptが出ると面倒なのでsilent
   execute 'silent !' . cmdline
 endfunction
 
