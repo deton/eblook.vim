@@ -790,11 +790,11 @@ function! s:GetContent(count)
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
-  if exists("dict.book")
-    silent echo 'book ' . s:MakeBookArgument(dict)
-  endif
-  silent echo 'select ' . dict.name
-  silent echo 'content ' . refid . "\n"
+    if exists("dict.book")
+      silent echo 'book ' . s:MakeBookArgument(dict)
+    endif
+    silent echo 'select ' . dict.name
+    silent echo 'content ' . refid . "\n"
   redir END
   call s:ExecuteEblook()
   "return 0 " DEBUG: 整形前の内容を確認する
