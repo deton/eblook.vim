@@ -365,7 +365,7 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
    {
      \'jpeg': ' start ""',
      \'bmp': ' start ""',
-     \'xbm': ' start ""',
+     \'pbm': ' start ""',
      \'wav': ' start ""',
      \'mpg': ' start ""',
    \}
@@ -373,10 +373,26 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
    {
      \'jpeg': 'xdg-open',
      \'bmp': 'xdg-open',
-     \'xbm': 'xdg-open',
+     \'pbm': 'xdg-open',
      \'wav': 'xdg-open',
      \'mpg': 'xdg-open',
    \}
+   設定例1:
+    let eblook_viewers = {
+      \'jpeg': ' start ""',
+      \'mpg': 'start "C:\Program Files\Windows Media Player\wmplayer.exe"',
+      \'wav': 'start "C:\Program Files\foobar2000\foobar2000.exe"',
+      \'pbm': 'start "C:\Program Files\IrfanView\i_view32.exe"',
+      \'bmp': 'start mspaint',
+    \}
+   設定例2:
+    let eblook_viewers = {
+      \'jpeg': 'xli >/dev/null',
+      \'pbm': 'xli >/dev/null',
+      \'bmp': 'xli >/dev/null',
+      \'wav': 'xdg-open',
+      \'mpg': 'mplayer',
+    \}
 
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"

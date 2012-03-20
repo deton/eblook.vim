@@ -173,7 +173,7 @@ scriptencoding cp932
 "        {
 "          \'jpeg': ' start ""',
 "          \'bmp': ' start ""',
-"          \'xbm': ' start ""',
+"          \'pbm': ' start ""',
 "          \'wav': ' start ""',
 "          \'mpg': ' start ""',
 "        \}
@@ -181,7 +181,7 @@ scriptencoding cp932
 "        {
 "          \'jpeg': 'xdg-open',
 "          \'bmp': 'xdg-open',
-"          \'xbm': 'xdg-open',
+"          \'pbm': 'xdg-open',
 "          \'wav': 'xdg-open',
 "          \'mpg': 'xdg-open',
 "        \}
@@ -264,7 +264,7 @@ if !exists('eblook_viewers')
     let eblook_viewers = {
       \'jpeg': ' start ""',
       \'bmp': ' start ""',
-      \'xbm': ' start ""',
+      \'pbm': ' start ""',
       \'wav': ' start ""',
       \'mpg': ' start ""',
     \}
@@ -272,7 +272,7 @@ if !exists('eblook_viewers')
     let eblook_viewers = {
       \'jpeg': 'xdg-open',
       \'bmp': 'xdg-open',
-      \'xbm': 'xdg-open',
+      \'pbm': 'xdg-open',
       \'wav': 'xdg-open',
       \'mpg': 'xdg-open',
     \}
@@ -1199,7 +1199,7 @@ function! s:ShowMedia(count)
 
   let tmpext = substitute(ftype, ':.*', '', '')
   if tmpext ==# 'mono'
-    let tmpext = 'xbm'
+    let tmpext = 'pbm'
   endif
   " mspaintはパス区切りが\でないと駄目
   let tmpfshell = tempname() . '.' . tmpext
@@ -1213,9 +1213,9 @@ function! s:ShowMedia(count)
       silent echo 'book ' . s:MakeBookArgument(dict)
     endif
     silent echo 'select ' . dict.name
-    if tmpext ==# 'xbm'
+    if tmpext ==# 'pbm'
       let m = matchlist(ftype, 'mono:\(\d\+\)x\(\d\+\)')
-      silent echo 'xbm ' . refid . ' ' . m[1] . ' ' . m[2]
+      silent echo 'pbm ' . refid . ' ' . m[1] . ' ' . m[2]
     elseif tmpext ==# 'wav'
       let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
       silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfeb
@@ -1232,11 +1232,12 @@ function! s:ShowMedia(count)
     echomsg tmpext . 'ファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
     return
   endif
-  if tmpext ==# 'xbm'
-    let xbm = substitute(res, 'eblook> ', '', 'g')
-    " XXX:redirすると改行が1つ入るため、pbmだと壊れる
+  if tmpext ==# 'pbm'
+    let pbm = substitute(res, 'Warning: you should specify a book directory first', '', '')
+    let pbm = substitute(pbm, 'eblook> ', '', 'g')
+    let pbm = substitute(pbm, '\%^\n\n', '', '')
     execute 'redir! > ' . tmpfshell
-      silent echo xbm
+      silent echon pbm
     redir END
   endif
 
