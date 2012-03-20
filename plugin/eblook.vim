@@ -167,6 +167,25 @@ scriptencoding cp932
 "       contentウィンドウ用のstatusline。
 "       省略値: %{b:group}Eblook content {%{b:caption}%<}
 "
+"    'eblook_viewers'
+"       画像や音声再生用の外部ビューアコマンド。
+"       省略値(Windowsの場合):
+"        {
+"          \'jpeg': ' start ""',
+"          \'bmp': ' start ""',
+"          \'xbm': ' start ""',
+"          \'wav': ' start ""',
+"          \'mpg': ' start ""',
+"        \}
+"       省略値(Windows以外の場合):
+"        {
+"          \'jpeg': 'xdg-open',
+"          \'bmp': 'xdg-open',
+"          \'xbm': 'xdg-open',
+"          \'wav': 'xdg-open',
+"          \'mpg': 'xdg-open',
+"        \}
+"
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
 "
