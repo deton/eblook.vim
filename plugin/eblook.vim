@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-18
+" Last Change: 2012-03-20
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -239,8 +239,14 @@ if !exists('eblookprg')
   let eblookprg = 'eblook'
 endif
 
-if !exists('eblook_imgprg')
-  let eblook_imgprg = 'xli'
+if !exists('eblook_viewers')
+  let eblook_viewers = {
+    \'jpeg': 'xdg-open',
+    \'pbm': 'xdg-open',
+    \'bmp': 'xdg-open',
+    \'wav': 'xdg-open',
+    \'mpg': 'xdg-open',
+  \}
 endif
 
 " eblookプログラムの出力を読み込むときのエンコーディング
@@ -1150,7 +1156,15 @@ function! s:ShowMedia()
   if type(ref) != type([])
     return
   endif
+  let ftype = ref[0]
   let refid = ref[1]
+
+  let tmpext = substitute(ftype, ':.*', '', '')
+  if tmpext ==# 'mono'
+    let tmpext = 'pbm'
+  endif
+  let tmpfname = fnamemodify(s:cmdfile, ':p:h') . '/tmpebl.' . tmpext
+  let tmpfname = substitute(tmpfname, '\\', '/', 'g')
 
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
@@ -1159,19 +1173,48 @@ function! s:ShowMedia()
     silent echo 'book ' . s:MakeBookArgument(dict)
   endif
   silent echo 'select ' . dict.name
-  " TODO: support mono/bmp/wav/mpeg
-  let tmpfname = fnamemodify(s:cmdfile, ':p:h') . '/tmp.jpeg'
-  let tmpfname = substitute(tmpfname, '\\', '/', 'g')
-  silent echo 'jpeg ' . refid . ' ' . tmpfname
-  redir END
-  call system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
-
-  if match(g:eblook_imgprg, '%s') >= 0
-    let viewer = substitute(g:eblook_imgprg, '%s', shellescape(tmpfname), '')
+  if tmpext ==# 'pbm'
+    let m = matchlist(ftype, 'mono:\(\d\+\)x\(\d\+\)')
+    silent echo 'pbm ' . refid . ' ' . m[1] . ' ' . m[2]
+  elseif tmpext ==# 'bmp'
+    silent echo 'bmp ' . refid . ' ' . tmpfname
+  elseif tmpext ==# 'jpeg'
+    silent echo 'jpeg ' . refid . ' ' . tmpfname
+  elseif tmpext ==# 'wav'
+    let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
+    silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfname
+  elseif tmpext ==# 'mpg'
+    let m = matchlist(refid, '\(\d\+\),\(\d\+\),\(\d\+\),\(\d\+\)')
+    silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfname)
   else
-    let viewer = g:eblook_imgprg . ' ' . shellescape(tmpfname)
   endif
-  call system(viewer)
+  redir END
+  let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
+  let ngmsg = matchstr(res, 'NG: .*\ze\n')
+  if v:shell_error || strlen(ngmsg) > 0
+    echomsg 'メディアファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
+    return
+  endif
+  if tmpext ==# 'pbm'
+    let pbm = substitute(res, 'eblook> ', '', 'g')
+    execute 'redir! >' . tmpfname
+      silent echo pbm
+    redir END
+  endif
+
+  let viewer = get(g:eblook_viewers, tmpext, '')
+  if strlen(viewer) == 0
+    return
+  endif
+  if match(viewer, '%s') >= 0
+    let cmdline = substitute(viewer, '%s', shellescape(tmpfname), '')
+  else
+    let cmdline = viewer . ' ' . shellescape(tmpfname)
+  endif
+  let res = system(cmdline)
+  if v:shell_error
+    echomsg 'ビューアコマンド(' . cmdline . ')実行失敗: ' . res
+  endif
 endfunction
 
 " バッファのヒストリをたどる。
