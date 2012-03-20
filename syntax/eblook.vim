@@ -2,7 +2,7 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-03-18
+" Last Change:  2012-03-20
 
 scriptencoding cp932
 
@@ -19,24 +19,30 @@ if has("conceal")
     syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>"
     syn match ebRefBeg	"." contained
     syn match ebRefEnd	"." contained
+    syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>"
+    syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zes" matchgroup=ebSndEnd end="t\zs>"
+    syn match ebImgBeg	"." contained
+    syn match ebImgEnd	"." contained
+    syn match ebSndBeg	"." contained
+    syn match ebSndEnd	"." contained
   else
     syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" concealends
     syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" concealends
     syn match ebRefBeg	"." contained conceal
     syn match ebRefEnd	"." contained conceal
+    syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>" concealends
+    syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zes" matchgroup=ebSndEnd end="t\zs>" concealends
+    syn match ebImgBeg	"." contained conceal
+    syn match ebImgEnd	"." contained conceal
+    syn match ebSndBeg	"." contained conceal
+    syn match ebSndEnd	"." contained conceal
   endif
-  syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>" concealends
-  syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>" concealends
   " cf. helpIgnore in syntax/help.vim
-  syn match ebImgBeg	"." contained conceal
-  syn match ebImgEnd	"." contained conceal
-  syn match ebSndBeg	"." contained conceal
-  syn match ebSndEnd	"." contained conceal
 else
   syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>"
   syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>"
-  syn region ebImg matchgroup=ebImgBeg start="<\zeq" matchgroup=ebImgEnd end="r\zs>"
-  syn region ebSnd matchgroup=ebSndBeg start="<\zes" matchgroup=ebSndEnd end="t\zs>"
+  syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>"
+  syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zes" matchgroup=ebSndEnd end="t\zs>"
   syn match ebRefBeg	"." contained
   syn match ebRefEnd	"." contained
   syn match ebImgBeg	"." contained
@@ -59,21 +65,16 @@ endif
 
 hi def link ebRefLink	Identifier
 hi def link ebRefLinkVisited	Special
-if has("conceal")
+if g:eblook_show_refindex
   hi def link ebRefBeg	Type
   hi def link ebRefEnd	Type
-  hi def link ebImgBeg	Conceal
-  hi def link ebImgEnd	Conceal
-  hi def link ebSndBeg	Conceal
-  hi def link ebSndEnd	Conceal
+  hi def link ebImgBeg	Constant
+  hi def link ebImgEnd	Constant
+  hi def link ebSndBeg	Constant
+  hi def link ebSndEnd	Constant
 else
-  if g:eblook_show_refindex
-    hi def link ebRefBeg	Type
-    hi def link ebRefEnd	Type
-  else
-    hi def link ebRefBeg	Ignore
-    hi def link ebRefEnd	Ignore
-  endif
+  hi def link ebRefBeg	Ignore
+  hi def link ebRefEnd	Ignore
   hi def link ebImgBeg	Ignore
   hi def link ebImgEnd	Ignore
   hi def link ebSndBeg	Ignore
