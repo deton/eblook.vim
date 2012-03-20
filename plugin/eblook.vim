@@ -1169,8 +1169,8 @@ function! s:ShowMedia()
   if tmpext ==# 'mono'
     let tmpext = 'pbm'
   endif
-  let tmpfname = fnamemodify(s:cmdfile, ':p:h') . '/tmpebl.' . tmpext
-  let tmpfname = substitute(tmpfname, '\\', '/', 'g')
+  let tmpfshell = tempname() . '.' . tmpext
+  let tmpfeb = substitute(tmpfshell, '\\', '/', 'g')
 
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
@@ -1183,15 +1183,15 @@ function! s:ShowMedia()
     let m = matchlist(ftype, 'mono:\(\d\+\)x\(\d\+\)')
     silent echo 'pbm ' . refid . ' ' . m[1] . ' ' . m[2]
   elseif tmpext ==# 'bmp'
-    silent echo 'bmp ' . refid . ' ' . tmpfname
+    silent echo 'bmp ' . refid . ' ' . tmpfeb
   elseif tmpext ==# 'jpeg'
-    silent echo 'jpeg ' . refid . ' ' . tmpfname
+    silent echo 'jpeg ' . refid . ' ' . tmpfeb
   elseif tmpext ==# 'wav'
     let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
-    silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfname
+    silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfeb
   elseif tmpext ==# 'mpg'
     let m = matchlist(refid, '\(\d\+\),\(\d\+\),\(\d\+\),\(\d\+\)')
-    silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfname)
+    silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfeb)
   else
   endif
   redir END
@@ -1203,7 +1203,7 @@ function! s:ShowMedia()
   endif
   if tmpext ==# 'pbm'
     let pbm = substitute(res, 'eblook> ', '', 'g')
-    execute 'redir! >' . tmpfname
+    execute 'redir! >' . tmpfshell
       silent echo pbm
     redir END
   endif
@@ -1213,11 +1213,11 @@ function! s:ShowMedia()
     return
   endif
   if match(viewer, '%s') >= 0
-    let cmdline = substitute(viewer, '%s', shellescape(tmpfname), '')
+    let cmdline = substitute(viewer, '%s', shellescape(tmpfshell), '')
   else
-    let cmdline = viewer . ' ' . shellescape(tmpfname)
+    let cmdline = viewer . ' ' . shellescape(tmpfshell)
   endif
-  execute '!' . cmdline
+  execute 'silent !' . cmdline
 endfunction
 
 " バッファのヒストリをたどる。
