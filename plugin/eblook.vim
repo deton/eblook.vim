@@ -1136,6 +1136,8 @@ endfunction
 " contentバッファ中のカーソル位置付近のimg等を抽出して、
 " その内容を外部プログラムで表示する。
 function! s:ShowMedia()
+  " TODO:画像や動画の場合、captionが複数行にわたる場合があり、
+  "      2行目以降で操作した場合でも表示できるようにする
   let str = getline('.')
   let refpat = '<\zs\d\+\ze[〈《]'
   let index = matchstr(str, refpat)
@@ -1194,9 +1196,9 @@ function! s:ShowMedia()
   endif
   redir END
   let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
-  let ngmsg = matchstr(res, 'NG: .*\ze\n')
+  let ngmsg = matchstr(res, '\CNG: .*\ze\n')
   if v:shell_error || strlen(ngmsg) > 0
-    echomsg 'メディアファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
+    echomsg tmpext . 'ファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
     return
   endif
   if tmpext ==# 'pbm'
@@ -1215,10 +1217,7 @@ function! s:ShowMedia()
   else
     let cmdline = viewer . ' ' . shellescape(tmpfname)
   endif
-  let res = system(cmdline)
-  if v:shell_error
-    echomsg 'ビューアコマンド(' . cmdline . ')実行失敗: ' . res
-  endif
+  execute '!' . cmdline
 endfunction
 
 " バッファのヒストリをたどる。
