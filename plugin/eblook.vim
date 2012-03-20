@@ -487,6 +487,10 @@ endfunction
 " @param {String} word ŒŸõ‚·‚é’PŒê
 " @param {Boolean} isstem stemming‚µ‚½’PŒê‚ÌŒŸõ’†‚©‚Ç‚¤‚©
 function! s:Search(group, word, isstem)
+  if strlen(a:word) == 0
+    echomsg 'eblook-vim: ŒŸõŒê‚ª‹ó•¶š—ñ‚È‚Ì‚ÅAŒŸõ‚ğ’†~‚µ‚Ü‚·'
+    return -1
+  endif
   let s:lastword = a:word
   let gr = s:ExpandDefaultGroup(a:group)
   let dictlist = s:GetDictList(gr)
