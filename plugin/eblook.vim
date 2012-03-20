@@ -240,13 +240,23 @@ if !exists('eblookprg')
 endif
 
 if !exists('eblook_viewers')
-  let eblook_viewers = {
-    \'jpeg': 'xdg-open',
-    \'pbm': 'xdg-open',
-    \'bmp': 'xdg-open',
-    \'wav': 'xdg-open',
-    \'mpg': 'xdg-open',
-  \}
+  if has('win32') || has('win64')
+    let eblook_viewers = {
+      \'jpeg': ' start ""',
+      \'xbm': ' start ""',
+      \'bmp': ' start ""',
+      \'wav': ' start ""',
+      \'mpg': ' start ""',
+    \}
+  else
+    let eblook_viewers = {
+      \'jpeg': 'xdg-open',
+      \'xbm': 'xdg-open',
+      \'bmp': 'xdg-open',
+      \'wav': 'xdg-open',
+      \'mpg': 'xdg-open',
+    \}
+  endif
 endif
 
 " eblookプログラムの出力を読み込むときのエンコーディング
@@ -1166,7 +1176,7 @@ function! s:ShowMedia(count)
 
   let tmpext = substitute(ftype, ':.*', '', '')
   if tmpext ==# 'mono'
-    let tmpext = 'pbm'
+    let tmpext = 'xbm'
   endif
   let tmpfshell = tempname() . '.' . tmpext
   let tmpfeb = substitute(tmpfshell, '\\', '/', 'g')
@@ -1174,25 +1184,25 @@ function! s:ShowMedia(count)
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
-  if exists("dict.book")
-    silent echo 'book ' . s:MakeBookArgument(dict)
-  endif
-  silent echo 'select ' . dict.name
-  if tmpext ==# 'pbm'
-    let m = matchlist(ftype, 'mono:\(\d\+\)x\(\d\+\)')
-    silent echo 'pbm ' . refid . ' ' . m[1] . ' ' . m[2]
-  elseif tmpext ==# 'bmp'
-    silent echo 'bmp ' . refid . ' ' . tmpfeb
-  elseif tmpext ==# 'jpeg'
-    silent echo 'jpeg ' . refid . ' ' . tmpfeb
-  elseif tmpext ==# 'wav'
-    let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
-    silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfeb
-  elseif tmpext ==# 'mpg'
-    let m = matchlist(refid, '\(\d\+\),\(\d\+\),\(\d\+\),\(\d\+\)')
-    silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfeb)
-  else
-  endif
+    if exists("dict.book")
+      silent echo 'book ' . s:MakeBookArgument(dict)
+    endif
+    silent echo 'select ' . dict.name
+    if tmpext ==# 'xbm'
+      let m = matchlist(ftype, 'mono:\(\d\+\)x\(\d\+\)')
+      silent echo 'xbm ' . refid . ' ' . m[1] . ' ' . m[2]
+    elseif tmpext ==# 'bmp'
+      silent echo 'bmp ' . refid . ' ' . tmpfeb
+    elseif tmpext ==# 'jpeg'
+      silent echo 'jpeg ' . refid . ' ' . tmpfeb
+    elseif tmpext ==# 'wav'
+      let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
+      silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfeb
+    elseif tmpext ==# 'mpg'
+      let m = matchlist(refid, '\(\d\+\),\(\d\+\),\(\d\+\),\(\d\+\)')
+      silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfeb)
+    else
+    endif
   redir END
   let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
   let ngmsg = matchstr(res, 'eblook> \zsNG: .*\ze\n')
@@ -1200,15 +1210,17 @@ function! s:ShowMedia(count)
     echomsg tmpext . 'ファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
     return
   endif
-  if tmpext ==# 'pbm'
-    let pbm = substitute(res, 'eblook> ', '', 'g')
-    execute 'redir! >' . tmpfshell
-      silent echo pbm
+  if tmpext ==# 'xbm'
+    let xbm = substitute(res, 'eblook> ', '', 'g')
+    " XXX:redirすると改行が1つ入るため、pbmだと壊れる
+    execute 'redir! > ' . tmpfshell
+      silent echo xbm
     redir END
   endif
 
   let viewer = get(g:eblook_viewers, tmpext, '')
   if strlen(viewer) == 0
+    echomsg tmpext . '用ビューアがg:eblook_viewersに設定されていません'
     return
   endif
   if match(viewer, '%s') >= 0
