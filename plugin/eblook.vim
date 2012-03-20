@@ -1196,7 +1196,7 @@ function! s:ShowMedia()
   endif
   redir END
   let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
-  let ngmsg = matchstr(res, '\CNG: .*\ze\n')
+  let ngmsg = matchstr(res, 'eblook> \zsNG: .*\ze\n')
   if v:shell_error || strlen(ngmsg) > 0
     echomsg tmpext . 'ファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
     return
