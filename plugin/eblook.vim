@@ -735,18 +735,21 @@ function! s:NewBuffers(group)
     return -1
   endif
   let b:group = a:group
+  let b:word = ''
   if s:CreateBuffer(s:contentbufname, oldindex) < 0
     call s:Quit()
     let s:bufindex = oldindex
     return -1
   endif
   let b:group = a:group
+  " eblook内でエラーが発生して、結果が無い状態でstatuslineを表示しようとして
+  " Undefined variable: b:captionエラーが発生するのを回避
+  let b:caption = ''
   if s:GoWindow(1) < 0
     call s:Quit()
     let s:bufindex = oldindex
     return -1
   endif
-  let b:group = a:group
   execute g:eblook_entrywin_height . 'wincmd _'
   return 0
 endfunction
