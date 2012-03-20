@@ -434,7 +434,7 @@ function! s:Content_BufEnter()
     setlocal statusline=
   endif
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
-  nnoremap <buffer> <silent> x :call <SID>ShowMedia()<CR>
+  nnoremap <buffer> <silent> x :<C-U>call <SID>ShowMedia(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
@@ -1070,27 +1070,33 @@ function! s:SelectReference(count)
       let index = len(b:contentrefs)
     endif
   else
-    let str = getline('.')
-    let refpat = '<\zs\d\+\ze[|!]'
-    let index = matchstr(str, refpat)
-    let m1 = matchend(str, refpat)
-    if m1 < 0
-      return
-    endif
-    " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
-    let m2 = match(str, refpat, m1)
-    if m2 >= 0
-      let col = col('.')
-      let offset = strridx(strpart(str, 0, col), '<')
-      if offset >= 0
-	let index = matchstr(str, refpat, offset)
-      endif
-    endif
+    let index = s:GetIndexHere('<\zs\d\+\ze[|!]')
     if strlen(index) == 0
       return
     endif
   endif
   call s:FollowReference(index)
+endfunction
+
+" contentバッファ中のカーソル位置付近のrefpatを抽出して、
+" refpatに含まれるindex番号を返す。
+function! s:GetIndexHere(refpat)
+  let str = getline('.')
+  let index = matchstr(str, a:refpat)
+  let m1 = matchend(str, a:refpat)
+  if m1 < 0
+    return ''
+  endif
+  " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
+  let m2 = match(str, a:refpat, m1)
+  if m2 >= 0
+    let col = col('.')
+    let offset = strridx(strpart(str, 0, col), '<')
+    if offset >= 0
+      let index = matchstr(str, a:refpat, offset)
+    endif
+  endif
+  return index
 endfunction
 
 " entryバッファでカーソル行のエントリに含まれるreferenceのリストを表示
@@ -1135,27 +1141,20 @@ endfunction
 
 " contentバッファ中のカーソル位置付近のimg等を抽出して、
 " その内容を外部プログラムで表示する。
-function! s:ShowMedia()
-  " TODO:画像や動画の場合、captionが複数行にわたる場合があり、
-  "      2行目以降で操作した場合でも表示できるようにする
-  let str = getline('.')
-  let refpat = '<\zs\d\+\ze[〈《]'
-  let index = matchstr(str, refpat)
-  let m1 = matchend(str, refpat)
-  if m1 < 0
-    return
-  endif
-  " img等が1行に2つ以上ある場合は、カーソルが位置する方を使う
-  let m2 = match(str, refpat, m1)
-  if m2 >= 0
-    let col = col('.')
-    let offset = strridx(strpart(str, 0, col), '<')
-    if offset >= 0
-      let index = matchstr(str, refpat, offset)
+" @param count [count]で指定された、表示対象のindex番号
+function! s:ShowMedia(count)
+  if a:count > 0
+    let index = a:count
+    if a:count > len(b:contentrefsm)
+      let index = len(b:contentrefsm)
     endif
-  endif
-  if strlen(index) == 0
-    return
+  else
+    " TODO:画像や動画の場合、captionが複数行にわたる場合があり、
+    "      2行目以降で操作した場合でも表示できるようにする
+    let index = s:GetIndexHere('<\zs\d\+\ze[〈《]')
+    if strlen(index) == 0
+      return
+    endif
   endif
 
   let ref = get(b:contentrefsm, index - 1)
