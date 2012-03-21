@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-18
+" Last Change: 2012-03-20
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -167,6 +167,25 @@ scriptencoding cp932
 "       contentウィンドウ用のstatusline。
 "       省略値: %{b:group}Eblook content {%{b:caption}%<}
 "
+"    'eblook_viewers'
+"       画像や音声再生用の外部ビューアコマンド。
+"       省略値(Windowsの場合):
+"        {
+"          \'jpeg': ' start ""',
+"          \'bmp': ' start ""',
+"          \'pbm': ' start ""',
+"          \'wav': ' start ""',
+"          \'mpg': ' start ""',
+"        \}
+"       省略値(Windows以外の場合):
+"        {
+"          \'jpeg': 'xdg-open',
+"          \'bmp': 'xdg-open',
+"          \'pbm': 'xdg-open',
+"          \'wav': 'xdg-open',
+"          \'mpg': 'xdg-open',
+"        \}
+"
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
 "
@@ -237,6 +256,27 @@ endif
 " eblookプログラムの名前
 if !exists('eblookprg')
   let eblookprg = 'eblook'
+endif
+
+if !exists('eblook_viewers')
+  if has('win32') || has('win64')
+    " 第1引数に""を指定しないとコマンドプロンプトが開くだけ
+    let eblook_viewers = {
+      \'jpeg': ' start ""',
+      \'bmp': ' start ""',
+      \'pbm': ' start ""',
+      \'wav': ' start ""',
+      \'mpg': ' start ""',
+    \}
+  else
+    let eblook_viewers = {
+      \'jpeg': 'xdg-open',
+      \'bmp': 'xdg-open',
+      \'pbm': 'xdg-open',
+      \'wav': 'xdg-open',
+      \'mpg': 'xdg-open',
+    \}
+  endif
 endif
 
 " eblookプログラムの出力を読み込むときのエンコーディング
@@ -424,6 +464,7 @@ function! s:Content_BufEnter()
     setlocal statusline=
   endif
   nnoremap <buffer> <silent> <CR> :<C-U>call <SID>SelectReference(v:count)<CR>
+  nnoremap <buffer> <silent> x :<C-U>call <SID>ShowMedia(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
@@ -772,11 +813,11 @@ function! s:GetContent(count)
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
-  if exists("dict.book")
-    silent echo 'book ' . s:MakeBookArgument(dict)
-  endif
-  silent echo 'select ' . dict.name
-  silent echo 'content ' . refid . "\n"
+    if exists("dict.book")
+      silent echo 'book ' . s:MakeBookArgument(dict)
+    endif
+    silent echo 'select ' . dict.name
+    silent echo 'content ' . refid . "\n"
   redir END
   call s:ExecuteEblook()
   "return 0 " DEBUG: 整形前の内容を確認する
@@ -909,10 +950,14 @@ endfunction
 
 " contentバッファ中の<reference>等を短縮形式に置換する
 function! s:FormatReference()
-  silent! :g;<img=[^>]*>\(\_.\{-}\)</img=[^>]*>;s;;\=s:MakeCaptionString(submatch(1), 'img');g
-  silent! :g;<inline=[^>]*>\(\_.\{-}\)</inline=[^>]*>;s;;\=s:MakeCaptionString(submatch(1), 'inline');g
-  silent! :g;<snd=[^>]*>\(\_.\{-}\)</snd>;s;;\=s:MakeCaptionString(submatch(1), 'snd');g
-  silent! :g;<mov=[^>]*>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(1), 'mov');g
+  let b:contentrefsm = []
+  " <img=jpeg>...</img=589:334>
+  silent! :g;<img=\([^>]*\)>\(\_.\{-}\)</img=\([^>]*\)>;s;;\=s:MakeCaptionString(submatch(2), 'img', submatch(1), submatch(3));g
+  silent! :g;<inline=\([^>]*\)>\(\_.\{-}\)</inline=\([^>]*\)>;s;;\=s:MakeCaptionString(submatch(2), 'inline', submatch(1), submatch(3));g
+  " <snd=wav:433:2032-535:111>
+  silent! :g;<snd=\(.\{-}\):\([^>]*\)>\(\_.\{-}\)</snd>;s;;\=s:MakeCaptionString(submatch(3), 'snd', submatch(1), submatch(2));g
+  " <mov=mpg:590357301,590357297,590488370,590684976>
+  silent! :g;<mov=\(.\{-}\):\([^>]*\)>\(\_.\{-}\)</mov>;s;;\=s:MakeCaptionString(submatch(3), 'mov', submatch(1), submatch(2));g
 
   let b:contentrefs = []
   silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
@@ -923,19 +968,29 @@ endfunction
 " @param caption caption文字列。空文字列の可能性あり
 " @param tag captionの種類:'inline','img','snd','mov'
 " @return 整形後の文字列
-function! s:MakeCaptionString(caption, tag)
+function! s:MakeCaptionString(caption, tag, ftype, addr)
   let len = strlen(a:caption)
   " captionが空の場合は補完:
   " eblook 1.6.1+mediaで『理化学辞典第５版』を表示した場合、
   " 数式部分でcaptionが空の<inline>が出現。非表示にすると
   " 文章がつながらなくなる。(+media無しのeblookの場合は<img>で出現)
   if a:tag ==# 'img' || a:tag ==# 'inline'
-    return '<〈' . (len ? a:caption : '画像') . '〉>'
+    let markbeg = '〈'
+    let capstr = (len ? a:caption : '画像')
+    let markend = '〉'
   elseif a:tag ==# 'snd'
-    return '<《' . (len ? a:caption : '音声') . '》>'
+    let markbeg = '《'
+    let capstr = (len ? a:caption : '音声')
+    let markend = '》'
   elseif a:tag ==# 'mov'
-    return '<《' . (len ? a:caption : '動画') . '》>'
+    let markbeg = '《'
+    let capstr = (len ? a:caption : '動画')
+    let markend = '》'
+  else
+    return a:cation
   endif
+  call add(b:contentrefsm, [a:ftype, a:addr, capstr])
+  return '<' . len(b:contentrefsm) . markbeg . capstr . markend . '>'
 endfunction
 
 " '<reference>caption</reference=xxxx:xxxx>'を
@@ -1048,27 +1103,33 @@ function! s:SelectReference(count)
       let index = len(b:contentrefs)
     endif
   else
-    let str = getline('.')
-    let refpat = '<\zs\d\+\ze[|!]'
-    let index = matchstr(str, refpat)
-    let m1 = matchend(str, refpat)
-    if m1 < 0
-      return
-    endif
-    " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
-    let m2 = match(str, refpat, m1)
-    if m2 >= 0
-      let col = col('.')
-      let offset = strridx(strpart(str, 0, col), '<')
-      if offset >= 0
-	let index = matchstr(str, refpat, offset)
-      endif
-    endif
+    let index = s:GetIndexHere('<\zs\d\+\ze[|!]')
     if strlen(index) == 0
       return
     endif
   endif
   call s:FollowReference(index)
+endfunction
+
+" contentバッファ中のカーソル位置付近のrefpatを抽出して、
+" refpatに含まれるindex番号を返す。
+function! s:GetIndexHere(refpat)
+  let str = getline('.')
+  let index = matchstr(str, a:refpat)
+  let m1 = matchend(str, a:refpat)
+  if m1 < 0
+    return ''
+  endif
+  " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
+  let m2 = match(str, a:refpat, m1)
+  if m2 >= 0
+    let col = col('.')
+    let offset = strridx(strpart(str, 0, col), '<')
+    if offset >= 0
+      let index = matchstr(str, a:refpat, offset)
+    endif
+  endif
+  return index
 endfunction
 
 " entryバッファでカーソル行のエントリに含まれるreferenceのリストを表示
@@ -1109,6 +1170,89 @@ function! s:FollowReference(count)
 
   normal! gg
   call s:GetContent(a:count)
+endfunction
+
+" contentバッファ中のカーソル位置付近のimg等を抽出して、
+" その内容を外部プログラムで表示する。
+" @param count [count]で指定された、表示対象のindex番号
+function! s:ShowMedia(count)
+  if a:count > 0
+    let index = a:count
+    if a:count > len(b:contentrefsm)
+      let index = len(b:contentrefsm)
+    endif
+  else
+    " TODO:画像や動画の場合、captionが複数行にわたる場合があり、
+    "      2行目以降で操作した場合でも表示できるようにする
+    let index = s:GetIndexHere('<\zs\d\+\ze[〈《]')
+    if strlen(index) == 0
+      return
+    endif
+  endif
+
+  let ref = get(b:contentrefsm, index - 1)
+  if type(ref) != type([])
+    return
+  endif
+  let ftype = ref[0]
+  let refid = ref[1]
+
+  let tmpext = substitute(ftype, ':.*', '', '')
+  if tmpext ==# 'mono'
+    let tmpext = 'pbm'
+  endif
+  " mspaintはパス区切りが\でないと駄目
+  let tmpfshell = tempname() . '.' . tmpext
+  " eblook内ではパス区切りは\では駄目
+  let tmpfeb = substitute(tmpfshell, '\\', '/', 'g')
+
+  let dictlist = s:GetDictList(b:group)
+  let dict = dictlist[b:dictnum]
+  execute 'redir! >' . s:cmdfile
+    if exists("dict.book")
+      silent echo 'book ' . s:MakeBookArgument(dict)
+    endif
+    silent echo 'select ' . dict.name
+    if tmpext ==# 'pbm'
+      let m = matchlist(ftype, 'mono:\(\d\+\)x\(\d\+\)')
+      silent echo 'pbm ' . refid . ' ' . m[1] . ' ' . m[2]
+    elseif tmpext ==# 'wav'
+      let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
+      silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfeb
+    elseif tmpext ==# 'mpg'
+      let m = matchlist(refid, '\(\d\+\),\(\d\+\),\(\d\+\),\(\d\+\)')
+      silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfeb)
+    else " bmp || jpeg
+      silent echo tmpext . ' ' . refid . ' ' . tmpfeb
+    endif
+  redir END
+  let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
+  let ngmsg = matchstr(res, 'eblook> \zsNG: .*\ze\n')
+  if v:shell_error || strlen(ngmsg) > 0
+    echomsg tmpext . 'ファイル抽出失敗: ' . (v:shell_error ? res : ngmsg)
+    return
+  endif
+  if tmpext ==# 'pbm'
+    let pbm = substitute(res, 'Warning: you should specify a book directory first', '', '')
+    let pbm = substitute(pbm, 'eblook> ', '', 'g')
+    let pbm = substitute(pbm, '\%^\n\n', '', '')
+    execute 'redir! > ' . tmpfshell
+      silent echon pbm
+    redir END
+  endif
+
+  let viewer = get(g:eblook_viewers, tmpext, '')
+  if strlen(viewer) == 0
+    echomsg tmpext . '用ビューアがg:eblook_viewersに設定されていません'
+    return
+  endif
+  if match(viewer, '%s') >= 0
+    let cmdline = substitute(viewer, '%s', shellescape(tmpfshell), '')
+  else
+    let cmdline = viewer . ' ' . shellescape(tmpfshell)
+  endif
+  " hit-enter promptが出ると面倒なのでsilent
+  execute 'silent !' . cmdline
 endfunction
 
 " バッファのヒストリをたどる。

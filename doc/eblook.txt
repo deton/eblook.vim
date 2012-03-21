@@ -246,6 +246,7 @@ R                   reference一覧を表示する
 <C-P>               検索履歴中の一つ前のバッファを表示する
 <C-N>               検索履歴中の一つ次のバッファを表示する
 O                   contentウィンドウ内の長い行を|gq|で整形する
+x                   カーソル位置か[count]で指定する画像・音声・動画を表示・再生
 
 ==============================================================================
 5. オプション					*eblook-option*
@@ -357,6 +358,41 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
   省略値: %{b:group}Eblook content {%{b:caption}%<}
   |'ruler'|を追加したい場合は以下のように設定してください。
     let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<}%=%-14.(%l,%c%V%) %P'
+
+'eblook_viewers'				*'eblook_viewers'*
+  画像や音声再生用の外部ビューアコマンド。
+  省略値(Windowsの場合):
+   {
+     \'jpeg': ' start ""',
+     \'bmp': ' start ""',
+     \'pbm': ' start ""',
+     \'wav': ' start ""',
+     \'mpg': ' start ""',
+   \}
+  省略値(Windows以外の場合):
+   {
+     \'jpeg': 'xdg-open',
+     \'bmp': 'xdg-open',
+     \'pbm': 'xdg-open',
+     \'wav': 'xdg-open',
+     \'mpg': 'xdg-open',
+   \}
+   設定例1:
+    let eblook_viewers = {
+      \'jpeg': ' start ""',
+      \'mpg': 'start "C:\Program Files\Windows Media Player\wmplayer.exe"',
+      \'wav': 'start "C:\Program Files\foobar2000\foobar2000.exe"',
+      \'pbm': 'start "C:\Program Files\IrfanView\i_view32.exe"',
+      \'bmp': 'start mspaint',
+    \}
+   設定例2:
+    let eblook_viewers = {
+      \'jpeg': 'xli >/dev/null',
+      \'pbm': 'xli >/dev/null',
+      \'bmp': 'xli >/dev/null',
+      \'wav': 'xdg-open',
+      \'mpg': 'mplayer',
+    \}
 
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"
