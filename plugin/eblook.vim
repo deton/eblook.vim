@@ -1088,7 +1088,7 @@ function! s:SelectReference(count)
       let index = len(b:contentrefs)
     endif
   else
-    let index = s:GetIndexHere('<\zs\d\+\ze[|!]')
+    let index = s:GetIndexHere('<\zs\d\+\ze[|!]', '.')
     if strlen(index) == 0
       return
     endif
@@ -1098,8 +1098,8 @@ endfunction
 
 " contentバッファ中のカーソル位置付近のrefpatを抽出して、
 " refpatに含まれるindex番号を返す。
-function! s:GetIndexHere(refpat)
-  let str = getline('.')
+function! s:GetIndexHere(refpat, lnum)
+  let str = getline(a:lnum)
   let index = matchstr(str, a:refpat)
   let m1 = matchend(str, a:refpat)
   if m1 < 0
@@ -1108,7 +1108,13 @@ function! s:GetIndexHere(refpat)
   " referenceが1行に2つ以上ある場合は、カーソルが位置する方を使う
   let m2 = match(str, a:refpat, m1)
   if m2 >= 0
-    let col = col('.')
+    if a:lnum == '.'
+      let col = col('.')
+    elseif line('.') > a:lnum
+      let col = col('$')
+    else
+      let col = 1
+    endif
     let offset = strridx(strpart(str, 0, col), '<')
     if offset >= 0
       let index = matchstr(str, a:refpat, offset)
@@ -1167,11 +1173,18 @@ function! s:ShowMedia(count)
       let index = len(b:contentrefsm)
     endif
   else
-    " TODO:画像や動画の場合、captionが複数行にわたる場合があり、
-    "      2行目以降で操作した場合でも表示できるようにする
-    let index = s:GetIndexHere('<\zs\d\+\ze[〈《]')
+    let index = s:GetIndexHere('<\zs\d\+\ze[〈《]', '.')
     if strlen(index) == 0
-      return
+      " 画像や動画の場合、captionが複数行にわたる場合があり、
+      " 2行目以降で操作した場合でも表示できるようにする
+      let lnum = search('<\d\+[〈《]', 'bnW')
+      if lnum == 0
+	return
+      endif
+      let index = s:GetIndexHere('<\zs\d\+\ze[〈《]', lnum)
+      if strlen(index) == 0
+	return
+      endif
     endif
   endif
 
