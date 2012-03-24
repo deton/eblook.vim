@@ -361,38 +361,48 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 
 'eblook_viewers'				*'eblook_viewers'*
   画像や音声再生用の外部ビューアコマンド。
-  省略値(Windowsの場合):
-   {
-     \'jpeg': ' start ""',
-     \'bmp': ' start ""',
-     \'pbm': ' start ""',
-     \'wav': ' start ""',
-     \'mpg': ' start ""',
-   \}
-  省略値(Windows以外の場合):
-   {
-     \'jpeg': 'xdg-open',
-     \'bmp': 'xdg-open',
-     \'pbm': 'xdg-open',
-     \'wav': 'xdg-open',
-     \'mpg': 'xdg-open',
-   \}
-   設定例1:
-    let eblook_viewers = {
-      \'jpeg': ' start ""',
-      \'mpg': 'start "C:\Program Files\Windows Media Player\wmplayer.exe"',
-      \'wav': 'start "C:\Program Files\foobar2000\foobar2000.exe"',
-      \'pbm': 'start "C:\Program Files\IrfanView\i_view32.exe"',
-      \'bmp': 'start mspaint',
-    \}
-   設定例2:
-    let eblook_viewers = {
-      \'jpeg': 'xli >/dev/null',
-      \'pbm': 'xli >/dev/null',
-      \'bmp': 'xli >/dev/null',
-      \'wav': 'xdg-open',
-      \'mpg': 'mplayer',
-    \}
+
+  contentウィンドウで、画像や音声へのリンクの上でxキーを押すと、
+  画像や音声を一時ファイルに保存した後、この変数で指定された
+  外部ビューアコマンドを実行(|:!|)します。
+
+  外部ビューアコマンド文字列に%sが含まれる場合は、
+  |shellescape()|した一時ファイル名に置換します。
+  含まれない場合は、外部ビューアコマンド文字列の後に
+  スペースとshellescape()した一時ファイル名を追加します。
+
+    省略値(Windowsの場合):
+     {
+       \'jpeg': ' start ""',
+       \'bmp': ' start ""',
+       \'pbm': ' start ""',
+       \'wav': ' start ""',
+       \'mpg': ' start ""',
+     \}
+    省略値(Windows以外の場合):
+     {
+       \'jpeg': 'xdg-open %s &',
+       \'bmp': 'xdg-open %s &',
+       \'pbm': 'xdg-open %s &',
+       \'wav': 'xdg-open %s &',
+       \'mpg': 'xdg-open %s &',
+     \}
+    設定例1:
+     let eblook_viewers = {
+       \'jpeg': ' start ""',
+       \'bmp': 'start mspaint',
+       \'pbm': 'start "C:\Program Files\IrfanView\i_view32.exe"',
+       \'wav': 'start "C:\Program Files\foobar2000\foobar2000.exe"',
+       \'mpg': 'start "C:\Program Files\Windows Media Player\wmplayer.exe"',
+     \}
+    設定例2:
+     let eblook_viewers = {
+       \'jpeg': 'xli -quiet %s &',
+       \'bmp': 'xli -quiet %s &',
+       \'pbm': 'xli -quiet %s &',
+       \'wav': 'aplay -q %s &',
+       \'mpg': 'mplayer -really-quiet %s >/dev/null 2>&1 &',
+     \}
 
 'eblookprg'					*'eblookprg'*
   スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"

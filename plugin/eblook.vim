@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-20
+" Last Change: 2012-03-24
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -169,22 +169,6 @@ scriptencoding cp932
 "
 "    'eblook_viewers'
 "       画像や音声再生用の外部ビューアコマンド。
-"       省略値(Windowsの場合):
-"        {
-"          \'jpeg': ' start ""',
-"          \'bmp': ' start ""',
-"          \'pbm': ' start ""',
-"          \'wav': ' start ""',
-"          \'mpg': ' start ""',
-"        \}
-"       省略値(Windows以外の場合):
-"        {
-"          \'jpeg': 'xdg-open',
-"          \'bmp': 'xdg-open',
-"          \'pbm': 'xdg-open',
-"          \'wav': 'xdg-open',
-"          \'mpg': 'xdg-open',
-"        \}
 "
 "    'eblookprg'
 "       このスクリプトから呼び出すeblookプログラムの名前。省略値: eblook
@@ -269,12 +253,13 @@ if !exists('eblook_viewers')
       \'mpg': ' start ""',
     \}
   else
+    " XXX: mailcapを読み込んで設定する?
     let eblook_viewers = {
-      \'jpeg': 'xdg-open',
-      \'bmp': 'xdg-open',
-      \'pbm': 'xdg-open',
-      \'wav': 'xdg-open',
-      \'mpg': 'xdg-open',
+      \'jpeg': 'xdg-open %s &',
+      \'bmp': 'xdg-open %s &',
+      \'pbm': 'xdg-open %s &',
+      \'wav': 'xdg-open %s &',
+      \'mpg': 'xdg-open %s &',
     \}
   endif
 endif
