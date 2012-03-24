@@ -1216,12 +1216,12 @@ function! s:ShowMedia(count)
       silent echo 'pbm ' . refid . ' ' . m[1] . ' ' . m[2]
     elseif tmpext ==# 'wav'
       let m = matchlist(refid, '\(\d\+:\d\+\)-\(\d\+:\d\+\)')
-      silent echo 'wav ' . m[1] . ' ' . m[2] . ' ' . tmpfeb
+      silent echo 'wav ' . m[1] . ' ' . m[2] . ' "' . tmpfeb . '"'
     elseif tmpext ==# 'mpg'
       let m = matchlist(refid, '\(\d\+\),\(\d\+\),\(\d\+\),\(\d\+\)')
-      silent echo printf('mpeg %s %s %s %s %s', m[1], m[2], m[3], m[4], tmpfeb)
+      silent echo printf('mpeg %s %s %s %s "%s"', m[1], m[2], m[3], m[4], tmpfeb)
     else " bmp || jpeg
-      silent echo tmpext . ' ' . refid . ' ' . tmpfeb
+      silent echo tmpext . ' ' . refid . ' "' . tmpfeb . '"'
     endif
   redir END
   let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
