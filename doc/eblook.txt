@@ -227,6 +227,7 @@ R                   reference一覧を表示する
                     [count]でcontentウィンドウ内のreference番号を指定可能
 <C-P>               検索履歴中の一つ前のバッファを表示する
 <C-N>               検索履歴中の一つ次のバッファを表示する
+o                   contentウィンドウを最大化する
 O                   contentウィンドウ内の長い行を|gq|で整形する
 
 contentウィンドウでの操作			*eblook-usage-content*
@@ -245,6 +246,7 @@ R                   reference一覧を表示する
                     [count]で対象のreference番号を指定可能
 <C-P>               検索履歴中の一つ前のバッファを表示する
 <C-N>               検索履歴中の一つ次のバッファを表示する
+o                   contentウィンドウを最大化する
 O                   contentウィンドウ内の長い行を|gq|で整形する
 x                   カーソル位置か[count]で指定する画像・音声・動画を表示・再生
 

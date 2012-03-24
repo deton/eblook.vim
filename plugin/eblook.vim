@@ -65,6 +65,7 @@ scriptencoding cp932
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
 "   O                   contentウィンドウ内の長い行を|gq|で整形する
+"   o                   contentウィンドウを最大化する
 "
 " contentバッファのnmap
 "   <CR>                カーソル位置のreferenceを表示する
@@ -79,6 +80,7 @@ scriptencoding cp932
 "   <C-P>               検索履歴中の一つ前のバッファを表示する
 "   <C-N>               検索履歴中の一つ次のバッファを表示する
 "   O                   contentウィンドウ内の長い行を|gq|で整形する
+"   o                   contentウィンドウを最大化する
 "
 " オプション:
 "    'eblook_group'
@@ -422,6 +424,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
   nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
+  nnoremap <buffer> <silent> o :call <SID>MaximizeContentHeight()<CR>
   nnoremap <buffer> <silent> O :call <SID>GetAndFormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
@@ -453,6 +456,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
+  nnoremap <buffer> <silent> o :wincmd _<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
@@ -1341,6 +1345,15 @@ function! s:GoWindow(to_entry_buf)
     endif
   endif
   return 0
+endfunction
+
+" entryウィンドウ上から、contentウィンドウの高さを最大化する
+function! s:MaximizeContentHeight()
+  if s:GoWindow(0) < 0
+    return
+  endif
+  wincmd _
+  call s:GoWindow(1)
 endfunction
 
 " title文字列から辞書番号を返す
