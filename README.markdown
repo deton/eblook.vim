@@ -46,43 +46,56 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 更新履歴
 ========
 * 1.1.0 (2012-03-XXX)
-  * 発音記号などの外字をUnicode文字列へ置換する機能を追加
-    ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
-  * その他の外字を_(下線)に置換するように変更
-  * 辞書をグループ化して登録、検索する機能を追加。
-    検索時に[count]で辞書グループ番号を指定。
-  * ~/.vimrcでの辞書の設定をVim7のDictionaryとListで行う形式に変更
-    (辞書の追加・削除・検索順の変更時の手間を減らすため)。
-    (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
-  * contentウィンドウ内の長い行を|gq|で整形する機能を追加
-    (行が長く、ウィンドウの高さが狭い場合でも、問題なく表示できるように)
-  * `<reference>...<reference=xxxx:xxx>`を`<n|...|>`に置換するように変更
-    (nは、各contentウィンドウ内で1から始まるreference番号。
-     xxxx:xxxとの対応を取るための番号)。
-    (conceal syntaxで非表示にしても整形時にはカウントされているため、
-    行の折り返しがかなり早めにされているように見えるので、なるべく短縮。)
-    また、表示済の場合は`<n!...|>`に置換。
-  * Rキーやcontentウィンドウ内での`<CR>`キーにおいて、
-    [count]で対象reference番号を指定可能にした。
-  * stemming/語尾補正機能を追加。
-    何も見つからなかった時に、活用語尾などを取り除いて検索し直す機能を追加。
-    [porter-stem.vim](https://github.com/msbmsb/porter-stem.vim)
-    がインストール済であれば、porter-stem.vimも使用。
-    また、日本語用は[EBView](http://ebview.sourceforge.net)と同様の語尾補正。
-  * `<img>`,`<snd>`,`<mov>`,`<inline>`を外部ビューアで表示・再生する機能を追加。
-  * 何も見つからなかった時に、検索語を編集して再検索するためのプロンプトを
-    出すように変更。再検索したくない場合は、編集せずにそのままリターンキー。
-  * statuslineに検索語やキャプション文字列を表示するようにした
-  * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを追加
-  * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で設定可能にした
-  * Vim6対応を終了。要Vim7
+  * 新機能(表示)
+        * 発音記号などの外字をUnicode文字列へ置換する機能を追加
+        ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
+        * `<img>`,`<snd>`,`<mov>`,`<inline>`を外部ビューアで
+          表示・再生する機能を追加(画像等へのリンク上でxキー)。
+        * contentウィンドウ内の長い行を|gq|で整形する機能を追加
+          (行が長く、ウィンドウの高さが狭い場合でも、問題なく表示できるように)
+  * 新機能(動作)
+        * stemming/語尾補正機能を追加。
+          何も見つからなかった時に、
+          活用語尾などを取り除いて検索し直す機能を追加。
+          [porter-stem.vim](https://github.com/msbmsb/porter-stem.vim)
+          がインストール済であれば、porter-stem.vimも使用。
+          また、日本語用は[EBView](http://ebview.sourceforge.net)と同様の
+          語尾補正。
+        * 辞書をグループ化して登録、検索する機能を追加。
+          検索時に[count]で辞書グループ番号を指定。
+        * contentウィンドウをoキーで最大化する機能を追加
+  * 変更点(表示)
+        * 置換定義の見つからない外字を_(下線)に置換するように変更
+        * `<reference>...<reference=xxxx:xxx>`を`<n|...|>`に置換するように変更
+          (nは、各contentウィンドウ内で1から始まるreference番号。
+           xxxx:xxxとの対応を取るための番号)。
+          (conceal syntaxで非表示にしても整形時にはカウントされているため、
+          行の折り返しがかなり早めにされているように見えるので、なるべく短縮。)
+          また、表示済の場合は`<n!...|>`に置換。
+        * statuslineに検索語やキャプション文字列を表示するようにした
+  * 変更点(動作)
+        * Vim6対応を終了。要Vim7
+        * Rキーやcontentウィンドウ内での`<CR>`キーにおいて、
+          [count]で対象reference番号を指定可能にした。
+        * 何も見つからなかった時に、検索語を編集して再検索するための
+          プロンプトを出すように変更。再検索したくない場合は、
+          編集せずにそのままリターンキー。
+  * 変更点(設定)
+        * ~/.vimrcでの辞書の設定をVim7のDictionaryとListで行う形式に変更
+          (辞書の追加・削除・検索順の変更時の手間を減らすため)。
+          (従来形式の設定にも対応。新形式への変換は:EblookPasteDictListで可能)
+        * entryウィンドウの高さを指定する'eblook_entrywin_height'オプションを
+          追加
+        * 検索開始キーを`<Plug>EblookSearch`と`<Plug>EblookInput`で
+          設定可能にした
   * バグ修正
-    * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
-      辞書を引こうとすると、見出し一覧や内容表示ウィンドウが開けずに
-      エラー(E36: Not enough room)になる問題を修正
-    * appendix付きで指定した辞書の後にappendix指定無しの辞書を設定した場合、
-      eblook側でappendixが引き継がれて、意図しない外字置換が発生する問題に対処
-      (eblook 1.6.1+mediaでは修正されているので問題は発生しない)
+        * 'noequalalways'オプションが設定されている時に、狭いウィンドウ上で
+          辞書を引こうとすると、見出し一覧や内容表示ウィンドウが開けずに
+          エラー(E36: Not enough room)になる問題を修正
+        * appendix付きで指定した辞書の後にappendix指定無しの辞書を設定した場合、
+          eblook側でappendixが引き継がれて、
+          意図しない外字置換が発生する問題に対処
+          (eblook 1.6.1+mediaでは修正されているので問題は発生しない)
 
 * 1.0.5 (2012-01-19)
   * katonoさん作成のsyntaxファイルを取り込み
@@ -100,11 +113,10 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   * set expandtabしている場合に、`<reference>`先の内容表示ができない問題を修正
 
 * 1.0.2 (2004-06-26)
-  * 'eblook_dict{n}_name'が同じ辞書が複数ある場合に、
-    内容が正しく表示されないバグを修正
+  * 'eblook_dict{n}_name'が同じ辞書が複数ある場合に、内容が正しく表示されないバグを修正
   * オプションを2つ追加。
-    * 'eblookprg': eblookプログラムの名前
-    * 'eblookenc': eblookプログラムの出力を読み込むときのエンコーディング
+        * 'eblookprg': eblookプログラムの名前
+        * 'eblookenc': eblookプログラムの出力を読み込むときのエンコーディング
 
 * 1.0.1 (2003-12-06)
   * スペースを含む単語(de facto等)の検索ができなかったバグを修正。
