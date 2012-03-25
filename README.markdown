@@ -48,9 +48,11 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 * 1.1.0 (2012-03-XXX)
   * 新機能(表示関係)
         * 発音記号などの外字をUnicode文字列へ置換する機能を追加
-        ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
-        * `<img>`,`<snd>`,`<mov>`,`<inline>`を外部ビューアで
+          ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
+        * `<img>`,`<inline>`,`<snd>`,`<mov>`を外部ビューアで
           表示・再生する機能を追加(画像等へのリンク上でxキー)。
+	  (音声`<snd>`と動画`<mov>`の再生は
+	  [eblook 1.6.1+media](http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook)が必要)
         * contentウィンドウ内の長い行を|gq|で整形する機能を追加(Oキー)。
           (行が長く、ウィンドウの高さが狭い場合でも、問題なく表示できるように)
   * 新機能(動作関係)
