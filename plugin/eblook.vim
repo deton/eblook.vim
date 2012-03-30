@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-24
+" Last Change: 2012-03-31
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -167,7 +167,7 @@ scriptencoding cp932
 "
 "    'eblook_statusline_content'
 "       contentウィンドウ用のstatusline。
-"       省略値: %{b:group}Eblook content {%{b:caption}%<}
+"       省略値: %{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}
 "
 "    'eblook_viewers'
 "       画像や音声再生用の外部ビューアコマンド。
@@ -233,7 +233,7 @@ if !exists('eblook_stemming')
 endif
 
 if !exists('eblook_statusline_content')
-  let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<}'
+  let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}'
 endif
 if !exists('eblook_statusline_entry')
   let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
@@ -734,6 +734,7 @@ function! s:NewBuffers(group)
   " eblook内でエラーが発生して、結果が無い状態でstatuslineを表示しようとして
   " Undefined variable: b:captionエラーが発生するのを回避
   let b:caption = ''
+  let b:dtitle = ''
   if s:GoWindow(1) < 0
     call s:Quit()
     let s:bufindex = oldindex
@@ -795,6 +796,7 @@ function! s:GetContent(count)
     return -1
   endif
   let b:caption = ref[1]
+  let b:dtitle = title
 
   setlocal modifiable
   silent %d _

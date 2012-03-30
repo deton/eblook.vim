@@ -134,6 +134,9 @@ ebappendixコマンドを使ってAppendixを作り直す)
 (なお、「ジーニアス英和大辞典」もAppendixが必須ですが、genius2-1.1には
 外字置換設定は含まれていません。)
 
+外字置換設定を削除したAppendix(colloc-2.0とplus-2.0)を以下に置いてあります。
+http://www1.interq.or.jp/~deton/eblook-vim/#appendix
+
 ==============================================================================
 3. チュートリアル				*eblook-tutorial*
 
@@ -357,9 +360,9 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 
 'eblook_statusline_content'			*'eblook_statusline_content'*
   contentウィンドウ用の|statusline|。
-  省略値: %{b:group}Eblook content {%{b:caption}%<}
+  省略値: %{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}
   |'ruler'|を追加したい場合は以下のように設定してください。
-    let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<}%=%-14.(%l,%c%V%) %P'
+    let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}%=%-14.(%l,%c%V%) %P'
 
 'eblook_viewers'				*'eblook_viewers'*
   画像や音声再生用の外部ビューアコマンド。
