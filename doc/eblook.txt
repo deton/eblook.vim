@@ -353,16 +353,16 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
 
 'eblook_statusline_entry'			*'eblook_statusline_entry'*
   entryウィンドウ用の|statusline|。
-  省略値: %{b:group}Eblook entry {%{b:word}%<} [%L]
+  省略値: %{b:group}Eblook entry {%{b:word}}%< [%L]
   |'ruler'|を追加したい場合は以下のように設定してください
   (参考:|statusline|のヘルプのExamples)。
-    let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}%<} [%L]%=%-14.(%l,%c%V%) %P'
+    let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}}%< [%L]%=%-14.(%l,%c%V%) %P'
 
 'eblook_statusline_content'			*'eblook_statusline_content'*
   contentウィンドウ用の|statusline|。
-  省略値: %{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}
+  省略値: %{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<
   |'ruler'|を追加したい場合は以下のように設定してください。
-    let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}%=%-14.(%l,%c%V%) %P'
+    let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<%=%-14.(%l,%c%V%) %P'
 
 'eblook_viewers'				*'eblook_viewers'*
   画像や音声再生用の外部ビューアコマンド。

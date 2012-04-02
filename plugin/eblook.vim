@@ -163,11 +163,11 @@ scriptencoding cp932
 "
 "    'eblook_statusline_entry'
 "       entryウィンドウ用のstatusline。
-"       省略値: %{b:group}Eblook entry {%{b:word}%<} [%L]
+"       省略値: %{b:group}Eblook entry {%{b:word}}%< [%L]
 "
 "    'eblook_statusline_content'
 "       contentウィンドウ用のstatusline。
-"       省略値: %{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}
+"       省略値: %{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<
 "
 "    'eblook_viewers'
 "       画像や音声再生用の外部ビューアコマンド。
@@ -233,10 +233,10 @@ if !exists('eblook_stemming')
 endif
 
 if !exists('eblook_statusline_content')
-  let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}%<} %{b:dtitle}'
+  let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<'
 endif
 if !exists('eblook_statusline_entry')
-  let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}%<} [%L]'
+  let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}}%< [%L]'
 endif
 
 " eblookプログラムの名前
