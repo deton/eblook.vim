@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-03-31
+" Last Change: 2012-04-03
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -833,7 +833,7 @@ function! s:GetContent(count)
     if maxover > 0
       unlet s:visited[:maxover]
     endif
-    call add(s:visited, b:group . ',' . b:dictnum . ',' . refid)
+    call add(s:visited, b:dtitle . "\t" . refid)
   endif
   call s:GoWindow(1)
   return 0
@@ -996,12 +996,12 @@ function! s:MakeReferenceString(caption, addr)
   let len = strlen(a:caption)
   let capstr = len ? a:caption : '参照'
   call add(b:contentrefs, [a:addr, capstr])
-  return '<' . len(b:contentrefs) . s:Visited(b:group, b:dictnum, a:addr) . capstr . '|>'
+  return '<' . len(b:contentrefs) . s:Visited(b:dtitle, a:addr) . capstr . '|>'
 endfunction
 
 " 訪問済リンクかどうか調べて、'!'か'|'を返す
-function! s:Visited(group, dictnum, addr)
-  if match(s:visited, a:group . ',' . a:dictnum . ',' . a:addr) >= 0
+function! s:Visited(title, addr)
+  if match(s:visited, a:title . "\t" . a:addr) >= 0
     return '!'
   else
     return '|'
@@ -1011,8 +1011,7 @@ endfunction
 " entryバッファの参照先文字列の置換用関数
 function! s:MakeEntryReferenceString(title, addr, caption)
   call add(b:refs, [a:addr, a:caption])
-  let dnum = s:GetDictNumFromTitle(b:group, a:title)
-  return a:title . "\t<" . len(b:refs) . s:Visited(b:group, dnum, a:addr) . a:caption . '|>'
+  return a:title . "\t<" . len(b:refs) . s:Visited(a:title, a:addr) . a:caption . '|>'
 endfunction
 
 " entryバッファ上からcontentバッファを整形する
@@ -1156,7 +1155,7 @@ function! s:FollowReference(count)
   let title = dictlist[dnum].title
   let j = 0
   while j < len(contentrefs)
-    let refstr = '<' . (j + 1) . s:Visited(b:group, dnum, contentrefs[j][0]) . contentrefs[j][1] . '|>'
+    let refstr = '<' . (j + 1) . s:Visited(title, contentrefs[j][0]) . contentrefs[j][1] . '|>'
     execute 'normal! o' . title . "\<C-V>\<Tab>" . refstr . "\<Esc>"
     let j = j + 1
   endwhile
