@@ -45,7 +45,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
-* 1.1.0 (2012-04-XXX)
+* 1.1.0 (2012-04-05)
   * 新機能(表示関係)
         * 発音記号などの外字をUnicode文字列へ置換する機能を追加
           ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
