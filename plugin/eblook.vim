@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-04-03
+" Last Change: 2012-04-21
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -661,7 +661,7 @@ function! s:RedirSearchCommand(dictlist, word)
     let i = i + 1
   endwhile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
-  close!
+  bwipeout!
   return 0
 endfunction
 
@@ -905,7 +905,7 @@ function! s:LoadGaijiMapFile(dict)
     endif
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
-  close!
+  bwipeout!
   execute bufwinnr(curbuf) . 'wincmd w'
   return gaijimap
 endfunction
