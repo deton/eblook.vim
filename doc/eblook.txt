@@ -240,6 +240,7 @@ contentウィンドウでの操作			*eblook-usage-content*
 <Space>             PageDownを行う
 <BS>                PageUpを行う
 <Tab>               次のreferenceにカーソルを移動する
+<S-Tab>             前のreferenceにカーソルを移動する
 q                   entryウィンドウとcontentウィンドウを閉じる
 s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
                     検索対象の辞書グループ番号を[count]で指定可能

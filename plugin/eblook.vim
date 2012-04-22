@@ -72,6 +72,7 @@ scriptencoding cp932
 "   <Space>             PageDownを行う
 "   <BS>                PageUpを行う
 "   <Tab>               次のreferenceにカーソルを移動する
+"   <S-Tab>             前のreferenceにカーソルを移動する
 "   q                   entryウィンドウとcontentウィンドウを閉じる
 "   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
 "   S                   直前の検索語を[count]で指定する辞書グループで再検索する
@@ -435,6 +436,7 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
   nnoremap <buffer> <silent> <Tab> /\t<CR>
+  nnoremap <buffer> <silent> <S-Tab> ?\t<CR>
 endfunction
 
 " contentバッファに入った時に実行。set nobuflistedする。
@@ -458,6 +460,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
+  nnoremap <buffer> <silent> <S-Tab> ?<\d\+[\|!]?<CR>
   nnoremap <buffer> <silent> o :wincmd _<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
