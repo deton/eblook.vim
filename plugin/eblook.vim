@@ -410,6 +410,7 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  set nolist
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -442,6 +443,7 @@ function! s:Content_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  set nolist
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
