@@ -1316,6 +1316,7 @@ function! s:Quit()
   if s:SelectWindowByName(s:entrybufname . s:bufindex) >= 0
     hide
   endif
+  call delete(s:cmdfile)
 endfunction
 
 " entryウィンドウからcontentウィンドウをスクロールする。
