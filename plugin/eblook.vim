@@ -437,6 +437,11 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
   nnoremap <buffer> <silent> <Tab> /\t<CR>
   nnoremap <buffer> <silent> <S-Tab> ?\t<CR>
+  if has("gui_running")
+    nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>GetContent(0)<CR>
+    nnoremap <buffer> <silent> <C-RightMouse> :call <SID>History(-1)<CR>
+    nnoremap <buffer> <silent> <C-LeftMouse> :call <SID>History(1)<CR>
+  endif
 endfunction
 
 " contentバッファに入った時に実行。set nobuflistedする。
@@ -470,6 +475,11 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+  if has("gui_running")
+    nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>SelectReference(v:count)<CR>
+    nnoremap <buffer> <silent> <C-RightMouse> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
+    nnoremap <buffer> <silent> <C-LeftMouse> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+  endif
 endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
