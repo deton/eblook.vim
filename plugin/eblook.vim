@@ -665,6 +665,7 @@ function! s:RedirSearchCommand(dictlist, word)
       \ . 'search "' . a:word . '"' . "\<CR>\<Esc>"
     let i = i + 1
   endwhile
+  setlocal noswapfile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
   bwipeout!
   return 0
