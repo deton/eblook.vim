@@ -479,6 +479,10 @@ function! s:Content_BufEnter()
     nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>SelectReference(v:count)<CR>
     nnoremap <buffer> <silent> <C-RightMouse> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
     nnoremap <buffer> <silent> <C-LeftMouse> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+    menu .1 PopUp.[eblook]\ Back :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
+    menu .2 PopUp.[eblook]\ Forward :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+    menu .3 PopUp.[eblook]\ SearchVisual :<C-U>call <SID>SearchVisual(v:count)<CR>
+    menu .4 PopUp.-SEP_EBLOOK-	<Nop>
   endif
 endfunction
 
@@ -1326,6 +1330,12 @@ endfunction
 
 " entryウィンドウとcontentウィンドウを隠す
 function! s:Quit()
+  if has("gui_running")
+    unmenu PopUp.[eblook]\ Back
+    unmenu PopUp.[eblook]\ Forward
+    unmenu PopUp.[eblook]\ SearchVisual
+    unmenu PopUp.-SEP_EBLOOK-
+  endif
   if s:SelectWindowByName(s:contentbufname . s:bufindex) >= 0
     hide
   endif
