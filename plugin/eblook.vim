@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-04-21
+" Last Change: 2012-08-25
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -952,6 +952,8 @@ function! s:FormatReference()
 
   let b:contentrefs = []
   silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
+  " /‚Ìhistory‚É<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>‚ªo‚È‚¢‚æ‚¤‚É
+  call histdel('/', -1)
 endfunction
 
 " <img>“™‚Ìcaption‚ğqr“™‚Å‚­‚­‚éB
