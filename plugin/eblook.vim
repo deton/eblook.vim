@@ -72,6 +72,7 @@ scriptencoding cp932
 "   <Space>             PageDownを行う
 "   <BS>                PageUpを行う
 "   <Tab>               次のreferenceにカーソルを移動する
+"   <S-Tab>             前のreferenceにカーソルを移動する
 "   q                   entryウィンドウとcontentウィンドウを閉じる
 "   s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
 "   S                   直前の検索語を[count]で指定する辞書グループで再検索する
@@ -410,6 +411,7 @@ function! s:Entry_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  set nolist
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -434,6 +436,12 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
   nnoremap <buffer> <silent> <Tab> /\t<CR>
+  nnoremap <buffer> <silent> <S-Tab> ?\t<CR>
+  if has("gui_running")
+    nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>GetContent(0)<CR>
+    nnoremap <buffer> <silent> <C-RightMouse> :call <SID>History(-1)<CR>
+    nnoremap <buffer> <silent> <C-LeftMouse> :call <SID>History(1)<CR>
+  endif
 endfunction
 
 " contentバッファに入った時に実行。set nobuflistedする。
@@ -442,6 +450,7 @@ function! s:Content_BufEnter()
   set bufhidden=hide
   set noswapfile
   set nobuflisted
+  set nolist
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -456,6 +465,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
+  nnoremap <buffer> <silent> <S-Tab> ?<\d\+[\|!]?<CR>
   nnoremap <buffer> <silent> o :wincmd _<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
@@ -465,6 +475,15 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+  if has("gui_running")
+    nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>SelectReference(v:count)<CR>
+    nnoremap <buffer> <silent> <C-RightMouse> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
+    nnoremap <buffer> <silent> <C-LeftMouse> :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+    menu .1 PopUp.[eblook]\ Back :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
+    menu .2 PopUp.[eblook]\ Forward :call <SID>History(1)<CR>:call <SID>GoWindow(0)<CR>
+    menu .3 PopUp.[eblook]\ SearchVisual :<C-U>call <SID>SearchVisual(v:count)<CR>
+    menu .4 PopUp.-SEP_EBLOOK-	<Nop>
+  endif
 endfunction
 
 " プロンプトを出して、ユーザから入力された文字列を検索する
@@ -660,6 +679,7 @@ function! s:RedirSearchCommand(dictlist, word)
       \ . 'search "' . a:word . '"' . "\<CR>\<Esc>"
     let i = i + 1
   endwhile
+  setlocal noswapfile
   silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
   bwipeout!
   return 0
@@ -1312,12 +1332,19 @@ endfunction
 
 " entryウィンドウとcontentウィンドウを隠す
 function! s:Quit()
+  if has("gui_running")
+    unmenu PopUp.[eblook]\ Back
+    unmenu PopUp.[eblook]\ Forward
+    unmenu PopUp.[eblook]\ SearchVisual
+    unmenu PopUp.-SEP_EBLOOK-
+  endif
   if s:SelectWindowByName(s:contentbufname . s:bufindex) >= 0
     hide
   endif
   if s:SelectWindowByName(s:entrybufname . s:bufindex) >= 0
     hide
   endif
+  call delete(s:cmdfile)
 endfunction
 
 " entryウィンドウからcontentウィンドウをスクロールする。
