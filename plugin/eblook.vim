@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-08-25
+" Last Change: 2012-09-01
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -435,8 +435,8 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>
   nnoremap <buffer> <silent> <C-N> :call <SID>History(1)<CR>
-  nnoremap <buffer> <silent> <Tab> /\t<CR>
-  nnoremap <buffer> <silent> <S-Tab> ?\t<CR>
+  nnoremap <buffer> <silent> <Tab> :call search("\t")<CR>
+  nnoremap <buffer> <silent> <S-Tab> :call search("\t", 'b')<CR>
   if has("gui_running")
     nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>GetContent(0)<CR>
     nnoremap <buffer> <silent> <C-RightMouse> :call <SID>History(-1)<CR>
@@ -464,8 +464,8 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> x :<C-U>call <SID>ShowMedia(v:count)<CR>
   nnoremap <buffer> <silent> <Space> <PageDown>
   nnoremap <buffer> <silent> <BS> <PageUp>
-  nnoremap <buffer> <silent> <Tab> /<\d\+[\|!]/<CR>
-  nnoremap <buffer> <silent> <S-Tab> ?<\d\+[\|!]?<CR>
+  nnoremap <buffer> <silent> <Tab> :call search('<\d\+[\|!]')<CR>
+  nnoremap <buffer> <silent> <S-Tab> :call search('<\d\+[\|!]', 'b')<CR>
   nnoremap <buffer> <silent> o :wincmd _<CR>
   nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
