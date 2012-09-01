@@ -232,6 +232,9 @@ endif
 if !exists('eblook_stemming')
   let eblook_stemming = 0
 endif
+if !exists('eblook_decorate')
+  let eblook_decorate = 0
+endif
 
 if !exists('eblook_statusline_content')
   let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<'
@@ -824,6 +827,9 @@ function! s:GetContent(count)
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
+    if g:eblook_decorate
+      silent echo 'set decorate-mode on'
+    endif
     if exists("dict.book")
       silent echo 'book ' . s:MakeBookArgument(dict)
     endif
@@ -836,6 +842,19 @@ function! s:GetContent(count)
   silent! :g/eblook> /s///g
   if search('<gaiji=', 'nw') != 0
     call s:ReplaceGaiji(dict)
+  endif
+  if g:eblook_decorate
+    " 現状は<ind=[1-9]>のみ対応
+    silent! :g/<\/\?su[bp]>/s///g
+    silent! :g/<\/\?no-newline>/s///g
+    " TODO: <em><font=bold><font=italic>のsyntax対応
+    silent! :g/<\/\?em>/s///g
+    silent! :g/<font=\%(bold\|italic\)>/s///g
+    silent! :g/<\/font>/s///g
+    silent! :g/^<ind=\([0-9]\)>/s//\=printf('%*s', submatch(1), '')/g
+    " TODO: 次の<ind=>が出現するまで、同じindentを続ける(^<ind=が無くても)
+    " TODO: 行の途中にある<ind=>を考慮したFormatContent()内での折り返し
+    silent! :g/<ind=[0-9]>/s///g
   endif
   silent! :g/^$/d _
   call s:FormatReference()
