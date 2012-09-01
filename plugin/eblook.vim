@@ -844,17 +844,14 @@ function! s:GetContent(count)
     call s:ReplaceGaiji(dict)
   endif
   if g:eblook_decorate
-    " 現状は<ind=[1-9]>のみ対応
+    " 現状は<ind=[1-9]>以外は削除
     silent! :g/<\/\?su[bp]>/s///g
     silent! :g/<\/\?no-newline>/s///g
-    " TODO: <em><font=bold><font=italic>のsyntax対応
+    " TODO: <em>,<font=bold>,<font=italic>のsyntax対応
     silent! :g/<\/\?em>/s///g
     silent! :g/<font=\%(bold\|italic\)>/s///g
     silent! :g/<\/font>/s///g
-    silent! :g/^<ind=\([0-9]\)>/s//\=printf('%*s', submatch(1), '')/g
-    " TODO: 次の<ind=>が出現するまで、同じindentを続ける(^<ind=が無くても)
-    " TODO: 行の途中にある<ind=>を考慮したFormatContent()内での折り返し
-    silent! :g/<ind=[0-9]>/s///g
+    call s:FormatIndent()
   endif
   silent! :g/^$/d _
   call s:FormatReference()
@@ -1065,7 +1062,37 @@ function! s:GetAndFormatContent()
   call s:GoWindow(1)
 endfunction
 
+" contentバッファ内の<ind=[1-9]>を整形する
+function! s:FormatIndent()
+  silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
+  let ind = 0
+  let lnum = 1
+  let lastline = line('$')
+  while lnum <= lastline
+    call cursor(lnum, 1)
+    let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
+    " 行頭に<ind=>がある場合は、そのindent量を使用して現在行をindnet
+    while indnew != ''
+      let ind = indnew
+      s/^<ind=[0-9]>//
+      " ^<ind=1><ind=3>のような場合があるのでループしてチェック
+      let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
+    endwhile
+    s/^/\=printf('%*s', ind, '')/
+
+    " 行の途中に<ind=>がある場合は、次行以降のindent量を更新
+    let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
+    while indnew != ''
+      s/<ind=[0-9]>//
+      let ind = indnew
+      let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
+    endwhile
+    let lnum = lnum + 1
+  endwhile
+endfunction
+
 " contentバッファを整形する
+" TODO: <ind=[1-9]>を考慮した整形。特に、行の途中にある<ind=>を考慮した折り返し
 function! s:FormatContent()
   let tw = &textwidth
   if tw == 0 && &wrapmargin
