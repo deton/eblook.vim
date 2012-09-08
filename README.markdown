@@ -46,9 +46,11 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 更新履歴
 ========
 * 1.2.0 (2012-09-XXX)
-  * eblook 1.6.1+mediaのdecorate-modeを有効にすると出力される、
-    content中のインデント指定`<ind=1>`等に基づいて、
-    インデントを行う機能を追加。
+  * eblook 1.6.1+mediaのdecorate-mode対応
+        * content中のインデント指定`<ind=1>`等に基づいて、
+	  インデントを行う機能を追加。
+	* 肩番号等の上付き数字表示に対応(1-9のみ)。
+          `<sup>`をUnicodeの上付き数字に置換しているので、&enc=utf-8環境のみ。
   * [katonoさんによる変更](https://github.com/katono/eblook.vim)を取り込み
         * PopUpメニュー追加
 	* マウス操作対応
