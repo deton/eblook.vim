@@ -232,6 +232,9 @@ endif
 if !exists('eblook_stemming')
   let eblook_stemming = 0
 endif
+if !exists('g:eblook_decorate_ind1as0')
+  let g:eblook_decorate_ind1as0 = 0
+endif
 
 if !exists('eblook_statusline_content')
   let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<'
@@ -1102,7 +1105,12 @@ function! s:FormatHeadIndent(indcur)
     " ^<ind=1><ind=3>のような場合があるのでループしてチェック
     let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
   endwhile
-  s/^/\=printf('%*s', ind, '')/
+  if g:eblook_decorate_ind1as0 && ind > 0
+    let indtmp = ind - 1
+  else
+    let indtmp = ind
+  endif
+  s/^/\=printf('%*s', indtmp, '')/
   return ind
 endfunction
 
