@@ -232,9 +232,6 @@ endif
 if !exists('eblook_stemming')
   let eblook_stemming = 0
 endif
-if !exists('eblook_decorate')
-  let eblook_decorate = 0
-endif
 
 if !exists('eblook_statusline_content')
   let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<'
@@ -701,6 +698,19 @@ function! s:GetDictList(group)
   return dictlist
 endfunction
 
+" eblook 1.6.1+media版かどうかを調べる
+function! s:IsEblookMediaVersion()
+  if !exists('s:eblookmedia')
+    let l:version = system(g:eblookprg . ' -version')
+    if match(l:version, '^eblook 1\.6\.1+media-') >= 0
+      let s:eblookmedia = 1
+    else
+      let s:eblookmedia = 0
+    endif
+  endif
+  return s:eblookmedia
+endfunction
+
 " eblookのbookに指定するための引数値を作る
 " @param {Dictionary} dict 辞書情報
 " @return {String} bookに指定する引数
@@ -711,8 +721,7 @@ function! s:MakeBookArgument(dict)
   " 直前のbook用に指定したappendixが引き継がれないようにappendixは必ず付ける
   " (eblook 1.6.1+media版では対処されているので不要)
   if !exists('s:has_appendix_problem')
-    let l:version = system(g:eblookprg . ' -version')
-    if match(l:version, '^eblook 1\.6\.1+media-') >= 0
+    if s:IsEblookMediaVersion()
       let s:has_appendix_problem = 0
     else
       let s:has_appendix_problem = 1
@@ -835,6 +844,13 @@ function! s:GetContentSub(doformat)
   silent %d _
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
+  if !exists('g:eblook_decorate')
+    if s:IsEblookMediaVersion()
+      let g:eblook_decorate = 1
+    else
+      let g:eblook_decorate = 0
+    endif
+  endif
   execute 'redir! >' . s:cmdfile
     if g:eblook_decorate
       silent echo 'set decorate-mode on'
