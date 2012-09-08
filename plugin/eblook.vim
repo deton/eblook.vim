@@ -606,6 +606,7 @@ function! s:Search(group, word, isstem)
     let i = i + 1
   endwhile
   silent! :g/eblook.*> /s///g
+  call s:FormatDecorate(1)
   silent! :g/^$/d _
 
   " 各行のreference先を配列に格納して、バッファからは削除
@@ -672,6 +673,9 @@ endfunction
 function! s:RedirSearchCommand(dictlist, word)
   if s:OpenWindow('new') < 0
     return -1
+  endif
+  if s:IsEblookDecorate()
+    execute 'normal! iset decorate-mode on' . "\<Esc>"
   endif
   setlocal nobuflisted
   let prev_book = ''
@@ -849,13 +853,7 @@ function! s:GetContent(count)
   return 0
 endfunction
 
-" contentを取得してcontentバッファに表示する
-" @param doformat 整形するかどうか
-function! s:GetContentSub(doformat)
-  setlocal modifiable
-  silent %d _
-  let dictlist = s:GetDictList(b:group)
-  let dict = dictlist[b:dictnum]
+function! s:IsEblookDecorate()
   if !exists('g:eblook_decorate')
     if s:IsEblookMediaVersion()
       let g:eblook_decorate = 1
@@ -863,8 +861,18 @@ function! s:GetContentSub(doformat)
       let g:eblook_decorate = 0
     endif
   endif
+  return g:eblook_decorate
+endfunction
+
+" contentを取得してcontentバッファに表示する
+" @param doformat 整形するかどうか
+function! s:GetContentSub(doformat)
+  setlocal modifiable
+  silent %d _
+  let dictlist = s:GetDictList(b:group)
+  let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
-    if g:eblook_decorate
+    if s:IsEblookDecorate()
       silent echo 'set decorate-mode on'
     endif
     if exists("dict.book")
@@ -880,15 +888,7 @@ function! s:GetContentSub(doformat)
   if search('<gaiji=', 'nw') != 0
     call s:ReplaceGaiji(dict)
   endif
-  if g:eblook_decorate
-    " 未対応のタグは削除
-    silent! :g/<\/\?no-newline>/s///g
-    call s:ReplaceTag() " <sup>,<sub>
-    " TODO: <em>,<font=bold>,<font=italic>のsyntax対応
-    silent! :g/<\/\?em>/s///g
-    silent! :g/<font=\%(bold\|italic\)>/s///g
-    silent! :g/<\/font>/s///g
-  endif
+  call s:FormatDecorate(0)
   silent! :g/^$/d _
   call s:FormatReference()
   if exists('dict.autoformat')
@@ -910,6 +910,23 @@ function! s:GetContentSub(doformat)
       unlet s:visited[:maxover]
     endif
     call add(s:visited, b:dtitle . "\t" . b:refid)
+  endif
+endfunction
+
+" decorateタグを整形する
+" @param dropind <ind=[0-9]>を削除するかどうか
+function! s:FormatDecorate(dropind)
+  if g:eblook_decorate
+    " 未対応のタグは削除
+    silent! :g/<\/\?no-newline>/s///g
+    call s:ReplaceTag() " <sup>,<sub>
+    " TODO: <em>,<font=bold>,<font=italic>のsyntax対応
+    silent! :g/<\/\?em>/s///g
+    silent! :g/<font=\%(bold\|italic\)>/s///g
+    silent! :g/<\/font>/s///g
+    if a:dropind
+      silent! :g/<ind=[0-9]>/s///g
+    endif
   endif
 endfunction
 
