@@ -1067,6 +1067,22 @@ function! s:GetAndFormatContent()
   call s:GoWindow(1)
 endfunction
 
+" <ind=[1-9]>で指定されるindent量を使用して現在行をindnet
+" @param indcur 現在のindent量
+function! s:FormatHeadIndent(indcur)
+  let ind = a:indcur
+  let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
+  " 行頭に<ind=>がある場合は、indent量を更新
+  while indnew != ''
+    let ind = indnew
+    s/^<ind=[0-9]>//
+    " ^<ind=1><ind=3>のような場合があるのでループしてチェック
+    let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
+  endwhile
+  s/^/\=printf('%*s', ind, '')/
+  return ind
+endfunction
+
 " contentバッファ内の<ind=[1-9]>を整形する
 function! s:FormatIndent()
   silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
@@ -1075,15 +1091,7 @@ function! s:FormatIndent()
   let lastline = line('$')
   while lnum <= lastline
     call cursor(lnum, 1)
-    let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
-    " 行頭に<ind=>がある場合は、そのindent量を使用して現在行をindnet
-    while indnew != ''
-      let ind = indnew
-      s/^<ind=[0-9]>//
-      " ^<ind=1><ind=3>のような場合があるのでループしてチェック
-      let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
-    endwhile
-    s/^/\=printf('%*s', ind, '')/
+    let ind = s:FormatHeadIndent(ind)
 
     " 行の途中に<ind=>がある場合は、次行以降のindent量を更新
     let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
@@ -1111,17 +1119,9 @@ function! s:FormatContent()
   setlocal modifiable
   silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
   let ind = 0
-  normal! 1G$
+  normal! 1G
   while 1
-    let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
-    " 行頭に<ind=>がある場合は、そのindent量を使用して現在行をindnet
-    while indnew != ''
-      let ind = indnew
-      s/^<ind=[0-9]>//
-      " ^<ind=1><ind=3>のような場合があるのでループしてチェック
-      let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
-    endwhile
-    s/^/\=printf('%*s', ind, '')/
+    let ind = s:FormatHeadIndent(ind)
 
     " 長い行を分割する
     normal! ^
@@ -1171,7 +1171,7 @@ function! s:FormatLine(width, joined, ind)
   if last == first
     return last
   endif
-  " gqqが付けたindentは削除。<ind=[1-9]>をもとにindentを付けたいので。
+  " gqqが付けたindentは削除。<ind=[1-9]>をもとにindentを付けるので、余分。
   if indprev != ""
     silent! execute (first + 1) . ',' . last . 's/^' . indprev . '//'
   endif
