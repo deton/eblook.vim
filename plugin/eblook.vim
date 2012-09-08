@@ -1140,35 +1140,38 @@ function! s:FormatContent()
   endif
 
   setlocal modifiable
-  silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
+  if g:eblook_decorate
+    silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
+  endif
   let ind = 0
-  normal! 1G
+  normal! 1G$
   while 1
-    let ind = s:FormatHeadIndent(ind)
+    if g:eblook_decorate
+      let ind = s:FormatHeadIndent(ind)
 
-    " 長い行を分割する
-    normal! ^
-    while search('<ind=[0-9]>', 'c', line('.')) > 0
-      " 行の途中にある<ind=>を考慮して分割
-      let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
-      let vcol = virtcol('.')
-      if vcol > tw
-        let startline = line('.')
-	let stopline = s:FormatLine(tw, 0, ind)
-        call cursor(startline, 1)
-        let indline = search('<ind=[0-9]>', 'c', stopline)
-	s/<ind=[0-9]>//
-        " <ind=[0-9]>を削った後、再整形のため行結合
-        if indline < stopline
-          let n = stopline - indline + 1
-          execute "normal! " . n . "J"
-        endif
-      else
-	s/<ind=[0-9]>//
-      endif
-      let ind = indnew
-    endwhile
-    normal! $
+      " 行の途中にある<ind=>を考慮して長い行を分割する
+      normal! ^
+      while search('<ind=[0-9]>', 'c', line('.')) > 0
+	let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
+	let vcol = virtcol('.')
+	if vcol > tw
+	  let startline = line('.')
+	  let stopline = s:FormatLine(tw, 0, ind)
+	  call cursor(startline, 1)
+	  let indline = search('<ind=[0-9]>', 'c', stopline)
+	  s/<ind=[0-9]>//
+	  " <ind=[0-9]>を削った後、再整形のため行結合
+	  if indline < stopline
+	    let n = stopline - indline + 1
+	    execute "normal! " . n . "J"
+	  endif
+	else
+	  s/<ind=[0-9]>//
+	endif
+	let ind = indnew
+      endwhile
+      normal! $
+    endif
     if virtcol('$') > tw
       call s:FormatLine(tw, 0, ind)
     endif
@@ -1195,7 +1198,7 @@ function! s:FormatLine(width, joined, ind)
     return last
   endif
   " gqqが付けたindentは削除。<ind=[1-9]>をもとにindentを付けるので、余分。
-  if indprev != ""
+  if g:eblook_decorate && indprev != ""
     silent! execute (first + 1) . ',' . last . 's/^' . indprev . '//'
   endif
   call cursor(first, 1)
