@@ -470,7 +470,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <Tab> :call search('<\d\+[\|!]')<CR>
   nnoremap <buffer> <silent> <S-Tab> :call search('<\d\+[\|!]', 'b')<CR>
   nnoremap <buffer> <silent> o :wincmd _<CR>
-  nnoremap <buffer> <silent> O :call <SID>FormatContent()<CR>
+  nnoremap <buffer> <silent> O :call <SID>GetContentSub(1)<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
   nnoremap <buffer> <silent> R :<C-U>call <SID>FollowReference(v:count)<CR>
@@ -820,10 +820,19 @@ function! s:GetContent(count)
   endif
   let b:caption = ref[1]
   let b:dtitle = title
+  let b:dictnum = dnum
+  let b:refid = refid
 
+  call s:GetContentSub(0)
+  call s:GoWindow(1)
+  return 0
+endfunction
+
+" contentを取得してcontentバッファに表示する
+" @param doformat 整形するかどうか
+function! s:GetContentSub(doformat)
   setlocal modifiable
   silent %d _
-  let b:dictnum = dnum
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
@@ -834,7 +843,7 @@ function! s:GetContent(count)
       silent echo 'book ' . s:MakeBookArgument(dict)
     endif
     silent echo 'select ' . dict.name
-    silent echo 'content ' . refid . "\n"
+    silent echo 'content ' . b:refid . "\n"
   redir END
   call s:ExecuteEblook()
   "return 0 " DEBUG: 整形前の内容を確認する
@@ -860,7 +869,7 @@ function! s:GetContent(count)
     elseif g:eblook_decorate
       call s:FormatIndent()
     endif
-  elseif g:eblook_autoformat_default
+  elseif a:doformat || g:eblook_autoformat_default
     call s:FormatContent()
   elseif g:eblook_decorate
     call s:FormatIndent()
@@ -872,10 +881,8 @@ function! s:GetContent(count)
     if maxover > 0
       unlet s:visited[:maxover]
     endif
-    call add(s:visited, b:dtitle . "\t" . refid)
+    call add(s:visited, b:dtitle . "\t" . b:refid)
   endif
-  call s:GoWindow(1)
-  return 0
 endfunction
 
 " <gaiji=xxxxx>を置き換える。
