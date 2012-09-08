@@ -881,9 +881,9 @@ function! s:GetContentSub(doformat)
     call s:ReplaceGaiji(dict)
   endif
   if g:eblook_decorate
-    " 現状は<ind=[1-9]>以外は削除
-    silent! :g/<\/\?su[bp]>/s///g
+    " 未対応のタグは削除
     silent! :g/<\/\?no-newline>/s///g
+    call s:ReplaceTag() " <sup>,<sub>
     " TODO: <em>,<font=bold>,<font=italic>のsyntax対応
     silent! :g/<\/\?em>/s///g
     silent! :g/<font=\%(bold\|italic\)>/s///g
@@ -910,6 +910,24 @@ function! s:GetContentSub(doformat)
       unlet s:visited[:maxover]
     endif
     call add(s:visited, b:dtitle . "\t" . b:refid)
+  endif
+endfunction
+
+" 上付き文字(<sup>１</sup>)、下付き文字<sub>を置き換える
+function! s:ReplaceTag()
+  silent! :g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
+  silent! :g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
+endfunction
+
+" タグの置換文字列を取得する。
+" @param tag タグ。'sup'か'sub'
+" @param str 元の文字列
+" @return 置換文字列
+function! s:GetReplaceTagStr(tag, str)
+  if &encoding != 'utf-8'
+    return a:str
+  else
+    return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
   endif
 endfunction
 
