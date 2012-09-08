@@ -1,5 +1,5 @@
 scriptencoding utf-8
-let eblook#supsubmap_utf8#supmap = {
+let g:eblook#supsubmap_utf_8#supmap = {
   \'１': '¹',
   \'２': '²',
   \'３': '³',
@@ -11,4 +11,4 @@ let eblook#supsubmap_utf8#supmap = {
   \'９': '⁹',
 \}
 
-let eblook#supsubmap_utf8#submap = {}
+let g:eblook#supsubmap_utf_8#submap = {}

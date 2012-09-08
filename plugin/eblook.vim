@@ -924,10 +924,14 @@ endfunction
 " @param str 元の文字列
 " @return 置換文字列
 function! s:GetReplaceTagStr(tag, str)
-  if &encoding != 'utf-8'
+  let enc = substitute(&enc, '-', '_', 'g')
+  " XXX: 存在する場合でも!existsになる。
+  " if !exists("g:eblook#supsubmap_{enc}#{a:tag}map")
+  " XXX: existsチェック無しでいきなりget()すると0が返る。
+  if enc != 'utf_8'
     return a:str
   else
-    return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
+    return get(g:eblook#supsubmap_{enc}#{a:tag}map, a:str, a:str)
   endif
 endfunction
 
