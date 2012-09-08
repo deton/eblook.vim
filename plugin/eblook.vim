@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-01
+" Last Change: 2012-09-08
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -851,16 +851,19 @@ function! s:GetContent(count)
     silent! :g/<\/\?em>/s///g
     silent! :g/<font=\%(bold\|italic\)>/s///g
     silent! :g/<\/font>/s///g
-    call s:FormatIndent()
   endif
   silent! :g/^$/d _
   call s:FormatReference()
   if exists('dict.autoformat')
     if dict.autoformat
       call s:FormatContent()
+    elseif g:eblook_decorate
+      call s:FormatIndent()
     endif
   elseif g:eblook_autoformat_default
     call s:FormatContent()
+  elseif g:eblook_decorate
+    call s:FormatIndent()
   endif
   setlocal nomodifiable
   normal! 1G
@@ -1054,11 +1057,13 @@ endfunction
 
 " entryバッファ上からcontentバッファを整形する
 function! s:GetAndFormatContent()
+  let save = g:eblook_autoformat_default
+  let g:eblook_autoformat_default = 1
   if s:GetContent(0) < 0
+    let g:eblook_autoformat_default = save
     return -1
   endif
-  call s:GoWindow(0)
-  call s:FormatContent()
+  let g:eblook_autoformat_default = save
   call s:GoWindow(1)
 endfunction
 
@@ -1092,7 +1097,6 @@ function! s:FormatIndent()
 endfunction
 
 " contentバッファを整形する
-" TODO: <ind=[1-9]>を考慮した整形。特に、行の途中にある<ind=>を考慮した折り返し
 function! s:FormatContent()
   let tw = &textwidth
   if tw == 0 && &wrapmargin
@@ -1105,11 +1109,45 @@ function! s:FormatContent()
   endif
 
   setlocal modifiable
-  " 長い行を分割する
+  silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
+  let ind = 0
   normal! 1G$
   while 1
-    if virtcol('.') > tw
-      call s:FormatLine(tw, 0)
+    let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
+    " 行頭に<ind=>がある場合は、そのindent量を使用して現在行をindnet
+    while indnew != ''
+      let ind = indnew
+      s/^<ind=[0-9]>//
+      " ^<ind=1><ind=3>のような場合があるのでループしてチェック
+      let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
+    endwhile
+    s/^/\=printf('%*s', ind, '')/
+
+    " 長い行を分割する
+    normal! ^
+    while search('<ind=[0-9]>', 'c', line('.')) > 0
+      " 行の途中にある<ind=>を考慮して分割
+      let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
+      let vcol = virtcol('.')
+      if vcol > tw
+        let startline = line('.')
+	let stopline = s:FormatLine(tw, 0, ind)
+        call cursor(startline, 1)
+        let indline = search('<ind=[0-9]>', 'c', stopline)
+	s/<ind=[0-9]>//
+        " <ind=[0-9]>を削った後、再整形のため行結合
+        if indline < stopline
+          let n = stopline - indline + 1
+          execute "normal! " . n . "J"
+        endif
+      else
+	s/<ind=[0-9]>//
+      endif
+      let ind = indnew
+    endwhile
+    normal! $
+    if virtcol('$') > tw
+      call s:FormatLine(tw, 0, ind)
     endif
     if line('.') == line('$')
       break
@@ -1123,12 +1161,19 @@ endfunction
 " 長い行を分割する。
 " @param width 上限幅
 " @param joined 直前に行を結合したかどうか
-function! s:FormatLine(width, joined)
+" @param ind インデント量
+" @return 分割後の複数行のうちの最終行の行番号(line('.')と同じ)
+function! s:FormatLine(width, joined, ind)
   let first = line('.')
+  let indprev = matchstr(getline('.'), '^ *')
   normal! gqq
   let last = line('.')
   if last == first
-    return
+    return last
+  endif
+  " gqqが付けたindentは削除。<ind=[1-9]>をもとにindentを付けたいので。
+  if indprev != ""
+    silent! execute (first + 1) . ',' . last . 's/^' . indprev . '//'
   endif
   call cursor(first, 1)
   " <reference>置換後の<1|...|>が行をまたいだ場合には未対応のため、1行に収める:
@@ -1143,10 +1188,10 @@ function! s:FormatLine(width, joined)
     execute "normal! " . n . "J$"
     " 行結合後、再帰呼び出しされてて、<1|が行頭→これ以上再帰しても無駄
     if a:joined && c == 1
-      return
+      return line('.')
     endif
     if virtcol('.') > a:width
-      call s:FormatLine(a:width, 1)
+      call s:FormatLine(a:width, 1, a:ind)
     endif
   endif
 endfunction
