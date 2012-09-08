@@ -45,6 +45,16 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
+* 1.2.0 (2012-09-XXX)
+  * eblook 1.6.1+mediaのdecorate-modeを有効にすると出力される、
+    content中のインデント指定`<ind=1>`等に基づいて、
+    インデントを行う機能を追加。
+  * [katonoさんによる変更](https://github.com/katono/eblook.vim)を取り込み
+        * PopUpメニュー追加
+	* マウス操作対応
+	* 前のreferenceに移動する`<S-Tab>`キーの追加
+	* 一時ファイルが削除されない問題の修正
+
 * 1.1.1 (2012-04-22)
   * Vimの'hidden'オプションがonの場合、
     2回目以降の検索時にE139エラーが発生する問題を修正。

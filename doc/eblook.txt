@@ -155,13 +155,13 @@ http://www1.interq.or.jp/~deton/eblook-vim/#appendix
 検索結果はentryウィンドウとcontentウィンドウに表示されます。
 
       テスト【test】
-      (1)試験。検査。特に、学力試験。「心理―」「読解力を―する」
-      (2)一般に、考えたことや試作品などを実際に試してみること。
-      「―‐ドライバー」
-      <1|⇒―‐ケース【test case】|>
-      <2|⇒―‐パイロット【test pilot】|>
-      <3|⇒―‐パターン【test pattern】|>
-      <4|⇒―‐ピース【test-piece】|>
+       (1)試験。検査。特に、学力試験。「心理―」「読解力を―する」
+       (2)一般に、考えたことや試作品などを実際に試してみること。
+       「―‐ドライバー」
+       <1|⇒―‐ケース【test case】|>
+       <2|⇒―‐パイロット【test pilot】|>
+       <3|⇒―‐パターン【test pattern】|>
+       <4|⇒―‐ピース【test-piece】|>
       ~
       ==1Eblook content {テスト【test】}=======================================
       広辞苑第五版    テスト【test】
@@ -327,6 +327,15 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
     let eblook_stemming = 1
   https://github.com/msbmsb/porter-stem.vim がインストール済であれば、
   porter-stem.vimも使用します。
+
+'eblook_decorate'				*'eblook_decorate'*
+  eblook 1.6.1+mediaのdecorate-modeを有効にすると出力される、
+  content中のインデント指定に基づいて、インデントを行うかどうか。
+  省略値: 1(eblook 1.6.1+mediaの場合), 0(それ以外の場合)
+
+'eblook_decorate_indmin'			*'eblook_decorate_indmin'*
+  この値を越えたインデント量がcontent中で指定された場合に、
+  越えた文字数分のインデントを行う。省略値: 1
 
 'eblook_entrywin_height'			*'eblook_entrywin_height'*
   entryウィンドウの行数(目安)。省略値: 4

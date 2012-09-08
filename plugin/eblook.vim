@@ -144,6 +144,15 @@ scriptencoding cp932
 "       指定文字列で何も見つからなかった時に、活用語尾などを取り除いた
 "       文字列を使って検索し直すかどうか。省略値: 0
 "
+"    'eblook_decorate'
+"       eblook 1.6.1+mediaのdecorate-modeを有効にすると出力される、
+"       content中のインデント指定に基づいて、インデントを行うかどうか。
+"       省略値: 1(eblook 1.6.1+mediaの場合), 0(それ以外の場合)
+"
+"    'eblook_decorate_indmin'
+"       この値を越えたインデント量がcontent中で指定された場合に、
+"       越えた文字数分のインデントを行う。省略値: 1
+"
 "    'eblook_entrywin_height'
 "       entryウィンドウの行数(目安)。省略値: 4
 "
