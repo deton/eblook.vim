@@ -925,9 +925,10 @@ endfunction
 " @return 置換文字列
 function! s:GetReplaceTagStr(tag, str)
   let enc = substitute(&enc, '-', '_', 'g')
-  " XXX: 存在する場合でも!existsになる。
+  " XXX: 存在する場合でも!existsになる→&enc=utf-8の場合に置換が行われない。
   " if !exists("g:eblook#supsubmap_{enc}#{a:tag}map")
-  " XXX: existsチェック無しでいきなりget()すると0が返る。
+  " XXX: existsチェック無しでいきなりget()すると、存在しない場合に0が返る
+  " →&enc!=utf-8の場合に0に置換される
   if enc != 'utf_8'
     return a:str
   else
