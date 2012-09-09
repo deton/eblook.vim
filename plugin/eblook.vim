@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-08
+" Last Change: 2012-09-09
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -932,8 +932,12 @@ endfunction
 
 " 上付き文字(<sup>１</sup>)、下付き文字<sub>を置き換える
 function! s:ReplaceTag()
-  silent! :g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
-  silent! :g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
+  if &encoding ==# 'utf-8'
+    silent! :g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
+    silent! :g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
+  else
+    silent! :g/<\/\?su[pb]>/s///g
+  endif
 endfunction
 
 " タグの置換文字列を取得する。
@@ -941,16 +945,7 @@ endfunction
 " @param str 元の文字列
 " @return 置換文字列
 function! s:GetReplaceTagStr(tag, str)
-  let enc = substitute(&enc, '-', '_', 'g')
-  " XXX: 存在する場合でも!existsになる→&enc=utf-8の場合に置換が行われない。
-  " if !exists("g:eblook#supsubmap_{enc}#{a:tag}map")
-  " XXX: existsチェック無しでいきなりget()すると、存在しない場合に0が返る
-  " →&enc!=utf-8の場合に0に置換される
-  if enc != 'utf_8'
-    return a:str
-  else
-    return get(g:eblook#supsubmap_{enc}#{a:tag}map, a:str, a:str)
-  endif
+  return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
 endfunction
 
 " <gaiji=xxxxx>を置き換える。
