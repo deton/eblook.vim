@@ -33,6 +33,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 * plugin/eblook.vim     'runtimepath'/plugin  プラグインスクリプト本体
 * autoload/eblook/stem_en.vim  'runtimepath'/autoload/eblook  英語stemming用
 * autoload/eblook/stem_ja.vim  'runtimepath'/autoload/eblook  日本語語尾補正用
+* autoload/eblook/supsubmap_utf8.vim 'runtimepath'/autoload/eblook 上付き文字置換用
 * syntax/eblook.vim     'runtimepath'/syntax  eblook.vim用syntaxファイル
 * doc/eblook.txt        'runtimepath'/doc     スクリプトの説明書
 
@@ -49,6 +50,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   * eblook 1.6.1+mediaのdecorate-mode対応
         * content中のインデント指定`<ind=1>`等に基づいて、
 	  インデントを行う機能を追加。
+	* イタリック、ボールド表示
 	* 肩番号等の上付き数字表示に対応(1-9のみ)。
           `<sup>`をUnicodeの上付き数字に置換しているので、&enc=utf-8環境のみ。
   * [katonoさんによる変更](https://github.com/katono/eblook.vim)を取り込み

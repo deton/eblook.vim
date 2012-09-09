@@ -149,6 +149,11 @@ scriptencoding cp932
 "       content中のインデント指定に基づいて、インデントを行うかどうか。
 "       省略値: 1(eblook 1.6.1+mediaの場合), 0(それ以外の場合)
 "
+"    'eblook_decorate_syntax'
+"       decorate-mode有効時に、content中の指定に基づいて、
+"       イタリック、ボールド表示を行うかどうか。
+"       省略値: 0(syntax offの場合), 1(それ以外の場合)
+"
 "    'eblook_decorate_indmin'
 "       この値を越えたインデント量がcontent中で指定された場合に、
 "       越えた文字数分のインデントを行う。省略値: 1
@@ -245,7 +250,11 @@ if !exists('g:eblook_decorate_indmin')
   let g:eblook_decorate_indmin = 1
 endif
 if !exists('g:eblook_decorate_syntax')
-  let g:eblook_decorate_syntax = 1
+  if exists("g:syntax_on")
+    let g:eblook_decorate_syntax = 1
+  else
+    let g:eblook_decorate_syntax = 0
+  endif
 endif
 
 if !exists('eblook_statusline_content')
