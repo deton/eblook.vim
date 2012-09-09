@@ -15,8 +15,8 @@ endif
 
 if has("conceal")
   if g:eblook_show_refindex
-    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebBold,ebItalic,ebEm
-    syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebBold,ebItalic,ebEm
+    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefItalic,ebEm
+    syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefVisitedBold,ebRefVisitedItalic,ebEm
     syn match ebRefBeg	"." contained
     syn match ebRefEnd	"." contained
     syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>"
@@ -26,8 +26,8 @@ if has("conceal")
     syn match ebSndBeg	"." contained
     syn match ebSndEnd	"." contained
   else
-    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebBold,ebItalic,ebEm concealends
-    syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebBold,ebItalic,ebEm concealends
+    syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefItalic,ebEm concealends
+    syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefVisitedBold,ebRefVisitedItalic,ebEm concealends
     syn match ebRefBeg	"." contained conceal
     syn match ebRefEnd	"." contained conceal
     syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>" concealends
@@ -40,6 +40,11 @@ if has("conceal")
   " cf. helpIgnore in syntax/help.vim
 
   " cf. syntax/html.vim
+  " XXX: ‚Æ‚è‚ ‚¦‚¸RefLink’†‚Å‚Í1’iŠK‚Ìitalic‚Æbold‚Ì‚Ý‘Î‰ž
+  syn region ebRefItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" concealends
+  syn region ebRefVisitedItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" concealends
+  syn region ebRefBold contained matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" concealends
+  syn region ebRefVisitedBold contained matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" concealends
   syn region ebBold matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" contains=ebBoldItalic,ebBoldEm concealends
   syn region ebBoldItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" contains=ebBoldItalicEm concealends
   syn region ebBoldEm contained matchgroup=ebEmBeg start="<em>" matchgroup=ebEmEnd end="</em>" contains=ebBoldEmItalic concealends
@@ -62,8 +67,8 @@ if has("conceal")
   syn match ebEmEnd "." contained conceal
 
 else
-  syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebBold,ebItalic,ebEm
-  syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebBold,ebItalic,ebEm
+  syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefItalic,ebEm
+  syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefVisitedItalic,ebEm
   syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>"
   syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zes" matchgroup=ebSndEnd end="t\zs>"
   syn match ebRefBeg	"." contained
@@ -73,7 +78,11 @@ else
   syn match ebSndBeg	"." contained
   syn match ebSndEnd	"." contained
 
-  syn region ebBold matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" contains=ebItalic,ebEm
+  syn region ebRefItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>"
+  syn region ebRefVisitedItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>"
+  syn region ebRefBold contained matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>"
+  syn region ebRefVisitedBold contained matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>"
+  syn region ebBold matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" contains=ebBoldItalic,ebBoldEm
   syn region ebBoldItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" contains=ebBoldItalicEm
   syn region ebBoldEm contained matchgroup=ebEmBeg start="<em>" matchgroup=ebEmEnd end="</em>" contains=ebBoldEmItalic
   syn region ebBoldItalicEm contained matchgroup=ebEmBeg start="<em>" matchgroup=ebEmEnd end="</em>"
@@ -109,6 +118,42 @@ endif
 
 hi def link ebRefLink	Identifier
 hi def link ebRefLinkVisited	Special
+function! s:AddAttr(attr, base, name)
+  let hidef = s:GetHi(a:base)
+  let def = matchstr(hidef, 'xxx \zs.*')
+  if match(hidef, ' term=') == -1
+    let def .= ' term=' . a:attr
+  else
+    let def = substitute(def, 'term=\(\S*\)', 'term=\1,' . a:attr, '')
+  endif
+  if match(def, 'cterm=') == -1
+    let def .= ' cterm=' . a:attr
+  else
+    let def = substitute(def, 'cterm=\(\S*\)', 'cterm=\1,' . a:attr, '')
+  endif
+  if match(def, 'gui=') == -1
+    let def .= ' gui=' . a:attr
+  else
+    let def = substitute(def, 'gui=\(\S*\)', 'gui=\1,' . a:attr, '')
+  endif
+  execute 'hi def ' . a:name . ' ' . def
+endfunction
+function! s:GetHi(name)
+  silent! redir => hidef
+  silent! execute 'hi ' . a:name
+  silent! redir END
+  let link = matchstr(hidef, ' links to \zs.*')
+  if link == ''
+    return hidef
+  endif
+  return s:GetHi(link)
+endfunction
+call s:AddAttr('italic', 'ebRefLink', 'ebRefItalic')
+call s:AddAttr('italic', 'ebRefLinkVisited', 'ebRefVisitedItalic')
+call s:AddAttr('bold', 'ebRefLink', 'ebRefBold')
+call s:AddAttr('bold', 'ebRefLinkVisited', 'ebRefVisitedBold')
+delfunc s:GetHi
+delfunc s:AddAttr
 if g:eblook_show_refindex
   hi def link ebRefBeg	Type
   hi def link ebRefEnd	Type
