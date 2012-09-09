@@ -244,6 +244,9 @@ endif
 if !exists('g:eblook_decorate_indmin')
   let g:eblook_decorate_indmin = 1
 endif
+if !exists('g:eblook_decorate_syntax')
+  let g:eblook_decorate_syntax = 1
+endif
 
 if !exists('eblook_statusline_content')
   let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<'
@@ -920,10 +923,17 @@ function! s:FormatDecorate(dropind)
     " 未対応のタグは削除
     silent! :g/<\/\?no-newline>/s///g
     call s:ReplaceTag() " <sup>,<sub>
-    " TODO: <em>,<font=bold>,<font=italic>のsyntax対応
-    silent! :g/<\/\?em>/s///g
-    silent! :g/<font=\%(bold\|italic\)>/s///g
-    silent! :g/<\/font>/s///g
+    " <em>,<font=bold>,<font=italic>のsyntax対応
+    if g:eblook_decorate_syntax
+      " 短縮形式に置換。長いと行分割に影響が大きいので
+      silent! :g/<font=bold>/s//<b>/g
+      silent! :g/<font=italic>/s//<i>/g
+      silent! :g/<\/font>/s//<\/f>/g
+    else
+      silent! :g/<\/\?em>/s///g
+      silent! :g/<font=\%(bold\|italic\)>/s///g
+      silent! :g/<\/font>/s///g
+    endif
     if a:dropind
       silent! :g/<ind=[0-9]>/s///g
     endif
