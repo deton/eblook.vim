@@ -49,15 +49,15 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 * 1.2.0 (2012-09-XXX)
   * eblook 1.6.1+mediaのdecorate-mode対応
         * content中のインデント指定`<ind=1>`等に基づいて、
-	  インデントを行う機能を追加。
-	* イタリック、ボールド表示
-	* 肩番号等の上付き数字表示に対応(1-9のみ)。
+          インデントを行う機能を追加。
+        * イタリック、ボールド表示
+        * 肩番号等の上付き数字表示に対応(1-9のみ)。
           `<sup>`をUnicodeの上付き数字に置換しているので、&enc=utf-8環境のみ。
   * [katonoさんによる変更](https://github.com/katono/eblook.vim)を取り込み
         * PopUpメニュー追加
-	* マウス操作対応
-	* 前のreferenceに移動する`<S-Tab>`キーの追加
-	* 一時ファイルが削除されない問題の修正
+        * マウス操作対応
+        * 前のreferenceに移動する`<S-Tab>`キーの追加
+        * 一時ファイルが削除されない問題の修正
 
 * 1.1.1 (2012-04-22)
   * Vimの'hidden'オプションがonの場合、
@@ -69,8 +69,8 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
           ([EBWin用の外字定義ファイル](http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji)を使用)
         * `<img>`,`<inline>`,`<snd>`,`<mov>`を外部ビューアで
           表示・再生する機能を追加(画像等へのリンク上でxキー)。
-	  (音声`<snd>`と動画`<mov>`の再生は
-	  [eblook 1.6.1+media](http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook)が必要)
+          (音声`<snd>`と動画`<mov>`の再生は
+          [eblook 1.6.1+media](http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook)が必要)
         * contentウィンドウ内の長い行を|gq|で整形する機能を追加(Oキー)。
           (行が長く、ウィンドウの高さが狭い場合でも、問題なく表示できるように)
   * 新機能(動作関係)
