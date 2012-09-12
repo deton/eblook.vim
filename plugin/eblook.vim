@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-09
+" Last Change: 2012-09-12
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -617,7 +617,7 @@ function! s:Search(group, word, isstem)
     silent! execute 'g/eblook-' . i . '>/;/^eblook/-1s/^/' . title . "\t"
     let i = i + 1
   endwhile
-  silent! :g/eblook.*> /s///g
+  silent! :g/eblook.\{-}> /s///g
   call s:FormatDecorate(1)
   silent! :g/^$/d _
 
