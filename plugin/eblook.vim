@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-12
+" Last Change: 2012-09-13
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -436,6 +436,7 @@ function! s:Entry_BufEnter()
   set noswapfile
   set nobuflisted
   set nolist
+  set noexpandtab
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -475,6 +476,8 @@ function! s:Content_BufEnter()
   set noswapfile
   set nobuflisted
   set nolist
+  " s:FormatLine()“à‚Ågqq‚ª•t‚¯‚½indent‚ğíœ‚·‚éÛ‚É\t‚ª‚ ‚é‚Æ–Ê“|‚È‚Ì‚Å
+  set expandtab
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
