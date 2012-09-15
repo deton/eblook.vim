@@ -154,6 +154,10 @@ scriptencoding utf-8
 "       イタリック、ボールド表示を行うかどうか。
 "       省略値: 0(syntax offの場合), 1(それ以外の場合)
 "
+"    'eblook_decorate_supsub'
+"       decorate-mode有効時に、上付き・下付き文字列を、
+"       それぞれ^{上付き}・_{下付き}のように表示するかどうか。省略値: 0
+"
 "    'eblook_decorate_indmin'
 "       この値を越えたインデント量がcontent中で指定された場合に、
 "       越えた文字数分のインデントを行う。省略値: 1

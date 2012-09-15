@@ -48,11 +48,14 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 ========
 * 1.2.0 (2012-09-XXX)
   * eblook 1.6.1+mediaのdecorate-mode対応
-        * content中のインデント指定`<ind=1>`等に基づいて、
+        * content中のインデント指定`<ind=2>`等に基づいて、
           インデントを行う機能を追加。
         * イタリック、ボールド表示
-        * 肩番号等の上付き数字表示に対応(1-9のみ)。
-          `<sup>`をUnicodeの上付き数字に置換しているので、&enc=utf-8環境のみ。
+        * `<sup>`による上付き数字(1-9)をUnicodeの上付き数字に置換
+          (&enc=utf-8環境のみ)
+        * 上付き・下付き文字列を、^{上付き}・_{下付き}のように表示する
+          オプション(eblook_decorate_supsub)を追加
+  * `<unicode>`タグの置換に対応(&enc=utf-8環境のみ)
   * [katonoさんによる変更](https://github.com/katono/eblook.vim)を取り込み
         * PopUpメニュー追加
         * マウス操作対応
