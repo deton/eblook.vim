@@ -352,6 +352,9 @@ let s:visited = []
 let s:stemmedwords = []
 " stemmedwords内の検索中index
 let s:stemindex = -1
+let s:zen2han = {
+  \'０':'0','１':'1','２':'2','３':'3','４':'4','５':'5','６':'6','７':'7',
+  \'８':'8','９':'9','Ａ':'A','Ｂ':'B','Ｃ':'C','Ｄ':'D','Ｅ':'E','Ｆ':'F'}
 
 " マッピング
 let s:set_mapleader = 0
@@ -624,6 +627,7 @@ function! s:Search(group, word, isstem)
     let i = i + 1
   endwhile
   silent! :g/eblook.\{-}> /s///g
+  call s:ReplaceUnicode()
   call s:FormatDecorate(1)
   silent! :g/^$/d _
 
@@ -906,6 +910,7 @@ function! s:GetContentSub(doformat)
   if search('<gaiji=', 'nw') != 0
     call s:ReplaceGaiji(dict)
   endif
+  call s:ReplaceUnicode()
   call s:FormatDecorate(0)
   silent! :g/^$/d _
   call s:FormatReference()
@@ -1085,6 +1090,28 @@ function! s:GetGaiji(gaijimap, key)
     "return '_' . a:key . '_'     " DEBUG
   endif
   return res
+endfunction
+
+" <unicode>４Ｅ２Ｆ</unicode>等を置換する
+" (LogoVistaの漢字源 改訂第四版以降で使用されている)
+function! s:ReplaceUnicode()
+  if &encoding ==# 'utf-8'
+    silent! g/<unicode>\([０-９Ａ-Ｆ]\+\)<\/unicode>/s//\=s:GetUnicode(submatch(1))/g
+  else
+    silent! g/<unicode>\([０-９Ａ-Ｆ]\+\)<\/unicode>/s//_/g
+  endif
+  " 表の表示(もともとの用途。ロイヤル英文法で使用されている)
+  silent! g/<\/\?unicode>/s///g
+endfunction
+
+" <unicode>内の文字列に対する置換文字列を返す
+function! s:GetUnicode(code)
+  " XXX: substitute()内なので再帰的に\=は使えない
+  let han = []
+  for c in split(a:code, '\zs')
+    call add(han, get(s:zen2han, c, c))
+  endfor
+  return nr2char('0x' . join(han, ''))
 endfunction
 
 " contentバッファ中の<reference>等を短縮形式に置換する
