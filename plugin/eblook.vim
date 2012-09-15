@@ -442,7 +442,7 @@ function! s:Entry_BufEnter()
   set noswapfile
   set nobuflisted
   set nolist
-  set noexpandtab
+  setlocal noexpandtab
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -482,8 +482,8 @@ function! s:Content_BufEnter()
   set noswapfile
   set nobuflisted
   set nolist
-  " s:FormatLine()内でgqqが付けたindentを削除する際に\tがあると面倒なので
-  set expandtab
+  " s:FormatLine()でgqqとindentまわりの処理を楽にするため
+  setlocal expandtab autoindent nosmartindent
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
