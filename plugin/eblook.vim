@@ -974,9 +974,9 @@ function! s:ReplaceTag()
   " <no-newline>削除後に<sub>を1つにする。
   " 例:<no-newline>(<sub>げ</sub></no-newline><sub>んす</sub><no-newline><sub>い</sub>), </no-newline>
   " を、「(_{げ}_{んす}_{い}), 」でなく「(_{げんすい}), 」にする。
-  silent! g/<\/sub><sub>/s///g
-  silent! g/<\/sup><sup>/s///g
   if &encoding ==# 'utf-8' || g:eblook_decorate_supsub
+    silent! g/<\/sub><sub>/s///g
+    silent! g/<\/sup><sup>/s///g
     silent! g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
     silent! g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
   else
