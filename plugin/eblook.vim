@@ -969,11 +969,18 @@ endfunction
 
 " 上付き文字(<sup>１</sup>)、下付き文字<sub>を置き換える
 function! s:ReplaceTag()
+  " 新英和・和英中辞典のmarshalで、禁則がらみで<sub>と<no-newline>が混ざって、
+  " 下付き文字がばらばらになってて見にくいので、
+  " <no-newline>削除後に<sub>を1つにする。
+  " 例:<no-newline>(<sub>げ</sub></no-newline><sub>んす</sub><no-newline><sub>い</sub>), </no-newline>
+  " を、「(_{げ}_{んす}_{い}), 」でなく「(_{げんすい}), 」にする。
+  silent! g/<\/sub><sub>/s///g
+  silent! g/<\/sup><sup>/s///g
   if &encoding ==# 'utf-8' || g:eblook_decorate_supsub
-    silent! :g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
-    silent! :g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
+    silent! g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
+    silent! g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
   else
-    silent! :g/<\/\?su[pb]>/s///g
+    silent! g/<\/\?su[pb]>/s///g
   endif
 endfunction
 
