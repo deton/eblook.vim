@@ -1227,7 +1227,7 @@ function! s:FormatContent()
 	let vcol = virtcol('.')
 	if vcol > tw
 	  let startline = line('.')
-	  let stopline = s:FormatLine(tw, 0, ind)
+	  let stopline = s:FormatLine(ind)
 	  call cursor(startline, 1)
 	  let indline = search('<ind=[0-9]>', 'c', stopline)
 	  s/<ind=[0-9]>//
@@ -1244,7 +1244,7 @@ function! s:FormatContent()
       normal! $
     endif
     if virtcol('$') > tw
-      call s:FormatLine(tw, 0, ind)
+      call s:FormatLine(ind)
     endif
     if line('.') == line('$')
       break
@@ -1256,11 +1256,9 @@ function! s:FormatContent()
 endfunction
 
 " 長い行を分割する。
-" @param width 上限幅
-" @param joined 直前に行を結合したかどうか
 " @param ind インデント量
 " @return 分割後の複数行のうちの最終行の行番号(line('.')と同じ)
-function! s:FormatLine(width, joined, ind)
+function! s:FormatLine(ind)
   let first = line('.')
   let indprev = matchstr(getline('.'), '^ *')
   normal! gqq
@@ -1276,27 +1274,8 @@ function! s:FormatLine(width, joined, ind)
       let indcur = ''
     endif
     silent! execute (first + 1) . ',' . last . 's/^' . indprev . '/' . indcur . '/'
+    call cursor(last, 1)
   endif
-  call cursor(first, 1)
-  " <reference>置換後の<1|...|>が行をまたいだ場合には未対応のため、1行に収める:
-  " <1|直前に改行を入れて次の行と結合した後、再度分割し直す。
-  let openrefline = search('<\d\+[|!][^>]*$', 'cW', last)
-  if openrefline > 0
-    let c = virtcol('.')
-    if c > 1
-      execute "normal! i\<CR>\<Esc>"
-    endif
-    let n = last - openrefline + 1
-    execute "normal! " . n . "J$"
-    " 行結合後、再帰呼び出しされてて、<1|が行頭→これ以上再帰しても無駄
-    if a:joined && c == 1
-      return line('.')
-    endif
-    if virtcol('.') > a:width
-      call s:FormatLine(a:width, 1, a:ind)
-    endif
-  endif
-  call cursor(last, 1)
   return last
 endfunction
 
@@ -1310,7 +1289,7 @@ function! s:SelectReference(count)
       let index = len(b:contentrefs)
     endif
   else
-    let index = s:GetIndexHere('<\zs\d\+\ze[|!]', '.')
+    let index = s:GetIndex('<\zs\d\+\ze[|!]')
     if strlen(index) == 0
       return
     endif
@@ -1319,6 +1298,24 @@ function! s:SelectReference(count)
 endfunction
 
 " contentバッファ中のカーソル位置付近のrefpatを抽出して、
+" refpatに含まれるindex番号を返す。
+function! s:GetIndex(refpat)
+  let index = s:GetIndexHere(a:refpat, '.')
+  if strlen(index) == 0
+    " 複数行にわたるcaptionの2行目以降で操作した場合でも表示できるようにする
+    let lnum = search(a:refpat, 'bnW')
+    if lnum == 0
+      return ''
+    endif
+    let index = s:GetIndexHere(a:refpat, lnum)
+    if strlen(index) == 0
+      return ''
+    endif
+  endif
+  return index
+endfunction
+
+" contentバッファ中の指定行内でのカーソル位置付近のrefpatを抽出して、
 " refpatに含まれるindex番号を返す。
 function! s:GetIndexHere(refpat, lnum)
   let str = getline(a:lnum)
@@ -1395,18 +1392,9 @@ function! s:ShowMedia(count)
       let index = len(b:contentrefsm)
     endif
   else
-    let index = s:GetIndexHere('<\zs\d\+\ze[〈《]', '.')
+    let index = s:GetIndex('<\zs\d\+\ze[〈《]')
     if strlen(index) == 0
-      " 画像や動画の場合、captionが複数行にわたる場合があり、
-      " 2行目以降で操作した場合でも表示できるようにする
-      let lnum = search('<\d\+[〈《]', 'bnW')
-      if lnum == 0
-	return
-      endif
-      let index = s:GetIndexHere('<\zs\d\+\ze[〈《]', lnum)
-      if strlen(index) == 0
-	return
-      endif
+      return
     endif
   endif
 
