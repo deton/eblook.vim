@@ -941,6 +941,9 @@ function! s:FormatDecorate(dropind)
       silent! :g/<font=bold>/s//<b>/g
       silent! :g/<font=italic>/s//<i>/g
       silent! :g/<\/font>/s//<\/f>/g
+      " 1文字ずつ<em>は無駄に長くて、concealすると表示との不一致が大きいので。
+      " 「<em>単</em><em>語</em>」→「<em>単語</em>」
+      silent! :g/<\/em><em>/s///g
     else
       silent! :g/<\/\?em>/s///g
       silent! :g/<font=\%(bold\|italic\)>/s///g
