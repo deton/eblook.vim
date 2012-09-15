@@ -52,7 +52,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
           インデントを行う機能を追加。
         * イタリック、ボールド表示
         * `<sup>`による上付き数字(1-9)をUnicodeの上付き数字に置換
-          (&enc=utf-8環境のみ)
+          (&enc=utf-8環境のみ)。autoload/eblook/supsubmap_utf8.vimファイル追加。
         * 上付き・下付き文字列を、^{上付き}・_{下付き}のように表示する
           オプション(eblook_decorate_supsub)を追加
   * `<unicode>`タグの置換に対応(&enc=utf-8環境のみ)
