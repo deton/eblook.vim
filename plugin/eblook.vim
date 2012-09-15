@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-13
+" Last Change: 2012-09-15
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -1269,8 +1269,13 @@ function! s:FormatLine(width, joined, ind)
     return last
   endif
   " gqqが付けたindentは削除。<ind=[1-9]>をもとにindentを付けるので、余分。
-  if g:eblook_decorate && indprev != ""
-    silent! execute (first + 1) . ',' . last . 's/^' . indprev . '//'
+  if g:eblook_decorate
+    if a:ind > g:eblook_decorate_indmin
+      let indcur = printf('%*s', a:ind - g:eblook_decorate_indmin, '')
+    else 
+      let indcur = ''
+    endif
+    silent! execute (first + 1) . ',' . last . 's/^' . indprev . '/' . indcur . '/'
   endif
   call cursor(first, 1)
   " <reference>置換後の<1|...|>が行をまたいだ場合には未対応のため、1行に収める:
@@ -1291,6 +1296,8 @@ function! s:FormatLine(width, joined, ind)
       call s:FormatLine(a:width, 1, a:ind)
     endif
   endif
+  call cursor(last, 1)
+  return last
 endfunction
 
 " contentバッファ中のカーソル位置付近のreferenceを抽出して、
