@@ -256,6 +256,9 @@ if !exists('g:eblook_decorate_syntax')
     let g:eblook_decorate_syntax = 0
   endif
 endif
+if !exists('g:eblook_decorate_supsub')
+  let g:eblook_decorate_supsub = 0
+endif
 
 if !exists('eblook_statusline_content')
   let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<'
@@ -957,7 +960,7 @@ endfunction
 
 " 上付き文字(<sup>１</sup>)、下付き文字<sub>を置き換える
 function! s:ReplaceTag()
-  if &encoding ==# 'utf-8'
+  if &encoding ==# 'utf-8' || g:eblook_decorate_supsub
     silent! :g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
     silent! :g/<sub>\([^<]*\)<\/sub>/s//\=s:GetReplaceTagStr('sub', submatch(1))/g
   else
@@ -970,7 +973,18 @@ endfunction
 " @param str 元の文字列
 " @return 置換文字列
 function! s:GetReplaceTagStr(tag, str)
-  return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
+  if &encoding ==# 'utf-8' && has_key(g:eblook#supsubmap_utf8#{a:tag}map, a:str)
+    return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
+  elseif g:eblook_decorate_supsub
+    if a:tag == 'sup'
+      return '^{' . a:str . '}'
+    else
+      " XXX:未対応外字置換の_とぶつかる可能性あり
+      return '_{' . a:str . '}'
+    endif
+  else
+    return a:str
+  endif
 endfunction
 
 " <gaiji=xxxxx>を置き換える。

@@ -39,6 +39,13 @@ if has("conceal")
   endif
   " cf. helpIgnore in syntax/help.vim
 
+  syn region ebSup matchgroup=ebSupBeg start="\ze\^{" matchgroup=ebSupEnd end="}\zs" concealends
+  syn region ebSub matchgroup=ebSubBeg start="\ze_{" matchgroup=ebSubEnd end="}\zs" concealends
+  syn match ebSupBeg	"." contained
+  syn match ebSupEnd	"." contained
+  syn match ebSubBeg	"." contained
+  syn match ebSubEnd	"." contained
+
   " cf. syntax/html.vim
   " XXX: ‚Æ‚è‚ ‚¦‚¸RefLink’†‚Å‚Í1’iŠK‚Ìitalic‚Æbold‚Ì‚Ý‘Î‰ž
   syn region ebRefItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" concealends
@@ -61,12 +68,18 @@ else
   syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefVisitedItalic
   syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeq" matchgroup=ebImgEnd end="r\zs>"
   syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zes" matchgroup=ebSndEnd end="t\zs>"
+  syn region ebSup matchgroup=ebSupBeg start="\ze\^{" matchgroup=ebSupEnd end="}\zs"
+  syn region ebSub matchgroup=ebSubBeg start="\ze_{" matchgroup=ebSubEnd end="}\zs"
   syn match ebRefBeg	"." contained
   syn match ebRefEnd	"." contained
   syn match ebImgBeg	"." contained
   syn match ebImgEnd	"." contained
   syn match ebSndBeg	"." contained
   syn match ebSndEnd	"." contained
+  syn match ebSupBeg	"." contained
+  syn match ebSupEnd	"." contained
+  syn match ebSubBeg	"." contained
+  syn match ebSubEnd	"." contained
 
   syn region ebRefItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>"
   syn region ebRefVisitedItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>"
@@ -154,6 +167,12 @@ else
 endif
 hi def link ebImg	Constant
 hi def link ebSnd	Constant
+hi def link ebSup	Comment
+hi def link ebSub	Statement
+hi def link ebSupBeg	Ignore
+hi def link ebSupEnd	Ignore
+hi def link ebSubBeg	Ignore
+hi def link ebSubEnd	Ignore
 hi def link ebPrevBeg	NonText
 hi def link ebPrevEnd	NonText
 hi def link ebNextBeg	NonText
