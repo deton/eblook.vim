@@ -25,114 +25,114 @@
 " CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
 
-scriptencoding cp932
+scriptencoding utf-8
 
 " Description:
-"   `eblook'ƒvƒƒOƒ‰ƒ€‚ğg‚Á‚ÄEPWING/“dqƒuƒbƒN«‘‚ğŒŸõ‚·‚éB
-"   ‚±‚ÌƒXƒNƒŠƒvƒg‚ğg‚¤‚½‚ß‚É‚ÍA
-"   `eblook'ƒvƒƒOƒ‰ƒ€<http://openlab.jp/edict/eblook/>‚ÆEPWING«‘‚ª•K—vB
+"   `eblook'ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ã£ã¦EPWING/é›»å­ãƒ–ãƒƒã‚¯è¾æ›¸ã‚’æ¤œç´¢ã™ã‚‹ã€‚
+"   ã“ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’ä½¿ã†ãŸã‚ã«ã¯ã€
+"   `eblook'ãƒ—ãƒ­ã‚°ãƒ©ãƒ <http://openlab.jp/edict/eblook/>ã¨EPWINGè¾æ›¸ãŒå¿…è¦ã€‚
 "
-"   <Leader><C-Y>‚ğ‰Ÿ‚µ‚ÄŒŸõŒê‚ğ“ü—Í‚·‚é‚ÆAŒŸõŒ‹‰Ê‚ªentryƒEƒBƒ“ƒhƒE‚Æ
-"   contentƒEƒBƒ“ƒhƒE‚É•\¦‚³‚ê‚éB
+"   <Leader><C-Y>ã‚’æŠ¼ã—ã¦æ¤œç´¢èªã‚’å…¥åŠ›ã™ã‚‹ã¨ã€æ¤œç´¢çµæœãŒentryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨
+"   contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«è¡¨ç¤ºã•ã‚Œã‚‹ã€‚
 "
-" ƒRƒ}ƒ“ƒh:
-"   :EblookSearch         w’è‚µ‚½’PŒê‚ÌŒŸõ‚ğs‚¤
-"   :EblookListGroup      «‘ƒOƒ‹[ƒv‚Ìˆê——‚ğ•\¦‚·‚é
-"   :EblookGroup          count”ñw’è‚ÌŒŸõ‘ÎÛ«‘ƒOƒ‹[ƒv”Ô†‚ğİ’è
-"   :EblookListDict       «‘‚Ìˆê——‚ğ•\¦‚·‚é
-"   :EblookSkipDict       w’è‚µ‚½«‘”Ô†‚Ì«‘‚ğˆê“I‚ÉŒŸõ‘ÎÛ‚©‚çŠO‚·
-"   :EblookNotSkipDict    w’è‚µ‚½«‘”Ô†‚Ì«‘‚ğˆê“I‚ÉŒŸõ‘ÎÛ‚É“ü‚ê‚é
-"   :EblookPasteDictList  «‘İ’è‚ğƒy[ƒXƒg‚·‚é(eblook-vim-1.1.0‚Ö‚ÌˆÚs—p)
+" ã‚³ãƒãƒ³ãƒ‰:
+"   :EblookSearch         æŒ‡å®šã—ãŸå˜èªã®æ¤œç´¢ã‚’è¡Œã†
+"   :EblookListGroup      è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ã®ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+"   :EblookGroup          countéæŒ‡å®šæ™‚ã®æ¤œç´¢å¯¾è±¡è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·ã‚’è¨­å®š
+"   :EblookListDict       è¾æ›¸ã®ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+"   :EblookSkipDict       æŒ‡å®šã—ãŸè¾æ›¸ç•ªå·ã®è¾æ›¸ã‚’ä¸€æ™‚çš„ã«æ¤œç´¢å¯¾è±¡ã‹ã‚‰å¤–ã™
+"   :EblookNotSkipDict    æŒ‡å®šã—ãŸè¾æ›¸ç•ªå·ã®è¾æ›¸ã‚’ä¸€æ™‚çš„ã«æ¤œç´¢å¯¾è±¡ã«å…¥ã‚Œã‚‹
+"   :EblookPasteDictList  è¾æ›¸è¨­å®šã‚’ãƒšãƒ¼ã‚¹ãƒˆã™ã‚‹(eblook-vim-1.1.0ã¸ã®ç§»è¡Œç”¨)
 "
 " nmap:
-"   <Leader><C-Y>       ŒŸõ’PŒê‚ğ“ü—Í‚µ‚ÄŒŸõ‚ğs‚¤
-"   <Leader>y           ƒJ[ƒ\ƒ‹ˆÊ’u‚É‚ ‚é’PŒê‚ğŒŸõ‚·‚é
+"   <Leader><C-Y>       æ¤œç´¢å˜èªã‚’å…¥åŠ›ã—ã¦æ¤œç´¢ã‚’è¡Œã†
+"   <Leader>y           ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã«ã‚ã‚‹å˜èªã‚’æ¤œç´¢ã™ã‚‹
 "
 " vmap:
-"   <Leader>y           ‘I‘ğ‚µ‚½•¶š—ñ‚ğŒŸõ‚·‚é
+"   <Leader>y           é¸æŠã—ãŸæ–‡å­—åˆ—ã‚’æ¤œç´¢ã™ã‚‹
 "
-" entryƒoƒbƒtƒ@‚Ìnmap
-"   <CR>                ƒJ[ƒ\ƒ‹s‚Ìentry‚É‘Î‰‚·‚écontent‚ğ•\¦‚·‚é
-"   J                   ƒJ[ƒ\ƒ‹‚ğ‰º‚Ìs‚ÉˆÚ“®‚µ‚Äcontent‚ğ•\¦‚·‚é
-"   K                   ƒJ[ƒ\ƒ‹‚ğã‚Ìs‚ÉˆÚ“®‚µ‚Äcontent‚ğ•\¦‚·‚é
-"   <Space>             contentƒEƒBƒ“ƒhƒE‚ÅPageDown‚ğs‚¤
-"   <BS>                contentƒEƒBƒ“ƒhƒE‚ÅPageUp‚ğs‚¤
-"   q                   entryƒEƒBƒ“ƒhƒE‚ÆcontentƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚é
-"   s                   V‚µ‚¢’PŒê‚ğ“ü—Í‚µ‚ÄŒŸõ‚·‚é(<Leader><C-Y>‚Æ“¯‚¶)
-"   S                   ’¼‘O‚ÌŒŸõŒê‚ğ[count]‚Åw’è‚·‚é«‘ƒOƒ‹[ƒv‚ÅÄŒŸõ‚·‚é
-"   p                   contentƒEƒBƒ“ƒhƒE‚ÉˆÚ“®‚·‚é
-"   R                   referenceˆê——‚ğ•\¦‚·‚é
-"   <C-P>               ŒŸõ—š—ğ’†‚Ìˆê‚Â‘O‚Ìƒoƒbƒtƒ@‚ğ•\¦‚·‚é
-"   <C-N>               ŒŸõ—š—ğ’†‚Ìˆê‚ÂŸ‚Ìƒoƒbƒtƒ@‚ğ•\¦‚·‚é
-"   O                   contentƒEƒBƒ“ƒhƒE“à‚Ì’·‚¢s‚ğ|gq|‚Å®Œ`‚·‚é
-"   o                   contentƒEƒBƒ“ƒhƒE‚ğÅ‘å‰»‚·‚é
+" entryãƒãƒƒãƒ•ã‚¡ã®nmap
+"   <CR>                ã‚«ãƒ¼ã‚½ãƒ«è¡Œã®entryã«å¯¾å¿œã™ã‚‹contentã‚’è¡¨ç¤ºã™ã‚‹
+"   J                   ã‚«ãƒ¼ã‚½ãƒ«ã‚’ä¸‹ã®è¡Œã«ç§»å‹•ã—ã¦contentã‚’è¡¨ç¤ºã™ã‚‹
+"   K                   ã‚«ãƒ¼ã‚½ãƒ«ã‚’ä¸Šã®è¡Œã«ç§»å‹•ã—ã¦contentã‚’è¡¨ç¤ºã™ã‚‹
+"   <Space>             contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã§PageDownã‚’è¡Œã†
+"   <BS>                contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã§PageUpã‚’è¡Œã†
+"   q                   entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã‚‹
+"   s                   æ–°ã—ã„å˜èªã‚’å…¥åŠ›ã—ã¦æ¤œç´¢ã™ã‚‹(<Leader><C-Y>ã¨åŒã˜)
+"   S                   ç›´å‰ã®æ¤œç´¢èªã‚’[count]ã§æŒ‡å®šã™ã‚‹è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ã§å†æ¤œç´¢ã™ã‚‹
+"   p                   contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ç§»å‹•ã™ã‚‹
+"   R                   referenceä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+"   <C-P>               æ¤œç´¢å±¥æ­´ä¸­ã®ä¸€ã¤å‰ã®ãƒãƒƒãƒ•ã‚¡ã‚’è¡¨ç¤ºã™ã‚‹
+"   <C-N>               æ¤œç´¢å±¥æ­´ä¸­ã®ä¸€ã¤æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã‚’è¡¨ç¤ºã™ã‚‹
+"   O                   contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®é•·ã„è¡Œã‚’|gq|ã§æ•´å½¢ã™ã‚‹
+"   o                   contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æœ€å¤§åŒ–ã™ã‚‹
 "
-" contentƒoƒbƒtƒ@‚Ìnmap
-"   <CR>                ƒJ[ƒ\ƒ‹ˆÊ’u‚Ìreference‚ğ•\¦‚·‚é
-"   <Space>             PageDown‚ğs‚¤
-"   <BS>                PageUp‚ğs‚¤
-"   <Tab>               Ÿ‚Ìreference‚ÉƒJ[ƒ\ƒ‹‚ğˆÚ“®‚·‚é
-"   <S-Tab>             ‘O‚Ìreference‚ÉƒJ[ƒ\ƒ‹‚ğˆÚ“®‚·‚é
-"   q                   entryƒEƒBƒ“ƒhƒE‚ÆcontentƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚é
-"   s                   V‚µ‚¢’PŒê‚ğ“ü—Í‚µ‚ÄŒŸõ‚·‚é(<Leader><C-Y>‚Æ“¯‚¶)
-"   S                   ’¼‘O‚ÌŒŸõŒê‚ğ[count]‚Åw’è‚·‚é«‘ƒOƒ‹[ƒv‚ÅÄŒŸõ‚·‚é
-"   p                   entryƒEƒBƒ“ƒhƒE‚ÉˆÚ“®‚·‚é
-"   R                   referenceˆê——‚ğ•\¦‚·‚é
-"   <C-P>               ŒŸõ—š—ğ’†‚Ìˆê‚Â‘O‚Ìƒoƒbƒtƒ@‚ğ•\¦‚·‚é
-"   <C-N>               ŒŸõ—š—ğ’†‚Ìˆê‚ÂŸ‚Ìƒoƒbƒtƒ@‚ğ•\¦‚·‚é
-"   O                   contentƒEƒBƒ“ƒhƒE“à‚Ì’·‚¢s‚ğ|gq|‚Å®Œ`‚·‚é
-"   o                   contentƒEƒBƒ“ƒhƒE‚ğÅ‘å‰»‚·‚é
+" contentãƒãƒƒãƒ•ã‚¡ã®nmap
+"   <CR>                ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®referenceã‚’è¡¨ç¤ºã™ã‚‹
+"   <Space>             PageDownã‚’è¡Œã†
+"   <BS>                PageUpã‚’è¡Œã†
+"   <Tab>               æ¬¡ã®referenceã«ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç§»å‹•ã™ã‚‹
+"   <S-Tab>             å‰ã®referenceã«ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç§»å‹•ã™ã‚‹
+"   q                   entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã‚‹
+"   s                   æ–°ã—ã„å˜èªã‚’å…¥åŠ›ã—ã¦æ¤œç´¢ã™ã‚‹(<Leader><C-Y>ã¨åŒã˜)
+"   S                   ç›´å‰ã®æ¤œç´¢èªã‚’[count]ã§æŒ‡å®šã™ã‚‹è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ã§å†æ¤œç´¢ã™ã‚‹
+"   p                   entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ç§»å‹•ã™ã‚‹
+"   R                   referenceä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+"   <C-P>               æ¤œç´¢å±¥æ­´ä¸­ã®ä¸€ã¤å‰ã®ãƒãƒƒãƒ•ã‚¡ã‚’è¡¨ç¤ºã™ã‚‹
+"   <C-N>               æ¤œç´¢å±¥æ­´ä¸­ã®ä¸€ã¤æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã‚’è¡¨ç¤ºã™ã‚‹
+"   O                   contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®é•·ã„è¡Œã‚’|gq|ã§æ•´å½¢ã™ã‚‹
+"   o                   contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æœ€å¤§åŒ–ã™ã‚‹
 "
-" ƒIƒvƒVƒ‡ƒ“:
+" ã‚ªãƒ—ã‚·ãƒ§ãƒ³:
 "    'eblook_group'
-"      |[count]|‚ªw’è‚³‚ê‚Ä‚¢‚È‚¢‚ÉŒŸõ‘ÎÛ‚É‚·‚é«‘ƒOƒ‹[ƒv”Ô†B
-"      È—ª’l: 1
+"      |[count]|ãŒæŒ‡å®šã•ã‚Œã¦ã„ãªã„æ™‚ã«æ¤œç´¢å¯¾è±¡ã«ã™ã‚‹è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·ã€‚
+"      çœç•¥å€¤: 1
 "
 "    'eblook_dictlist{n}'
-"      «‘ƒOƒ‹[ƒv{n}‚ÌEPWING«‘‚Ì|List|B{n}‚Í1ˆÈãB
-"      List‚ÌŠe—v‘f‚ÍˆÈ‰º‚Ìkey‚ğ‚Â|Dictionary|B
+"      è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—{n}ã®EPWINGè¾æ›¸ã®|List|ã€‚{n}ã¯1ä»¥ä¸Šã€‚
+"      Listã®å„è¦ç´ ã¯ä»¥ä¸‹ã®keyã‚’æŒã¤|Dictionary|ã€‚
 "
 "      'title'
-"         «‘‚Ì¯•Êq‚ğw’èBentryƒEƒBƒ“ƒhƒE’†‚Å«‘‚ğ¯•Ê‚·‚é‚½‚ß‚Ég‚¤B
-"         (eblook.vim“à•”‚Å‚Í«‘”Ô†‚©title‚Å«‘‚ğ¯•Ê‚·‚éB)
-"         «‘‚ğ¯•Ê‚·‚é‚½‚ß‚Ég‚¤‚¾‚¯‚È‚Ì‚ÅA
-"         ‘¼‚Ì«‘‚Æ‚Ô‚Â‚©‚ç‚È‚¢•¶š—ñ‚ğ“K“–‚É‚Â‚¯‚éB
+"         è¾æ›¸ã®è­˜åˆ¥å­ã‚’æŒ‡å®šã€‚entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸­ã§è¾æ›¸ã‚’è­˜åˆ¥ã™ã‚‹ãŸã‚ã«ä½¿ã†ã€‚
+"         (eblook.vimå†…éƒ¨ã§ã¯è¾æ›¸ç•ªå·ã‹titleã§è¾æ›¸ã‚’è­˜åˆ¥ã™ã‚‹ã€‚)
+"         è¾æ›¸ã‚’è­˜åˆ¥ã™ã‚‹ãŸã‚ã«ä½¿ã†ã ã‘ãªã®ã§ã€
+"         ä»–ã®è¾æ›¸ã¨ã¶ã¤ã‹ã‚‰ãªã„æ–‡å­—åˆ—ã‚’é©å½“ã«ã¤ã‘ã‚‹ã€‚
 "
 "      'book'
-"         eblookƒvƒƒOƒ‰ƒ€‚Ì`book'ƒRƒ}ƒ“ƒh‚É“n‚·ƒpƒ‰ƒ[ƒ^B
-"         «‘‚Ì‚ ‚éƒfƒBƒŒƒNƒgƒŠ(catalogsƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒfƒBƒŒƒNƒgƒŠ)‚ğw’èB
+"         eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®`book'ã‚³ãƒãƒ³ãƒ‰ã«æ¸¡ã™ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã€‚
+"         è¾æ›¸ã®ã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª(catalogsãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª)ã‚’æŒ‡å®šã€‚
 "
-"      'appendix' (È—ª‰Â”\)
-"         Appendix‚ğg‚¤ê‡‚ÍAAppendixƒfƒBƒŒƒNƒgƒŠ‚ğw’èB
-"         eblookƒvƒƒOƒ‰ƒ€‚Ì`book'ƒRƒ}ƒ“ƒh‚É“n‚·2”Ô–Ú‚Ìƒpƒ‰ƒ[ƒ^B
+"      'appendix' (çœç•¥å¯èƒ½)
+"         Appendixã‚’ä½¿ã†å ´åˆã¯ã€Appendixãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’æŒ‡å®šã€‚
+"         eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®`book'ã‚³ãƒãƒ³ãƒ‰ã«æ¸¡ã™2ç•ªç›®ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã€‚
 "
 "      'name'
-"         eblookƒvƒƒOƒ‰ƒ€‚Ì`select'ƒRƒ}ƒ“ƒh‚É“n‚·ƒpƒ‰ƒ[ƒ^B
-"         «‘–¼‚ğw’èBeblookƒvƒƒOƒ‰ƒ€‚ÌlistƒRƒ}ƒ“ƒh‚Å’²‚×‚éB
+"         eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®`select'ã‚³ãƒãƒ³ãƒ‰ã«æ¸¡ã™ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã€‚
+"         è¾æ›¸åã‚’æŒ‡å®šã€‚eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®listã‚³ãƒãƒ³ãƒ‰ã§èª¿ã¹ã‚‹ã€‚
 "
-"      'skip' (È—ª‰Â”\)
-"         0‚Å‚È‚¢’l‚ğİ’è‚·‚é‚ÆA‚±‚Ì«‘‚ÍŒŸõ‚µ‚È‚¢B
-"         ('skip'ƒL[‚ª–¢w’è‚Ìê‡‚Í0‚Æ‚İ‚È‚·)
+"      'skip' (çœç•¥å¯èƒ½)
+"         0ã§ãªã„å€¤ã‚’è¨­å®šã™ã‚‹ã¨ã€ã“ã®è¾æ›¸ã¯æ¤œç´¢ã—ãªã„ã€‚
+"         ('skip'ã‚­ãƒ¼ãŒæœªæŒ‡å®šã®å ´åˆã¯0ã¨ã¿ãªã™)
 "
-"      'autoformat' (È—ª‰Â”\)
-"         content•\¦‚É’·‚¢s‚ğ|gq|‚Å®Œ`‚·‚é‚©‚Ç‚¤‚©B
-"         ('autoformat'ƒL[‚ª–¢w’è‚Ìê‡‚Í0‚Æ‚İ‚È‚·)
+"      'autoformat' (çœç•¥å¯èƒ½)
+"         contentè¡¨ç¤ºæ™‚ã«é•·ã„è¡Œã‚’|gq|ã§æ•´å½¢ã™ã‚‹ã‹ã©ã†ã‹ã€‚
+"         ('autoformat'ã‚­ãƒ¼ãŒæœªæŒ‡å®šã®å ´åˆã¯0ã¨ã¿ãªã™)
 "
-"      —á:
+"      ä¾‹:
 "        let eblook_dictlist1 = [
 "          \{
-"            \'title': 'L«‰‘‘æŒÜ”Å',
+"            \'title': 'åºƒè¾è‹‘ç¬¬äº”ç‰ˆ',
 "            \'book': '/usr/local/epwing/tougou99',
 "            \'name': 'kojien',
 "          \},
 "          \{
-"            \'title': 'ƒW[ƒjƒAƒX‰p˜a‘å«“T',
+"            \'title': 'ã‚¸ãƒ¼ãƒ‹ã‚¢ã‚¹è‹±å’Œå¤§è¾å…¸',
 "            \'book': '/usr/local/epwing/GENIUS',
 "            \'appendix': '/usr/local/epwing/appendix/genius2-1.1',
 "            \'name': 'genius'
 "          \},
 "          \{
-"            \'title': 'Œ»‘ã—pŒê‚ÌŠî‘b’m¯',
+"            \'title': 'ç¾ä»£ç”¨èªã®åŸºç¤çŸ¥è­˜',
 "            \'book': '/usr/local/epwing/tougou99',
 "            \'name': 'gn99ep01',
 "            \'skip': 1,
@@ -141,77 +141,77 @@ scriptencoding cp932
 "        \]
 "
 "    'eblook_stemming'
-"       w’è•¶š—ñ‚Å‰½‚àŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚ÉAŠˆ—pŒê”ö‚È‚Ç‚ğæ‚èœ‚¢‚½
-"       •¶š—ñ‚ğg‚Á‚ÄŒŸõ‚µ’¼‚·‚©‚Ç‚¤‚©BÈ—ª’l: 0
+"       æŒ‡å®šæ–‡å­—åˆ—ã§ä½•ã‚‚è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸæ™‚ã«ã€æ´»ç”¨èªå°¾ãªã©ã‚’å–ã‚Šé™¤ã„ãŸ
+"       æ–‡å­—åˆ—ã‚’ä½¿ã£ã¦æ¤œç´¢ã—ç›´ã™ã‹ã©ã†ã‹ã€‚çœç•¥å€¤: 0
 "
 "    'eblook_decorate'
-"       eblook 1.6.1+media‚Ìdecorate-mode‚ğ—LŒø‚É‚·‚é‚Æo—Í‚³‚ê‚éA
-"       content’†‚ÌƒCƒ“ƒfƒ“ƒgw’è‚ÉŠî‚Ã‚¢‚ÄAƒCƒ“ƒfƒ“ƒg‚ğs‚¤‚©‚Ç‚¤‚©B
-"       È—ª’l: 1(eblook 1.6.1+media‚Ìê‡), 0(‚»‚êˆÈŠO‚Ìê‡)
+"       eblook 1.6.1+mediaã®decorate-modeã‚’æœ‰åŠ¹ã«ã™ã‚‹ã¨å‡ºåŠ›ã•ã‚Œã‚‹ã€
+"       contentä¸­ã®ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆæŒ‡å®šã«åŸºã¥ã„ã¦ã€ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆã‚’è¡Œã†ã‹ã©ã†ã‹ã€‚
+"       çœç•¥å€¤: 1(eblook 1.6.1+mediaã®å ´åˆ), 0(ãã‚Œä»¥å¤–ã®å ´åˆ)
 "
 "    'eblook_decorate_syntax'
-"       decorate-mode—LŒø‚ÉAcontent’†‚Ìw’è‚ÉŠî‚Ã‚¢‚ÄA
-"       ƒCƒ^ƒŠƒbƒNAƒ{[ƒ‹ƒh•\¦‚ğs‚¤‚©‚Ç‚¤‚©B
-"       È—ª’l: 0(syntax off‚Ìê‡), 1(‚»‚êˆÈŠO‚Ìê‡)
+"       decorate-modeæœ‰åŠ¹æ™‚ã«ã€contentä¸­ã®æŒ‡å®šã«åŸºã¥ã„ã¦ã€
+"       ã‚¤ã‚¿ãƒªãƒƒã‚¯ã€ãƒœãƒ¼ãƒ«ãƒ‰è¡¨ç¤ºã‚’è¡Œã†ã‹ã©ã†ã‹ã€‚
+"       çœç•¥å€¤: 0(syntax offã®å ´åˆ), 1(ãã‚Œä»¥å¤–ã®å ´åˆ)
 "
 "    'eblook_decorate_indmin'
-"       ‚±‚Ì’l‚ğ‰z‚¦‚½ƒCƒ“ƒfƒ“ƒg—Ê‚ªcontent’†‚Åw’è‚³‚ê‚½ê‡‚ÉA
-"       ‰z‚¦‚½•¶š”•ª‚ÌƒCƒ“ƒfƒ“ƒg‚ğs‚¤BÈ—ª’l: 1
+"       ã“ã®å€¤ã‚’è¶ŠãˆãŸã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆé‡ãŒcontentä¸­ã§æŒ‡å®šã•ã‚ŒãŸå ´åˆã«ã€
+"       è¶ŠãˆãŸæ–‡å­—æ•°åˆ†ã®ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆã‚’è¡Œã†ã€‚çœç•¥å€¤: 1
 "
 "    'eblook_entrywin_height'
-"       entryƒEƒBƒ“ƒhƒE‚Ìs”(–ÚˆÀ)BÈ—ª’l: 4
+"       entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡Œæ•°(ç›®å®‰)ã€‚çœç•¥å€¤: 4
 "
 "    'eblook_history_max'
-"       •Û‚µ‚Ä‚¨‚­‰ß‹‚ÌŒŸõ—š—ğƒoƒbƒtƒ@”‚ÌãŒÀBÈ—ª’l: 10
+"       ä¿æŒã—ã¦ãŠãéå»ã®æ¤œç´¢å±¥æ­´ãƒãƒƒãƒ•ã‚¡æ•°ã®ä¸Šé™ã€‚çœç•¥å€¤: 10
 "
 "    'eblook_visited_max'
-"       •\¦•ÏX—p‚É•Û‚µ‚Ä‚¨‚­–K–âÏƒŠƒ“ƒN”‚ÌãŒÀBÈ—ª’l: 100
+"       è¡¨ç¤ºå¤‰æ›´ç”¨ã«ä¿æŒã—ã¦ãŠãè¨ªå•æ¸ˆãƒªãƒ³ã‚¯æ•°ã®ä¸Šé™ã€‚çœç•¥å€¤: 100
 "
 "    'eblook_autoformat_default'
-"       contentƒEƒBƒ“ƒhƒE“à‚Ì’·‚¢s‚ğ|gq|‚Å®Œ`‚·‚é‚©‚Ç‚¤‚©‚ÌƒfƒtƒHƒ‹ƒg’lB
-"       ‘S«‘‚ğí‚É®Œ`‚µ‚½‚¢ê‡Œü‚¯(‘S«‘‚É‚Â‚¢‚Ä'autoformat'ƒvƒƒpƒeƒB
-"       ‚ğw’è‚·‚é‚Ì‚Í–Ê“|‚È‚Ì‚Å)BÈ—ª’l: 0
+"       contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®é•·ã„è¡Œã‚’|gq|ã§æ•´å½¢ã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã€‚
+"       å…¨è¾æ›¸ã‚’å¸¸ã«æ•´å½¢ã—ãŸã„å ´åˆå‘ã‘(å…¨è¾æ›¸ã«ã¤ã„ã¦'autoformat'ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+"       ã‚’æŒ‡å®šã™ã‚‹ã®ã¯é¢å€’ãªã®ã§)ã€‚çœç•¥å€¤: 0
 "
 "    'eblook_show_refindex'
-"       contentƒEƒBƒ“ƒhƒE“à‚Ìreference”Ô†‚ğconceal syntax‚ğg‚Á‚Ä”ñ•\¦‚É
-"       ‚·‚é‚©‚Ç‚¤‚©BÈ—ª’l: 0
+"       contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®referenceç•ªå·ã‚’conceal syntaxã‚’ä½¿ã£ã¦éè¡¨ç¤ºã«
+"       ã™ã‚‹ã‹ã©ã†ã‹ã€‚çœç•¥å€¤: 0
 "
 "    'eblook_statusline_entry'
-"       entryƒEƒBƒ“ƒhƒE—p‚ÌstatuslineB
-"       È—ª’l: %{b:group}Eblook entry {%{b:word}}%< [%L]
+"       entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”¨ã®statuslineã€‚
+"       çœç•¥å€¤: %{b:group}Eblook entry {%{b:word}}%< [%L]
 "
 "    'eblook_statusline_content'
-"       contentƒEƒBƒ“ƒhƒE—p‚ÌstatuslineB
-"       È—ª’l: %{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<
+"       contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”¨ã®statuslineã€‚
+"       çœç•¥å€¤: %{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<
 "
 "    'eblook_viewers'
-"       ‰æ‘œ‚â‰¹ºÄ¶—p‚ÌŠO•”ƒrƒ…[ƒAƒRƒ}ƒ“ƒhB
+"       ç”»åƒã‚„éŸ³å£°å†ç”Ÿç”¨ã®å¤–éƒ¨ãƒ“ãƒ¥ãƒ¼ã‚¢ã‚³ãƒãƒ³ãƒ‰ã€‚
 "
 "    'eblookprg'
-"       ‚±‚ÌƒXƒNƒŠƒvƒg‚©‚çŒÄ‚Ño‚·eblookƒvƒƒOƒ‰ƒ€‚Ì–¼‘OBÈ—ª’l: eblook
+"       ã“ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‹ã‚‰å‘¼ã³å‡ºã™eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®åå‰ã€‚çœç•¥å€¤: eblook
 "
 "    'eblookenc'
-"       eblookƒvƒƒOƒ‰ƒ€‚Ìo—Í‚ğ“Ç‚İ‚Ş‚Æ‚«‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒOB
-"       İ’è‰Â”\‚È’l‚Í|'encoding'|QÆBÈ—ª’l: &encoding
+"       eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å‡ºåŠ›ã‚’èª­ã¿è¾¼ã‚€ã¨ãã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã€‚
+"       è¨­å®šå¯èƒ½ãªå€¤ã¯|'encoding'|å‚ç…§ã€‚çœç•¥å€¤: &encoding
 "
 "    '<Plug>EblookInput'
-"       ŒŸõ’PŒê‚ğ“ü—Í‚µ‚ÄŒŸõ‚ğs‚¤‚½‚ß‚ÌƒL[BÈ—ª’l: <Leader><C-Y>
-"       <Leader><C-Y>‚ğw’è‚·‚éê‡‚Ì—á:
+"       æ¤œç´¢å˜èªã‚’å…¥åŠ›ã—ã¦æ¤œç´¢ã‚’è¡Œã†ãŸã‚ã®ã‚­ãƒ¼ã€‚çœç•¥å€¤: <Leader><C-Y>
+"       <Leader><C-Y>ã‚’æŒ‡å®šã™ã‚‹å ´åˆã®ä¾‹:
 "         map <Leader><C-Y> <Plug>EblookInput
 "
 "    '<Plug>EblookSearch'
-"       ƒJ[ƒ\ƒ‹ˆÊ’u‚É‚ ‚é’PŒê(nmap)/‘I‘ğ‚µ‚½•¶š—ñ(vmap)‚ğŒŸõ‚·‚é‚½‚ß‚ÌƒL[B
-"       È—ª’l: <Leader>y
-"       <Leader>y‚ğw’è‚·‚éê‡‚Ì—á:
+"       ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã«ã‚ã‚‹å˜èª(nmap)/é¸æŠã—ãŸæ–‡å­—åˆ—(vmap)ã‚’æ¤œç´¢ã™ã‚‹ãŸã‚ã®ã‚­ãƒ¼ã€‚
+"       çœç•¥å€¤: <Leader>y
+"       <Leader>yã‚’æŒ‡å®šã™ã‚‹å ´åˆã®ä¾‹:
 "         map <Leader>y <Plug>EblookSearch
 "
 "    'mapleader'
-"       ƒL[ƒ}ƒbƒsƒ“ƒO‚ÌƒvƒŒƒtƒBƒbƒNƒXB|mapleader|‚ğQÆBÈ—ª’l: CTRL-K
-"       CTRL-K‚ğw’è‚·‚éê‡‚Ì—á:
+"       ã‚­ãƒ¼ãƒãƒƒãƒ”ãƒ³ã‚°ã®ãƒ—ãƒ¬ãƒ•ã‚£ãƒƒã‚¯ã‚¹ã€‚|mapleader|ã‚’å‚ç…§ã€‚çœç•¥å€¤: CTRL-K
+"       CTRL-Kã‚’æŒ‡å®šã™ã‚‹å ´åˆã®ä¾‹:
 "         let mapleader = "\<C-K>"
 "
 "    'plugin_eblook_disable'
-"       ‚±‚Ìƒvƒ‰ƒOƒCƒ“‚ğ“Ç‚İ‚İ‚½‚­‚È‚¢ê‡‚ÉŸ‚Ì‚æ‚¤‚Éİ’è‚·‚éB
+"       ã“ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’èª­ã¿è¾¼ã¿ãŸããªã„å ´åˆã«æ¬¡ã®ã‚ˆã†ã«è¨­å®šã™ã‚‹ã€‚
 "         let plugin_eblook_disable = 1
 
 if exists('plugin_eblook_disable') || exists('g:loaded_eblook')
@@ -222,17 +222,17 @@ let g:loaded_eblook = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-" entryƒEƒBƒ“ƒhƒE‚Ìs”
+" entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡Œæ•°
 if !exists('eblook_entrywin_height')
   let eblook_entrywin_height = 4
 endif
 
-" •Û‚µ‚Ä‚¨‚­‰ß‹‚ÌŒŸõƒoƒbƒtƒ@”‚ÌãŒÀ
+" ä¿æŒã—ã¦ãŠãéå»ã®æ¤œç´¢ãƒãƒƒãƒ•ã‚¡æ•°ã®ä¸Šé™
 if !exists('eblook_history_max')
   let eblook_history_max = 10
 endif
 
-" •\¦•ÏX—p‚É•Û‚µ‚Ä‚¨‚­–K–âÏƒŠƒ“ƒN”‚ÌãŒÀ
+" è¡¨ç¤ºå¤‰æ›´ç”¨ã«ä¿æŒã—ã¦ãŠãè¨ªå•æ¸ˆãƒªãƒ³ã‚¯æ•°ã®ä¸Šé™
 if !exists('eblook_visited_max')
   let eblook_visited_max = 100
 endif
@@ -267,14 +267,14 @@ if !exists('eblook_statusline_entry')
   let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}}%< [%L]'
 endif
 
-" eblookƒvƒƒOƒ‰ƒ€‚Ì–¼‘O
+" eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®åå‰
 if !exists('eblookprg')
   let eblookprg = 'eblook'
 endif
 
 if !exists('eblook_viewers')
   if has('win32') || has('win64')
-    " ‘æ1ˆø”‚É""‚ğw’è‚µ‚È‚¢‚ÆƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg‚ªŠJ‚­‚¾‚¯
+    " ç¬¬1å¼•æ•°ã«""ã‚’æŒ‡å®šã—ãªã„ã¨ã‚³ãƒãƒ³ãƒ‰ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆãŒé–‹ãã ã‘
     let eblook_viewers = {
       \'jpeg': ' start ""',
       \'bmp': ' start ""',
@@ -283,7 +283,7 @@ if !exists('eblook_viewers')
       \'mpg': ' start ""',
     \}
   else
-    " XXX: mailcap‚ğ“Ç‚İ‚ñ‚Åİ’è‚·‚é?
+    " XXX: mailcapã‚’èª­ã¿è¾¼ã‚“ã§è¨­å®šã™ã‚‹?
     let eblook_viewers = {
       \'jpeg': 'xdg-open %s &',
       \'bmp': 'xdg-open %s &',
@@ -294,11 +294,11 @@ if !exists('eblook_viewers')
   endif
 endif
 
-" eblookƒvƒƒOƒ‰ƒ€‚Ìo—Í‚ğ“Ç‚İ‚Ş‚Æ‚«‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒO
+" eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å‡ºåŠ›ã‚’èª­ã¿è¾¼ã‚€ã¨ãã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 if !exists('eblookenc')
   let eblookenc = &encoding
 endif
-" eblookenc’l(vim‚Ìencoding)‚©‚çeblook --encodingƒIƒvƒVƒ‡ƒ“’l‚Ö‚Ì•ÏŠ·ƒe[ƒuƒ‹
+" eblookencå€¤(vimã®encoding)ã‹ã‚‰eblook --encodingã‚ªãƒ—ã‚·ãƒ§ãƒ³å€¤ã¸ã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«
 let s:eblookenc2opt = {
 \  'euc-jp': 'euc',
 \  'cp932': 'sjis',
@@ -334,33 +334,33 @@ if !exists(":EblookPasteDictList")
   command -count=0 EblookPasteDictList call <SID>PasteDictList(<count>)
 endif
 
-" eblook‚ÉƒŠƒ_ƒCƒŒƒNƒg‚·‚éƒRƒ}ƒ“ƒh‚ğ•Û‚·‚éˆêƒtƒ@ƒCƒ‹–¼
+" eblookã«ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã™ã‚‹ã‚³ãƒãƒ³ãƒ‰ã‚’ä¿æŒã™ã‚‹ä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«å
 let s:cmdfile = tempname()
-" entryƒoƒbƒtƒ@–¼‚Ìƒx[ƒX
+" entryãƒãƒƒãƒ•ã‚¡åã®ãƒ™ãƒ¼ã‚¹
 let s:entrybufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_entry_'
 let s:entrybufname = substitute(s:entrybufname, '\\', '/', 'g')
-" contentƒoƒbƒtƒ@–¼‚Ìƒx[ƒX
+" contentãƒãƒƒãƒ•ã‚¡åã®ãƒ™ãƒ¼ã‚¹
 let s:contentbufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_content_'
 let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
-" ƒoƒbƒtƒ@ƒqƒXƒgƒŠ’†‚ÌŒ»İˆÊ’u
+" ãƒãƒƒãƒ•ã‚¡ãƒ’ã‚¹ãƒˆãƒªä¸­ã®ç¾åœ¨ä½ç½®
 let s:bufindex = 0
-" ’¼‘O‚ÉŒŸõ‚µ‚½•¶š—ñ
+" ç›´å‰ã«æ¤œç´¢ã—ãŸæ–‡å­—åˆ—
 let s:lastword = ''
-" •\¦ÏreferenceƒAƒhƒŒƒXƒŠƒXƒg(–K–âÏƒŠƒ“ƒN‚Ì•\¦•ÏX—p)
+" è¡¨ç¤ºæ¸ˆreferenceã‚¢ãƒ‰ãƒ¬ã‚¹ãƒªã‚¹ãƒˆ(è¨ªå•æ¸ˆãƒªãƒ³ã‚¯ã®è¡¨ç¤ºå¤‰æ›´ç”¨)
 let s:visited = []
-" stemmingŒã‚ÌŒŸõ•¶š—ñBÅ‰‚Ì—v‘f‚ªstemming‘O‚Ì•¶š—ñ
+" stemmingå¾Œã®æ¤œç´¢æ–‡å­—åˆ—ã€‚æœ€åˆã®è¦ç´ ãŒstemmingå‰ã®æ–‡å­—åˆ—
 let s:stemmedwords = []
-" stemmedwords“à‚ÌŒŸõ’†index
+" stemmedwordså†…ã®æ¤œç´¢ä¸­index
 let s:stemindex = -1
 
-" ƒ}ƒbƒsƒ“ƒO
+" ãƒãƒƒãƒ”ãƒ³ã‚°
 let s:set_mapleader = 0
 if !exists('g:mapleader')
   let g:mapleader = "\<C-K>"
   let s:set_mapleader = 1
 endif
-" (<Plug>EblookSearch‚Æ<Plug>EblookSearchInput‚É‚·‚é‚ÆA
-"  <Plug>EblookSearch‚Ì•û‚ª|'timeout'|‘Ò‚¿‚É‚È‚é)
+" (<Plug>EblookSearchã¨<Plug>EblookSearchInputã«ã™ã‚‹ã¨ã€
+"  <Plug>EblookSearchã®æ–¹ãŒ|'timeout'|å¾…ã¡ã«ãªã‚‹)
 if !hasmapto('<Plug>EblookInput')
   map <unique> <Leader><C-Y> <Plug>EblookInput
 endif
@@ -389,7 +389,7 @@ execute "autocmd BufEnter " . s:entrybufname . "* call <SID>Entry_BufEnter()"
 execute "autocmd BufEnter " . s:contentbufname . "* call <SID>Content_BufEnter()"
 augroup END
 
-" eblook-vim-1.0.5‚Ü‚Å‚Ì«‘w’èŒ`®‚ğ“Ç‚İ‚Ş
+" eblook-vim-1.0.5ã¾ã§ã®è¾æ›¸æŒ‡å®šå½¢å¼ã‚’èª­ã¿è¾¼ã‚€
 if !exists("g:eblook_dictlist1")
   let g:eblook_dictlist1 = []
   let s:i = 1
@@ -397,7 +397,7 @@ if !exists("g:eblook_dictlist1")
     let dict = { 'name': g:eblook_dict{s:i}_name }
     if exists("g:eblook_dict{s:i}_book")
       let dict.book = g:eblook_dict{s:i}_book
-      " appendix‚ªw’è‚³‚ê‚Ä‚¢‚éê‡Abook‚Æ‚Í•ª—£‚·‚é(ˆµ‚¢‚â‚·‚­‚·‚é‚½‚ß)
+      " appendixãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã€bookã¨ã¯åˆ†é›¢ã™ã‚‹(æ‰±ã„ã‚„ã™ãã™ã‚‹ãŸã‚)
       let bookapp = matchlist(dict.book, '^\("[^"]\+"\)\s\+\(.\+\)\|^\([^"]\+\)\s\+\(.\+\)')
       if len(bookapp) > 1
 	if strlen(bookapp[1]) > 0
@@ -416,7 +416,7 @@ if !exists("g:eblook_dictlist1")
     if exists("g:eblook_dict{s:i}_title")
       let dict.title = g:eblook_dict{s:i}_title
     else
-      " «‘‚Ìtitle‚ªİ’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚çA«‘”Ô†‚Æname‚ğİ’è‚µ‚Ä‚¨‚­
+      " è¾æ›¸ã®titleãŒè¨­å®šã•ã‚Œã¦ã„ãªã‹ã£ãŸã‚‰ã€è¾æ›¸ç•ªå·ã¨nameã‚’è¨­å®šã—ã¦ãŠã
       let dict.title = s:i . dict.name
     endif
     if exists("g:eblook_dict{s:i}_skip")
@@ -432,7 +432,7 @@ if !exists('g:eblook_group')
   let g:eblook_group = 1
 endif
 
-" entryƒoƒbƒtƒ@‚É“ü‚Á‚½‚ÉÀsBset nobuflisted‚·‚éB
+" entryãƒãƒƒãƒ•ã‚¡ã«å…¥ã£ãŸæ™‚ã«å®Ÿè¡Œã€‚set nobuflistedã™ã‚‹ã€‚
 function! s:Entry_BufEnter()
   set buftype=nofile
   set bufhidden=hide
@@ -472,14 +472,14 @@ function! s:Entry_BufEnter()
   endif
 endfunction
 
-" contentƒoƒbƒtƒ@‚É“ü‚Á‚½‚ÉÀsBset nobuflisted‚·‚éB
+" contentãƒãƒƒãƒ•ã‚¡ã«å…¥ã£ãŸæ™‚ã«å®Ÿè¡Œã€‚set nobuflistedã™ã‚‹ã€‚
 function! s:Content_BufEnter()
   set buftype=nofile
   set bufhidden=hide
   set noswapfile
   set nobuflisted
   set nolist
-  " s:FormatLine()“à‚Ågqq‚ª•t‚¯‚½indent‚ğíœ‚·‚éÛ‚É\t‚ª‚ ‚é‚Æ–Ê“|‚È‚Ì‚Å
+  " s:FormatLine()å†…ã§gqqãŒä»˜ã‘ãŸindentã‚’å‰Šé™¤ã™ã‚‹éš›ã«\tãŒã‚ã‚‹ã¨é¢å€’ãªã®ã§
   set expandtab
   set filetype=eblook
   if has("conceal")
@@ -516,12 +516,12 @@ function! s:Content_BufEnter()
   endif
 endfunction
 
-" ƒvƒƒ“ƒvƒg‚ğo‚µ‚ÄAƒ†[ƒU‚©‚ç“ü—Í‚³‚ê‚½•¶š—ñ‚ğŒŸõ‚·‚é
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
-" @param {Number} defgroup ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†(ƒfƒtƒHƒ‹ƒg)
-" @param {Boolean} uselastword ’¼‘O‚ÌŒŸõ•¶š—ñ‚ğƒfƒtƒHƒ‹ƒg•¶š—ñ‚Æ‚µ‚Ä“ü‚ê‚é‚©
-"   (<Leader>y‚Åæ“¾EŒŸõ‚µ‚½•¶š—ñ‚ğˆê•”•ÏX‚µ‚ÄÄŒŸõ‚Å‚«‚é‚æ‚¤‚ÉB
-"   input()‚Ìƒvƒƒ“ƒvƒg‚Å|c_CTRL-R_=|‚ÌŒãs:lastword‚Æ“ü—Í‚·‚é‚±‚Æ‚ÅÀŒ»‰Â”\)
+" ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆã‚’å‡ºã—ã¦ã€ãƒ¦ãƒ¼ã‚¶ã‹ã‚‰å…¥åŠ›ã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’æ¤œç´¢ã™ã‚‹
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
+" @param {Number} defgroup å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)
+" @param {Boolean} uselastword ç›´å‰ã®æ¤œç´¢æ–‡å­—åˆ—ã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆæ–‡å­—åˆ—ã¨ã—ã¦å…¥ã‚Œã‚‹ã‹
+"   (<Leader>yã§å–å¾—ãƒ»æ¤œç´¢ã—ãŸæ–‡å­—åˆ—ã‚’ä¸€éƒ¨å¤‰æ›´ã—ã¦å†æ¤œç´¢ã§ãã‚‹ã‚ˆã†ã«ã€‚
+"   input()ã®ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆã§|c_CTRL-R_=|ã®å¾Œs:lastwordã¨å…¥åŠ›ã™ã‚‹ã“ã¨ã§å®Ÿç¾å¯èƒ½)
 function! s:SearchInput(group, defgroup, uselastword)
   let gr = a:group
   if a:group == 0
@@ -539,9 +539,9 @@ function! s:SearchInput(group, defgroup, uselastword)
   call s:Search(gr, str, 0)
 endfunction
 
-" (entry/contentƒEƒBƒ“ƒhƒE‚©‚ç)’¼‘O‚ÌŒŸõ•¶š—ñ‚ğ‘¼‚Ì«‘ƒOƒ‹[ƒv‚ÅÄŒŸõ‚·‚é
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
-" @param {Number} defgroup Œ»İ‚Ì«‘ƒOƒ‹[ƒv”Ô†
+" (entry/contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹ã‚‰)ç›´å‰ã®æ¤œç´¢æ–‡å­—åˆ—ã‚’ä»–ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ã§å†æ¤œç´¢ã™ã‚‹
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
+" @param {Number} defgroup ç¾åœ¨ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
 function! s:SearchOtherGroup(group, defgroup)
   let gr = s:ExpandDefaultGroup(a:group)
   if gr == a:defgroup
@@ -550,8 +550,8 @@ function! s:SearchOtherGroup(group, defgroup)
   call s:Search(gr, s:lastword, 0)
 endfunction
 
-" Visual mode‚Å‘I‘ğ‚³‚ê‚Ä‚¢‚é•¶š—ñ‚ğŒŸõ‚·‚é
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
+" Visual modeã§é¸æŠã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—ã‚’æ¤œç´¢ã™ã‚‹
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
 function! s:SearchVisual(group)
   let save_reg = @@
   silent execute 'normal! `<' . visualmode() . '`>y'
@@ -559,22 +559,22 @@ function! s:SearchVisual(group)
   let @@ = save_reg
 endfunction
 
-" w’è‚³‚ê‚½’PŒê‚ÌŒŸõ‚ğs‚¤B
-" entryƒoƒbƒtƒ@‚ÉŒŸõŒ‹‰Ê‚ÌƒŠƒXƒg‚ğ•\¦‚µA
-" ‚»‚Ì‚¤‚¿æ“ª‚Ìentry‚Ì“à—e‚ğcontentƒoƒbƒtƒ@‚É•\¦‚·‚éB
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
-" @param {String} word ŒŸõ‚·‚é’PŒê
-" @param {Boolean} isstem stemming‚µ‚½’PŒê‚ÌŒŸõ’†‚©‚Ç‚¤‚©
+" æŒ‡å®šã•ã‚ŒãŸå˜èªã®æ¤œç´¢ã‚’è¡Œã†ã€‚
+" entryãƒãƒƒãƒ•ã‚¡ã«æ¤œç´¢çµæœã®ãƒªã‚¹ãƒˆã‚’è¡¨ç¤ºã—ã€
+" ãã®ã†ã¡å…ˆé ­ã®entryã®å†…å®¹ã‚’contentãƒãƒƒãƒ•ã‚¡ã«è¡¨ç¤ºã™ã‚‹ã€‚
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
+" @param {String} word æ¤œç´¢ã™ã‚‹å˜èª
+" @param {Boolean} isstem stemmingã—ãŸå˜èªã®æ¤œç´¢ä¸­ã‹ã©ã†ã‹
 function! s:Search(group, word, isstem)
   if strlen(a:word) == 0
-    echomsg 'eblook-vim: ŒŸõŒê‚ª‹ó•¶š—ñ‚È‚Ì‚ÅAŒŸõ‚ğ’†~‚µ‚Ü‚·'
+    echomsg 'eblook-vim: æ¤œç´¢èªãŒç©ºæ–‡å­—åˆ—ãªã®ã§ã€æ¤œç´¢ã‚’ä¸­æ­¢ã—ã¾ã™'
     return -1
   endif
   let s:lastword = a:word
   let gr = s:ExpandDefaultGroup(a:group)
   let dictlist = s:GetDictList(gr)
   if len(dictlist) == 0
-    echomsg 'eblook-vim: «‘ƒOƒ‹[ƒv(g:eblook_dictlist' . gr . ')‚É‚Í«‘‚ª‚ ‚è‚Ü‚¹‚ñ'
+    echomsg 'eblook-vim: è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—(g:eblook_dictlist' . gr . ')ã«ã¯è¾æ›¸ãŒã‚ã‚Šã¾ã›ã‚“'
     return -1
   endif
   let hasoldwin = bufwinnr(s:entrybufname . s:bufindex)
@@ -591,7 +591,7 @@ function! s:Search(group, word, isstem)
   call s:ExecuteEblook()
 
   silent! :g/eblook.*> \(eblook.*> \)/s//\1/g
-  " •K—v‚Ègaiji mapƒtƒ@ƒCƒ‹‚Ì‚İ“Ç‚İ‚Ş: <gaiji=‚Ì‚ ‚é«‘”Ô†‚ğƒŠƒXƒgƒAƒbƒv
+  " å¿…è¦ãªgaiji mapãƒ•ã‚¡ã‚¤ãƒ«ã®ã¿èª­ã¿è¾¼ã‚€: <gaiji=ã®ã‚ã‚‹è¾æ›¸ç•ªå·ã‚’ãƒªã‚¹ãƒˆã‚¢ãƒƒãƒ—
   silent! normal! G$
   let gaijidnums = []
   while search('<gaiji=', 'bW') != 0
@@ -612,7 +612,7 @@ function! s:Search(group, word, isstem)
     endif
     let title = get(dict, 'title', '')
     if strlen(title) == 0
-      " «‘‚Ìtitle‚ªİ’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚çA«‘”Ô†‚Æname‚ğİ’è‚·‚é
+      " è¾æ›¸ã®titleãŒè¨­å®šã•ã‚Œã¦ã„ãªã‹ã£ãŸã‚‰ã€è¾æ›¸ç•ªå·ã¨nameã‚’è¨­å®šã™ã‚‹
       let dict.title = i . dict.name
       let title = dict.title
     endif
@@ -627,8 +627,8 @@ function! s:Search(group, word, isstem)
   call s:FormatDecorate(1)
   silent! :g/^$/d _
 
-  " Šes‚Ìreferenceæ‚ğ”z—ñ‚ÉŠi”[‚µ‚ÄAƒoƒbƒtƒ@‚©‚ç‚Ííœ
-  " (conceal‚µ‚Ä‚àƒJƒEƒ“ƒg‚³‚ê‚é‚Ì‚ÅAs‚ª“r’†‚ÅÜ‚è•Ô‚³‚ê‚Ä‚¢‚Ü‚¢‚¿‚È‚Ì‚Å)
+  " å„è¡Œã®referenceå…ˆã‚’é…åˆ—ã«æ ¼ç´ã—ã¦ã€ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰ã¯å‰Šé™¤
+  " (concealã—ã¦ã‚‚ã‚«ã‚¦ãƒ³ãƒˆã•ã‚Œã‚‹ã®ã§ã€è¡ŒãŒé€”ä¸­ã§æŠ˜ã‚Šè¿”ã•ã‚Œã¦ã„ã¾ã„ã¡ãªã®ã§)
   let b:refs = []
   silent! :g/^\(.\{-}\)\t *\d\+\. \(\x\+:\x\+\)\t\(.*\)/s//\=s:MakeEntryReferenceString(submatch(1), submatch(2), submatch(3))/
 
@@ -657,14 +657,14 @@ function! s:Search(group, word, isstem)
 	let s:stemmedwords = s:Stem(a:word)
 	call filter(s:stemmedwords, 'v:val !=# "' . a:word . '"')
 	if len(s:stemmedwords) > 0
-	  call insert(s:stemmedwords, a:word) " Œ³‚Ì’PŒê‚ğæ“ª‚É“ü‚ê‚Ä‚¨‚­
+	  call insert(s:stemmedwords, a:word) " å…ƒã®å˜èªã‚’å…ˆé ­ã«å…¥ã‚Œã¦ãŠã
 	  let s:stemindex = 1
 	  call s:Search(gr, s:stemmedwords[s:stemindex], 1)
 	  return
 	endif
       endif
-      "redraw | echomsg 'eblook-vim(' . gr . '): ‰½‚àŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½: <' . word . '>'
-      let str = input(':' . gr . 'EblookSearch(‰½‚àŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½) ', word)
+      "redraw | echomsg 'eblook-vim(' . gr . '): ä½•ã‚‚è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ: <' . word . '>'
+      let str = input(':' . gr . 'EblookSearch(ä½•ã‚‚è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ) ', word)
       if strlen(str) == 0 || str ==# word
 	return
       endif
@@ -673,21 +673,21 @@ function! s:Search(group, word, isstem)
   endif
 endfunction
 
-" stemming/Œê”ö•â³‚µ‚½Œó•â•¶š—ñ‚ÌList‚ğæ“¾‚·‚é
-" @param {String} word ‘ÎÛ•¶š—ñ
-" @return Œó•â•¶š—ñ‚ÌList
+" stemming/èªå°¾è£œæ­£ã—ãŸå€™è£œæ–‡å­—åˆ—ã®Listã‚’å–å¾—ã™ã‚‹
+" @param {String} word å¯¾è±¡æ–‡å­—åˆ—
+" @return å€™è£œæ–‡å­—åˆ—ã®List
 function! s:Stem(word)
   if a:word =~ '[^ -~]'
     return eblook#stem_ja#Stem(a:word)
-    " XXX: ebview‚Æ“¯—l‚ÉAŠ¿š•”•ª‚Ì‚İ‚ğ’Ç‰Á‚·‚é
+    " XXX: ebviewã¨åŒæ§˜ã«ã€æ¼¢å­—éƒ¨åˆ†ã®ã¿ã‚’è¿½åŠ ã™ã‚‹
   else
     return eblook#stem_en#Stem(a:word)
   endif
 endfunction
 
-" eblookƒvƒƒOƒ‰ƒ€‚ÉƒŠƒ_ƒCƒŒƒNƒg‚·‚é‚½‚ß‚ÌŒŸõƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹‚ğì¬‚·‚é
-" @param dictlist ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv
-" @param {String} word ŒŸõ‚·‚é’PŒê
+" eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã™ã‚‹ãŸã‚ã®æ¤œç´¢ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹
+" @param dictlist å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—
+" @param {String} word æ¤œç´¢ã™ã‚‹å˜èª
 function! s:RedirSearchCommand(dictlist, word)
   if s:OpenWindow('new') < 0
     return -1
@@ -719,9 +719,9 @@ function! s:RedirSearchCommand(dictlist, word)
   return 0
 endfunction
 
-" w’è‚³‚ê‚½«‘ƒOƒ‹[ƒv‚Ì«‘ƒŠƒXƒg‚ğæ“¾‚·‚é
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
-" @return «‘ƒŠƒXƒg
+" æŒ‡å®šã•ã‚ŒãŸè¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ã®è¾æ›¸ãƒªã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
+" @return è¾æ›¸ãƒªã‚¹ãƒˆ
 function! s:GetDictList(group)
   let gr = s:ExpandDefaultGroup(a:group)
   if exists("g:eblook_dictlist{gr}")
@@ -732,7 +732,7 @@ function! s:GetDictList(group)
   return dictlist
 endfunction
 
-" eblook 1.6.1+media”Å‚©‚Ç‚¤‚©‚ğ’²‚×‚é
+" eblook 1.6.1+mediaç‰ˆã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹
 function! s:IsEblookMediaVersion()
   if !exists('s:eblookmedia')
     let l:version = system(g:eblookprg . ' -version')
@@ -745,15 +745,15 @@ function! s:IsEblookMediaVersion()
   return s:eblookmedia
 endfunction
 
-" eblook‚Ìbook‚Éw’è‚·‚é‚½‚ß‚Ìˆø”’l‚ğì‚é
-" @param {Dictionary} dict «‘î•ñ
-" @return {String} book‚Éw’è‚·‚éˆø”
+" eblookã®bookã«æŒ‡å®šã™ã‚‹ãŸã‚ã®å¼•æ•°å€¤ã‚’ä½œã‚‹
+" @param {Dictionary} dict è¾æ›¸æƒ…å ±
+" @return {String} bookã«æŒ‡å®šã™ã‚‹å¼•æ•°
 function! s:MakeBookArgument(dict)
   if exists('a:dict.appendix')
     return a:dict.book . ' ' . a:dict.appendix
   endif
-  " ’¼‘O‚Ìbook—p‚Éw’è‚µ‚½appendix‚ªˆø‚«Œp‚ª‚ê‚È‚¢‚æ‚¤‚Éappendix‚Í•K‚¸•t‚¯‚é
-  " (eblook 1.6.1+media”Å‚Å‚Í‘Îˆ‚³‚ê‚Ä‚¢‚é‚Ì‚Å•s—v)
+  " ç›´å‰ã®bookç”¨ã«æŒ‡å®šã—ãŸappendixãŒå¼•ãç¶™ãŒã‚Œãªã„ã‚ˆã†ã«appendixã¯å¿…ãšä»˜ã‘ã‚‹
+  " (eblook 1.6.1+mediaç‰ˆã§ã¯å¯¾å‡¦ã•ã‚Œã¦ã„ã‚‹ã®ã§ä¸è¦)
   if !exists('s:has_appendix_problem')
     if s:IsEblookMediaVersion()
       let s:has_appendix_problem = 0
@@ -768,9 +768,9 @@ function! s:MakeBookArgument(dict)
   endif
 endfunction
 
-" eblookƒvƒƒOƒ‰ƒ€‚ğÀs‚·‚é
+" eblookãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’å®Ÿè¡Œã™ã‚‹
 function! s:ExecuteEblook()
-  " ++enc‚ğw’è‚µ‚È‚¢‚ÆEUC‚Å‚Ì’Z‚¢o—Í‚ğCP932‚ÆŒë”F¯‚·‚é‚±‚Æ‚ª‚ ‚é
+  " ++encã‚’æŒ‡å®šã—ãªã„ã¨EUCã§ã®çŸ­ã„å‡ºåŠ›ã‚’CP932ã¨èª¤èªè­˜ã™ã‚‹ã“ã¨ãŒã‚ã‚‹
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
   if &encoding !=# g:eblookenc
     setlocal fileencoding=&encoding
@@ -779,10 +779,10 @@ function! s:ExecuteEblook()
   silent! :g/^Warning: you should specify a book directory first$/d _
 endfunction
 
-" V‚µ‚­ŒŸõ‚ğs‚¤‚½‚ß‚ÉAentryƒoƒbƒtƒ@‚Æcontentƒoƒbƒtƒ@‚ğì‚éB
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
+" æ–°ã—ãæ¤œç´¢ã‚’è¡Œã†ãŸã‚ã«ã€entryãƒãƒƒãƒ•ã‚¡ã¨contentãƒãƒƒãƒ•ã‚¡ã‚’ä½œã‚‹ã€‚
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
 function! s:NewBuffers(group)
-  " entryƒoƒbƒtƒ@‚Æcontentƒoƒbƒtƒ@‚Íˆê‘Î‚Åˆµ‚¤B
+  " entryãƒãƒƒãƒ•ã‚¡ã¨contentãƒãƒƒãƒ•ã‚¡ã¯ä¸€å¯¾ã§æ‰±ã†ã€‚
   let oldindex = s:bufindex
   let s:bufindex = s:NextBufIndex()
   if s:CreateBuffer(s:entrybufname, oldindex) < 0
@@ -797,8 +797,8 @@ function! s:NewBuffers(group)
     return -1
   endif
   let b:group = a:group
-  " eblook“à‚ÅƒGƒ‰[‚ª”­¶‚µ‚ÄAŒ‹‰Ê‚ª–³‚¢ó‘Ô‚Åstatusline‚ğ•\¦‚µ‚æ‚¤‚Æ‚µ‚Ä
-  " Undefined variable: b:captionƒGƒ‰[‚ª”­¶‚·‚é‚Ì‚ğ‰ñ”ğ
+  " eblookå†…ã§ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¦ã€çµæœãŒç„¡ã„çŠ¶æ…‹ã§statuslineã‚’è¡¨ç¤ºã—ã‚ˆã†ã¨ã—ã¦
+  " Undefined variable: b:captionã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã™ã‚‹ã®ã‚’å›é¿
   let b:caption = ''
   let b:dtitle = ''
   if s:GoWindow(1) < 0
@@ -810,9 +810,9 @@ function! s:NewBuffers(group)
   return 0
 endfunction
 
-" entryƒoƒbƒtƒ@‚©contentƒoƒbƒtƒ@‚Ì‚¢‚¸‚ê‚©‚ğì‚é
-" @param bufname s:entrybufname‚©s:contentbufname‚Ì‚¢‚¸‚ê‚©
-" @param oldindex Œ»İ‚Ìentry,contentƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX”Ô†
+" entryãƒãƒƒãƒ•ã‚¡ã‹contentãƒãƒƒãƒ•ã‚¡ã®ã„ãšã‚Œã‹ã‚’ä½œã‚‹
+" @param bufname s:entrybufnameã‹s:contentbufnameã®ã„ãšã‚Œã‹
+" @param oldindex ç¾åœ¨ã®entry,contentãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·
 function! s:CreateBuffer(bufname, oldindex)
   let oldbufname = a:bufname . a:oldindex
   let newbufname = a:bufname . s:bufindex
@@ -835,9 +835,9 @@ function! s:CreateBuffer(bufname, oldindex)
   return 0
 endfunction
 
-" entryƒoƒbƒtƒ@‚Ìw’ès‚É‘Î‰‚·‚é“à—e‚ğcontentƒoƒbƒtƒ@‚É•\¦‚·‚é
-" @param count ‘ÎÛ‚Ìs”Ô†B0‚Ìê‡‚ÍŒ»İs
-" @return -1:content•\¦¸”s, 0:•\¦¬Œ÷
+" entryãƒãƒƒãƒ•ã‚¡ã®æŒ‡å®šè¡Œã«å¯¾å¿œã™ã‚‹å†…å®¹ã‚’contentãƒãƒƒãƒ•ã‚¡ã«è¡¨ç¤ºã™ã‚‹
+" @param count å¯¾è±¡ã®è¡Œç•ªå·ã€‚0ã®å ´åˆã¯ç¾åœ¨è¡Œ
+" @return -1:contentè¡¨ç¤ºå¤±æ•—, 0:è¡¨ç¤ºæˆåŠŸ
 function! s:GetContent(count)
   if (a:count > 0)
     silent! execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
@@ -882,8 +882,8 @@ function! s:IsEblookDecorate()
   return g:eblook_decorate
 endfunction
 
-" content‚ğæ“¾‚µ‚Äcontentƒoƒbƒtƒ@‚É•\¦‚·‚é
-" @param doformat ®Œ`‚·‚é‚©‚Ç‚¤‚©
+" contentã‚’å–å¾—ã—ã¦contentãƒãƒƒãƒ•ã‚¡ã«è¡¨ç¤ºã™ã‚‹
+" @param doformat æ•´å½¢ã™ã‚‹ã‹ã©ã†ã‹
 function! s:GetContentSub(doformat)
   setlocal modifiable
   silent %d _
@@ -900,7 +900,7 @@ function! s:GetContentSub(doformat)
     silent echo 'content ' . b:refid . "\n"
   redir END
   call s:ExecuteEblook()
-  "return 0 " DEBUG: ®Œ`‘O‚Ì“à—e‚ğŠm”F‚·‚é
+  "return 0 " DEBUG: æ•´å½¢å‰ã®å†…å®¹ã‚’ç¢ºèªã™ã‚‹
 
   silent! :g/eblook> /s///g
   if search('<gaiji=', 'nw') != 0
@@ -931,21 +931,21 @@ function! s:GetContentSub(doformat)
   endif
 endfunction
 
-" decorateƒ^ƒO‚ğ®Œ`‚·‚é
-" @param dropind <ind=[0-9]>‚ğíœ‚·‚é‚©‚Ç‚¤‚©
+" decorateã‚¿ã‚°ã‚’æ•´å½¢ã™ã‚‹
+" @param dropind <ind=[0-9]>ã‚’å‰Šé™¤ã™ã‚‹ã‹ã©ã†ã‹
 function! s:FormatDecorate(dropind)
   if g:eblook_decorate
-    " –¢‘Î‰‚Ìƒ^ƒO‚Ííœ
+    " æœªå¯¾å¿œã®ã‚¿ã‚°ã¯å‰Šé™¤
     silent! :g/<\/\?no-newline>/s///g
     call s:ReplaceTag() " <sup>,<sub>
-    " <em>,<font=bold>,<font=italic>‚Ìsyntax‘Î‰
+    " <em>,<font=bold>,<font=italic>ã®syntaxå¯¾å¿œ
     if g:eblook_decorate_syntax
-      " ’ZkŒ`®‚É’uŠ·B’·‚¢‚Æs•ªŠ„‚É‰e‹¿‚ª‘å‚«‚¢‚Ì‚Å
+      " çŸ­ç¸®å½¢å¼ã«ç½®æ›ã€‚é•·ã„ã¨è¡Œåˆ†å‰²ã«å½±éŸ¿ãŒå¤§ãã„ã®ã§
       silent! :g/<font=bold>/s//<b>/g
       silent! :g/<font=italic>/s//<i>/g
       silent! :g/<\/font>/s//<\/f>/g
-      " 1•¶š‚¸‚Â<em>‚Í–³‘Ê‚É’·‚­‚ÄAconceal‚·‚é‚Æ•\¦‚Æ‚Ì•sˆê’v‚ª‘å‚«‚¢‚Ì‚ÅB
-      " u<em>’P</em><em>Œê</em>v¨u<em>’PŒê</em>v
+      " 1æ–‡å­—ãšã¤<em>ã¯ç„¡é§„ã«é•·ãã¦ã€concealã™ã‚‹ã¨è¡¨ç¤ºã¨ã®ä¸ä¸€è‡´ãŒå¤§ãã„ã®ã§ã€‚
+      " ã€Œ<em>å˜</em><em>èª</em>ã€â†’ã€Œ<em>å˜èª</em>ã€
       silent! :g/<\/em><em>/s///g
     else
       silent! :g/<\/\?em>/s///g
@@ -958,7 +958,7 @@ function! s:FormatDecorate(dropind)
   endif
 endfunction
 
-" ã•t‚«•¶š(<sup>‚P</sup>)A‰º•t‚«•¶š<sub>‚ğ’u‚«Š·‚¦‚é
+" ä¸Šä»˜ãæ–‡å­—(<sup>ï¼‘</sup>)ã€ä¸‹ä»˜ãæ–‡å­—<sub>ã‚’ç½®ãæ›ãˆã‚‹
 function! s:ReplaceTag()
   if &encoding ==# 'utf-8' || g:eblook_decorate_supsub
     silent! :g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
@@ -968,10 +968,10 @@ function! s:ReplaceTag()
   endif
 endfunction
 
-" ƒ^ƒO‚Ì’uŠ·•¶š—ñ‚ğæ“¾‚·‚éB
-" @param tag ƒ^ƒOB'sup'‚©'sub'
-" @param str Œ³‚Ì•¶š—ñ
-" @return ’uŠ·•¶š—ñ
+" ã‚¿ã‚°ã®ç½®æ›æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
+" @param tag ã‚¿ã‚°ã€‚'sup'ã‹'sub'
+" @param str å…ƒã®æ–‡å­—åˆ—
+" @return ç½®æ›æ–‡å­—åˆ—
 function! s:GetReplaceTagStr(tag, str)
   if &encoding ==# 'utf-8' && has_key(g:eblook#supsubmap_utf8#{a:tag}map, a:str)
     return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
@@ -979,7 +979,7 @@ function! s:GetReplaceTagStr(tag, str)
     if a:tag == 'sup'
       return '^{' . a:str . '}'
     else
-      " XXX:–¢‘Î‰ŠOš’uŠ·‚Ì_‚Æ‚Ô‚Â‚©‚é‰Â”\«‚ ‚è
+      " XXX:æœªå¯¾å¿œå¤–å­—ç½®æ›ã®_ã¨ã¶ã¤ã‹ã‚‹å¯èƒ½æ€§ã‚ã‚Š
       return '_{' . a:str . '}'
     endif
   else
@@ -987,35 +987,35 @@ function! s:GetReplaceTagStr(tag, str)
   endif
 endfunction
 
-" <gaiji=xxxxx>‚ğ’u‚«Š·‚¦‚éB
+" <gaiji=xxxxx>ã‚’ç½®ãæ›ãˆã‚‹ã€‚
 function! s:ReplaceGaiji(dict)
   let gaijimap = s:GetGaijiMap(a:dict)
   silent! :g/<gaiji=\([^>]*\)>/s//\=s:GetGaiji(gaijimap, submatch(1))/g
 endfunction
 
-" ŠOš’uŠ·•\‚ğæ“¾‚·‚é
-" @param dict «‘
-" @return ŠOš’uŠ·•\
+" å¤–å­—ç½®æ›è¡¨ã‚’å–å¾—ã™ã‚‹
+" @param dict è¾æ›¸
+" @return å¤–å­—ç½®æ›è¡¨
 function! s:GetGaijiMap(dict)
   if !exists("a:dict.gaijimap")
     try
       let a:dict.gaijimap = s:LoadGaijiMapFile(a:dict)
     catch /load-error/
-      " ƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚Ä‹ó‚«‚ğì‚Á‚ÄÄ“xŒŸõ‚µ’¼‚µ‚½‚ÉŠOšæ“¾‚Å‚«‚é‚æ‚¤‚É
+      " ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã¦ç©ºãã‚’ä½œã£ã¦å†åº¦æ¤œç´¢ã—ç›´ã—ãŸæ™‚ã«å¤–å­—å–å¾—ã§ãã‚‹ã‚ˆã†ã«
       return {}
     endtry
   endif
   return a:dict.gaijimap
 endfunction
 
-" EBWinŒ`®‚ÌŠOš’è‹`ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+" EBWinå½¢å¼ã®å¤–å­—å®šç¾©ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 " http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
-" @param dict «‘
-" @return “Ç‚İ‚ñ‚¾ŠOš’uŠ·•\B{'ha121':[unicode, ascii], ...}
+" @param dict è¾æ›¸
+" @return èª­ã¿è¾¼ã‚“ã å¤–å­—ç½®æ›è¡¨ã€‚{'ha121':[unicode, ascii], ...}
 function! s:LoadGaijiMapFile(dict)
   let name = a:dict.name
   let dir = matchstr(a:dict.book, '"\zs[^"]\+\ze"\|\S\+')
-  " "{dir}/{NAME}_{encoding}.map"‚ª–³‚¯‚ê‚Î"{dir}/{NAME}.map"‚ğcp932‚Å“Ç‚İ‚İ
+  " "{dir}/{NAME}_{encoding}.map"ãŒç„¡ã‘ã‚Œã°"{dir}/{NAME}.map"ã‚’cp932ã§èª­ã¿è¾¼ã¿
   let mapfilebase = dir . '/' . toupper(name)
   let encmapfile = mapfilebase . '_' . &encoding . '.map'
   let mapfile = mapfilebase . '.map'
@@ -1028,9 +1028,9 @@ function! s:LoadGaijiMapFile(dict)
   else
     return gaijimap
   endif
-  " Œ»İ‚ÌƒEƒBƒ“ƒhƒE(entry/content)‚Ì‚‚³‚ª‘«‚è‚È‚¢ê‡A
-  " OpenWindow()‚É‚æ‚èA‚‚³‚É—]—T‚Ì‚ ‚éƒEƒBƒ“ƒhƒEã‚Åsview‚·‚é‰Â”\«‚ª‚ ‚é‚Ì‚Å
-  " close‚µ‚½Œã‚ÅŒ³‚ÌƒEƒBƒ“ƒhƒE‚É–¾¦“I‚ÉØ‚è‘Ö‚¦‚é•K—v‚ ‚è
+  " ç¾åœ¨ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦(entry/content)ã®é«˜ã•ãŒè¶³ã‚Šãªã„å ´åˆã€
+  " OpenWindow()ã«ã‚ˆã‚Šã€é«˜ã•ã«ä½™è£•ã®ã‚ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šã§sviewã™ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§
+  " closeã—ãŸå¾Œã§å…ƒã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«æ˜ç¤ºçš„ã«åˆ‡ã‚Šæ›¿ãˆã‚‹å¿…è¦ã‚ã‚Š
   let curbuf = bufnr('')
   if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
     throw 'load-error'
@@ -1042,7 +1042,7 @@ function! s:LoadGaijiMapFile(dict)
     if line !~ '^[hzcg]\x\{4}'
       continue
     endif
-    " —á: hA121	u00E0	a	# comment
+    " ä¾‹: hA121	u00E0	a	# comment
     let lst = split(line)
     let gaiji = tolower(get(lst, 0))
     let unicode = get(lst, 1, '-')
@@ -1058,13 +1058,13 @@ function! s:LoadGaijiMapFile(dict)
   return gaijimap
 endfunction
 
-" ŠOš’uŠ·•¶š—ñ‚ğæ“¾‚·‚éB
-" @param gaijimap ŠOš’uŠ·•\
-" @param key ŠOšƒL[
-" @return ’uŠ·•¶š—ñ
+" å¤–å­—ç½®æ›æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
+" @param gaijimap å¤–å­—ç½®æ›è¡¨
+" @param key å¤–å­—ã‚­ãƒ¼
+" @return ç½®æ›æ–‡å­—åˆ—
 function! s:GetGaiji(gaijimap, key)
-  " XXX:GetGaiji()“à‚©‚çGetGaijiMap()‚ğŒÄ‚Ñ‚½‚¢‚ªA
-  " substitute()‚Å\=‚ªÄ‹A“I‚ÉŒÄ‚Î‚ê‚éŒ`‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß“®ì‚¹‚¸
+  " XXX:GetGaiji()å†…ã‹ã‚‰GetGaijiMap()ã‚’å‘¼ã³ãŸã„ãŒã€
+  " substitute()ã§\=ãŒå†å¸°çš„ã«å‘¼ã°ã‚Œã‚‹å½¢ã«ãªã£ã¦ã—ã¾ã†ãŸã‚å‹•ä½œã›ãš
   if !exists("a:gaijimap[a:key]")
     return '_'
     "return '_' . a:key . '_'     " DEBUG
@@ -1087,7 +1087,7 @@ function! s:GetGaiji(gaijimap, key)
   return res
 endfunction
 
-" contentƒoƒbƒtƒ@’†‚Ì<reference>“™‚ğ’ZkŒ`®‚É’uŠ·‚·‚é
+" contentãƒãƒƒãƒ•ã‚¡ä¸­ã®<reference>ç­‰ã‚’çŸ­ç¸®å½¢å¼ã«ç½®æ›ã™ã‚‹
 function! s:FormatReference()
   let b:contentrefsm = []
   " <img=jpeg>...</img=589:334>
@@ -1100,33 +1100,33 @@ function! s:FormatReference()
 
   let b:contentrefs = []
   silent! :g;<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>;s;;\=s:MakeReferenceString(submatch(1), submatch(2));g
-  " /‚Ìhistory‚É<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>‚ªo‚È‚¢‚æ‚¤‚É
+  " /ã®historyã«<reference>\(.\{-}\)</reference=\(\x\+:\x\+\)>ãŒå‡ºãªã„ã‚ˆã†ã«
   call histdel('/', -1)
 endfunction
 
-" <img>“™‚Ìcaption‚ğqr“™‚Å‚­‚­‚éB
-" <img>“™‚Ìƒ^ƒO‚Íconceal‚É‚·‚é‚Ì‚Å‰æ‘œ‚È‚Ì‚©‰¹º/“®‰æ‚È‚Ì‚©‚ğ¯•Ê‚Å‚«‚é‚æ‚¤‚ÉB
-" @param caption caption•¶š—ñB‹ó•¶š—ñ‚Ì‰Â”\«‚ ‚è
-" @param tag caption‚Ìí—Ş:'inline','img','snd','mov'
-" @return ®Œ`Œã‚Ì•¶š—ñ
+" <img>ç­‰ã®captionã‚’ã€ˆã€‰ç­‰ã§ããã‚‹ã€‚
+" <img>ç­‰ã®ã‚¿ã‚°ã¯concealã«ã™ã‚‹ã®ã§ç”»åƒãªã®ã‹éŸ³å£°/å‹•ç”»ãªã®ã‹ã‚’è­˜åˆ¥ã§ãã‚‹ã‚ˆã†ã«ã€‚
+" @param caption captionæ–‡å­—åˆ—ã€‚ç©ºæ–‡å­—åˆ—ã®å¯èƒ½æ€§ã‚ã‚Š
+" @param tag captionã®ç¨®é¡:'inline','img','snd','mov'
+" @return æ•´å½¢å¾Œã®æ–‡å­—åˆ—
 function! s:MakeCaptionString(caption, tag, ftype, addr)
   let len = strlen(a:caption)
-  " caption‚ª‹ó‚Ìê‡‚Í•âŠ®:
-  " eblook 1.6.1+media‚Åw—‰»Šw«“T‘æ‚T”Åx‚ğ•\¦‚µ‚½ê‡A
-  " ”®•”•ª‚Åcaption‚ª‹ó‚Ì<inline>‚ªoŒ»B”ñ•\¦‚É‚·‚é‚Æ
-  " •¶Í‚ª‚Â‚È‚ª‚ç‚È‚­‚È‚éB(+media–³‚µ‚Ìeblook‚Ìê‡‚Í<img>‚ÅoŒ»)
+  " captionãŒç©ºã®å ´åˆã¯è£œå®Œ:
+  " eblook 1.6.1+mediaã§ã€ç†åŒ–å­¦è¾å…¸ç¬¬ï¼•ç‰ˆã€ã‚’è¡¨ç¤ºã—ãŸå ´åˆã€
+  " æ•°å¼éƒ¨åˆ†ã§captionãŒç©ºã®<inline>ãŒå‡ºç¾ã€‚éè¡¨ç¤ºã«ã™ã‚‹ã¨
+  " æ–‡ç« ãŒã¤ãªãŒã‚‰ãªããªã‚‹ã€‚(+mediaç„¡ã—ã®eblookã®å ´åˆã¯<img>ã§å‡ºç¾)
   if a:tag ==# 'img' || a:tag ==# 'inline'
-    let markbeg = 'q'
-    let capstr = (len ? a:caption : '‰æ‘œ')
-    let markend = 'r'
+    let markbeg = 'ã€ˆ'
+    let capstr = (len ? a:caption : 'ç”»åƒ')
+    let markend = 'ã€‰'
   elseif a:tag ==# 'snd'
-    let markbeg = 's'
-    let capstr = (len ? a:caption : '‰¹º')
-    let markend = 't'
+    let markbeg = 'ã€Š'
+    let capstr = (len ? a:caption : 'éŸ³å£°')
+    let markend = 'ã€‹'
   elseif a:tag ==# 'mov'
-    let markbeg = 's'
-    let capstr = (len ? a:caption : '“®‰æ')
-    let markend = 't'
+    let markbeg = 'ã€Š'
+    let capstr = (len ? a:caption : 'å‹•ç”»')
+    let markend = 'ã€‹'
   else
     return a:cation
   endif
@@ -1134,22 +1134,22 @@ function! s:MakeCaptionString(caption, tag, ftype, addr)
   return '<' . len(b:contentrefsm) . markbeg . capstr . markend . '>'
 endfunction
 
-" '<reference>caption</reference=xxxx:xxxx>'‚ğ
-" '<1|caption|>'‚¾‚¯‚É‚µ‚½•¶š—ñ‚ğ•Ô‚·B
-" conceal‚µ‚Ä‚à•\¦‚³‚ê‚È‚¢‚¾‚¯‚ÅA®Œ`‚É‚ÍƒJƒEƒ“ƒg‚³‚ê‚Ä‚¢‚é‚Ì‚ÅA
-" <reference></reference=xxxx:xxxx>‚¾‚Æ’·‚·‚¬‚ÄA
-" s‚ÌÜ‚è•Ô‚µ‚ª‚©‚È‚è‘‚ß‚É‚³‚ê‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¦‚é‚Ì‚ÅB
-" @param caption caption•¶š—ñB‹ó•¶š—ñ‚Ì‰Â”\«‚ ‚è
-" @param addr referenceæƒAƒhƒŒƒX•¶š—ñ
-" @return •ÏŠ·Œã‚Ì•¶š—ñ
+" '<reference>caption</reference=xxxx:xxxx>'ã‚’
+" '<1|caption|>'ã ã‘ã«ã—ãŸæ–‡å­—åˆ—ã‚’è¿”ã™ã€‚
+" concealã—ã¦ã‚‚è¡¨ç¤ºã•ã‚Œãªã„ã ã‘ã§ã€æ•´å½¢æ™‚ã«ã¯ã‚«ã‚¦ãƒ³ãƒˆã•ã‚Œã¦ã„ã‚‹ã®ã§ã€
+" <reference></reference=xxxx:xxxx>ã ã¨é•·ã™ãã¦ã€
+" è¡Œã®æŠ˜ã‚Šè¿”ã—ãŒã‹ãªã‚Šæ—©ã‚ã«ã•ã‚Œã¦ã„ã‚‹ã‚ˆã†ã«è¦‹ãˆã‚‹ã®ã§ã€‚
+" @param caption captionæ–‡å­—åˆ—ã€‚ç©ºæ–‡å­—åˆ—ã®å¯èƒ½æ€§ã‚ã‚Š
+" @param addr referenceå…ˆã‚¢ãƒ‰ãƒ¬ã‚¹æ–‡å­—åˆ—
+" @return å¤‰æ›å¾Œã®æ–‡å­—åˆ—
 function! s:MakeReferenceString(caption, addr)
   let len = strlen(a:caption)
-  let capstr = len ? a:caption : 'QÆ'
+  let capstr = len ? a:caption : 'å‚ç…§'
   call add(b:contentrefs, [a:addr, capstr])
   return '<' . len(b:contentrefs) . s:Visited(b:dtitle, a:addr) . capstr . '|>'
 endfunction
 
-" –K–âÏƒŠƒ“ƒN‚©‚Ç‚¤‚©’²‚×‚ÄA'!'‚©'|'‚ğ•Ô‚·
+" è¨ªå•æ¸ˆãƒªãƒ³ã‚¯ã‹ã©ã†ã‹èª¿ã¹ã¦ã€'!'ã‹'|'ã‚’è¿”ã™
 function! s:Visited(title, addr)
   if match(s:visited, a:title . "\t" . a:addr) >= 0
     return '!'
@@ -1158,13 +1158,13 @@ function! s:Visited(title, addr)
   endif
 endfunction
 
-" entryƒoƒbƒtƒ@‚ÌQÆæ•¶š—ñ‚Ì’uŠ·—pŠÖ”
+" entryãƒãƒƒãƒ•ã‚¡ã®å‚ç…§å…ˆæ–‡å­—åˆ—ã®ç½®æ›ç”¨é–¢æ•°
 function! s:MakeEntryReferenceString(title, addr, caption)
   call add(b:refs, [a:addr, a:caption])
   return a:title . "\t<" . len(b:refs) . s:Visited(a:title, a:addr) . a:caption . '|>'
 endfunction
 
-" entryƒoƒbƒtƒ@ã‚©‚çcontentƒoƒbƒtƒ@‚ğ®Œ`‚·‚é
+" entryãƒãƒƒãƒ•ã‚¡ä¸Šã‹ã‚‰contentãƒãƒƒãƒ•ã‚¡ã‚’æ•´å½¢ã™ã‚‹
 function! s:GetAndFormatContent()
   let save = g:eblook_autoformat_default
   let g:eblook_autoformat_default = 1
@@ -1176,16 +1176,16 @@ function! s:GetAndFormatContent()
   call s:GoWindow(1)
 endfunction
 
-" <ind=[1-9]>‚Åw’è‚³‚ê‚éindent—Ê‚ğg—p‚µ‚ÄŒ»İs‚ğindnet
-" @param indcur Œ»İ‚Ìindent—Ê
+" <ind=[1-9]>ã§æŒ‡å®šã•ã‚Œã‚‹indenté‡ã‚’ä½¿ç”¨ã—ã¦ç¾åœ¨è¡Œã‚’indnet
+" @param indcur ç¾åœ¨ã®indenté‡
 function! s:FormatHeadIndent(indcur)
   let ind = a:indcur
   let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
-  " s“ª‚É<ind=>‚ª‚ ‚éê‡‚ÍAindent—Ê‚ğXV
+  " è¡Œé ­ã«<ind=>ãŒã‚ã‚‹å ´åˆã¯ã€indenté‡ã‚’æ›´æ–°
   while indnew != ''
     let ind = indnew
     s/^<ind=[0-9]>//
-    " ^<ind=1><ind=3>‚Ì‚æ‚¤‚Èê‡‚ª‚ ‚é‚Ì‚Åƒ‹[ƒv‚µ‚Äƒ`ƒFƒbƒN
+    " ^<ind=1><ind=3>ã®ã‚ˆã†ãªå ´åˆãŒã‚ã‚‹ã®ã§ãƒ«ãƒ¼ãƒ—ã—ã¦ãƒã‚§ãƒƒã‚¯
     let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
   endwhile
   if ind > g:eblook_decorate_indmin
@@ -1194,7 +1194,7 @@ function! s:FormatHeadIndent(indcur)
   return ind
 endfunction
 
-" contentƒoƒbƒtƒ@“à‚Ì<ind=[1-9]>‚ğ®Œ`‚·‚é
+" contentãƒãƒƒãƒ•ã‚¡å†…ã®<ind=[1-9]>ã‚’æ•´å½¢ã™ã‚‹
 function! s:FormatIndent()
   silent! :g/^<\%(next\|prev\)>/s/^/<ind=0>/
   let ind = 0
@@ -1204,7 +1204,7 @@ function! s:FormatIndent()
     call cursor(lnum, 1)
     let ind = s:FormatHeadIndent(ind)
 
-    " s‚Ì“r’†‚É<ind=>‚ª‚ ‚éê‡‚ÍAŸsˆÈ~‚Ìindent—Ê‚ğXV
+    " è¡Œã®é€”ä¸­ã«<ind=>ãŒã‚ã‚‹å ´åˆã¯ã€æ¬¡è¡Œä»¥é™ã®indenté‡ã‚’æ›´æ–°
     let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
     while indnew != ''
       s/<ind=[0-9]>//
@@ -1215,7 +1215,7 @@ function! s:FormatIndent()
   endwhile
 endfunction
 
-" contentƒoƒbƒtƒ@‚ğ®Œ`‚·‚é
+" contentãƒãƒƒãƒ•ã‚¡ã‚’æ•´å½¢ã™ã‚‹
 function! s:FormatContent()
   let tw = &textwidth
   if tw == 0 && &wrapmargin
@@ -1237,7 +1237,7 @@ function! s:FormatContent()
     if g:eblook_decorate
       let ind = s:FormatHeadIndent(ind)
 
-      " s‚Ì“r’†‚É‚ ‚é<ind=>‚ğl—¶‚µ‚Ä’·‚¢s‚ğ•ªŠ„‚·‚é
+      " è¡Œã®é€”ä¸­ã«ã‚ã‚‹<ind=>ã‚’è€ƒæ…®ã—ã¦é•·ã„è¡Œã‚’åˆ†å‰²ã™ã‚‹
       normal! ^
       while search('<ind=[0-9]>', 'c', line('.')) > 0
 	let indnew = matchstr(getline('.'), '<ind=\zs[0-9]\ze>')
@@ -1248,7 +1248,7 @@ function! s:FormatContent()
 	  call cursor(startline, 1)
 	  let indline = search('<ind=[0-9]>', 'c', stopline)
 	  s/<ind=[0-9]>//
-	  " <ind=[0-9]>‚ğí‚Á‚½ŒãAÄ®Œ`‚Ì‚½‚ßsŒ‹‡
+	  " <ind=[0-9]>ã‚’å‰Šã£ãŸå¾Œã€å†æ•´å½¢ã®ãŸã‚è¡Œçµåˆ
 	  if indline < stopline
 	    let n = stopline - indline + 1
 	    execute "normal! " . n . "J"
@@ -1272,9 +1272,9 @@ function! s:FormatContent()
   normal! 1G
 endfunction
 
-" ’·‚¢s‚ğ•ªŠ„‚·‚éB
-" @param ind ƒCƒ“ƒfƒ“ƒg—Ê
-" @return •ªŠ„Œã‚Ì•¡”s‚Ì‚¤‚¿‚ÌÅIs‚Ìs”Ô†(line('.')‚Æ“¯‚¶)
+" é•·ã„è¡Œã‚’åˆ†å‰²ã™ã‚‹ã€‚
+" @param ind ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆé‡
+" @return åˆ†å‰²å¾Œã®è¤‡æ•°è¡Œã®ã†ã¡ã®æœ€çµ‚è¡Œã®è¡Œç•ªå·(line('.')ã¨åŒã˜)
 function! s:FormatLine(ind)
   let first = line('.')
   let indprev = matchstr(getline('.'), '^ *')
@@ -1283,7 +1283,7 @@ function! s:FormatLine(ind)
   if last == first
     return last
   endif
-  " gqq‚ª•t‚¯‚½indent‚ÍíœB<ind=[1-9]>‚ğ‚à‚Æ‚Éindent‚ğ•t‚¯‚é‚Ì‚ÅA—]•ªB
+  " gqqãŒä»˜ã‘ãŸindentã¯å‰Šé™¤ã€‚<ind=[1-9]>ã‚’ã‚‚ã¨ã«indentã‚’ä»˜ã‘ã‚‹ã®ã§ã€ä½™åˆ†ã€‚
   if g:eblook_decorate
     if a:ind > g:eblook_decorate_indmin
       let indcur = printf('%*s', a:ind - g:eblook_decorate_indmin, '')
@@ -1296,9 +1296,9 @@ function! s:FormatLine(ind)
   return last
 endfunction
 
-" contentƒoƒbƒtƒ@’†‚ÌƒJ[ƒ\ƒ‹ˆÊ’u•t‹ß‚Ìreference‚ğ’Šo‚µ‚ÄA
-" ‚»‚Ì“à—e‚ğ•\¦‚·‚éB
-" @param count [count]‚Åw’è‚³‚ê‚½A•\¦‘ÎÛ‚Ìreference‚Ìindex”Ô†
+" contentãƒãƒƒãƒ•ã‚¡ä¸­ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ä»˜è¿‘ã®referenceã‚’æŠ½å‡ºã—ã¦ã€
+" ãã®å†…å®¹ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+" @param count [count]ã§æŒ‡å®šã•ã‚ŒãŸã€è¡¨ç¤ºå¯¾è±¡ã®referenceã®indexç•ªå·
 function! s:SelectReference(count)
   if a:count > 0
     let index = a:count
@@ -1314,12 +1314,12 @@ function! s:SelectReference(count)
   call s:FollowReference(index)
 endfunction
 
-" contentƒoƒbƒtƒ@’†‚ÌƒJ[ƒ\ƒ‹ˆÊ’u•t‹ß‚Ìrefpat‚ğ’Šo‚µ‚ÄA
-" refpat‚ÉŠÜ‚Ü‚ê‚éindex”Ô†‚ğ•Ô‚·B
+" contentãƒãƒƒãƒ•ã‚¡ä¸­ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ä»˜è¿‘ã®refpatã‚’æŠ½å‡ºã—ã¦ã€
+" refpatã«å«ã¾ã‚Œã‚‹indexç•ªå·ã‚’è¿”ã™ã€‚
 function! s:GetIndex(refpat)
   let index = s:GetIndexHere(a:refpat, '.')
   if strlen(index) == 0
-    " •¡”s‚É‚í‚½‚écaption‚Ì2s–ÚˆÈ~‚Å‘€ì‚µ‚½ê‡‚Å‚à•\¦‚Å‚«‚é‚æ‚¤‚É‚·‚é
+    " è¤‡æ•°è¡Œã«ã‚ãŸã‚‹captionã®2è¡Œç›®ä»¥é™ã§æ“ä½œã—ãŸå ´åˆã§ã‚‚è¡¨ç¤ºã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
     let lnum = search(a:refpat, 'bnW')
     if lnum == 0
       return ''
@@ -1332,8 +1332,8 @@ function! s:GetIndex(refpat)
   return index
 endfunction
 
-" contentƒoƒbƒtƒ@’†‚Ìw’ès“à‚Å‚ÌƒJ[ƒ\ƒ‹ˆÊ’u•t‹ß‚Ìrefpat‚ğ’Šo‚µ‚ÄA
-" refpat‚ÉŠÜ‚Ü‚ê‚éindex”Ô†‚ğ•Ô‚·B
+" contentãƒãƒƒãƒ•ã‚¡ä¸­ã®æŒ‡å®šè¡Œå†…ã§ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ä»˜è¿‘ã®refpatã‚’æŠ½å‡ºã—ã¦ã€
+" refpatã«å«ã¾ã‚Œã‚‹indexç•ªå·ã‚’è¿”ã™ã€‚
 function! s:GetIndexHere(refpat, lnum)
   let str = getline(a:lnum)
   let index = matchstr(str, a:refpat)
@@ -1341,7 +1341,7 @@ function! s:GetIndexHere(refpat, lnum)
   if m1 < 0
     return ''
   endif
-  " reference‚ª1s‚É2‚ÂˆÈã‚ ‚éê‡‚ÍAƒJ[ƒ\ƒ‹‚ªˆÊ’u‚·‚é•û‚ğg‚¤
+  " referenceãŒ1è¡Œã«2ã¤ä»¥ä¸Šã‚ã‚‹å ´åˆã¯ã€ã‚«ãƒ¼ã‚½ãƒ«ãŒä½ç½®ã™ã‚‹æ–¹ã‚’ä½¿ã†
   let m2 = match(str, a:refpat, m1)
   if m2 >= 0
     if a:lnum == '.'
@@ -1359,8 +1359,8 @@ function! s:GetIndexHere(refpat, lnum)
   return index
 endfunction
 
-" entryƒoƒbƒtƒ@‚ÅƒJ[ƒ\ƒ‹s‚ÌƒGƒ“ƒgƒŠ‚ÉŠÜ‚Ü‚ê‚éreference‚ÌƒŠƒXƒg‚ğ•\¦
-" @param count [count]‚Åw’è‚³‚ê‚½A•\¦‘ÎÛ‚Ìreference‚Ìindex”Ô†
+" entryãƒãƒƒãƒ•ã‚¡ã§ã‚«ãƒ¼ã‚½ãƒ«è¡Œã®ã‚¨ãƒ³ãƒˆãƒªã«å«ã¾ã‚Œã‚‹referenceã®ãƒªã‚¹ãƒˆã‚’è¡¨ç¤º
+" @param count [count]ã§æŒ‡å®šã•ã‚ŒãŸã€è¡¨ç¤ºå¯¾è±¡ã®referenceã®indexç•ªå·
 function! s:ListReferences(count)
   if s:GetContent(0) < 0
     return -1
@@ -1368,9 +1368,9 @@ function! s:ListReferences(count)
   call s:FollowReference(a:count)
 endfunction
 
-" reference‚ğƒŠƒXƒgƒAƒbƒv‚µ‚Äentryƒoƒbƒtƒ@‚É•\¦‚µA
-" w’è‚³‚ê‚½reference‚Ì“à—e‚ğcontentƒoƒbƒtƒ@‚É•\¦‚·‚éB
-" @param count [count]‚Åw’è‚³‚ê‚½A•\¦‘ÎÛ‚Ìreference‚Ìindex”Ô†
+" referenceã‚’ãƒªã‚¹ãƒˆã‚¢ãƒƒãƒ—ã—ã¦entryãƒãƒƒãƒ•ã‚¡ã«è¡¨ç¤ºã—ã€
+" æŒ‡å®šã•ã‚ŒãŸreferenceã®å†…å®¹ã‚’contentãƒãƒƒãƒ•ã‚¡ã«è¡¨ç¤ºã™ã‚‹ã€‚
+" @param count [count]ã§æŒ‡å®šã•ã‚ŒãŸã€è¡¨ç¤ºå¯¾è±¡ã®referenceã®indexç•ªå·
 function! s:FollowReference(count)
   if s:GoWindow(0) < 0
     return
@@ -1399,9 +1399,9 @@ function! s:FollowReference(count)
   call s:GetContent(a:count)
 endfunction
 
-" contentƒoƒbƒtƒ@’†‚ÌƒJ[ƒ\ƒ‹ˆÊ’u•t‹ß‚Ìimg“™‚ğ’Šo‚µ‚ÄA
-" ‚»‚Ì“à—e‚ğŠO•”ƒvƒƒOƒ‰ƒ€‚Å•\¦‚·‚éB
-" @param count [count]‚Åw’è‚³‚ê‚½A•\¦‘ÎÛ‚Ìindex”Ô†
+" contentãƒãƒƒãƒ•ã‚¡ä¸­ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ä»˜è¿‘ã®imgç­‰ã‚’æŠ½å‡ºã—ã¦ã€
+" ãã®å†…å®¹ã‚’å¤–éƒ¨ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§è¡¨ç¤ºã™ã‚‹ã€‚
+" @param count [count]ã§æŒ‡å®šã•ã‚ŒãŸã€è¡¨ç¤ºå¯¾è±¡ã®indexç•ªå·
 function! s:ShowMedia(count)
   if a:count > 0
     let index = a:count
@@ -1409,7 +1409,7 @@ function! s:ShowMedia(count)
       let index = len(b:contentrefsm)
     endif
   else
-    let index = s:GetIndex('<\zs\d\+\ze[qs]')
+    let index = s:GetIndex('<\zs\d\+\ze[ã€ˆã€Š]')
     if strlen(index) == 0
       return
     endif
@@ -1426,9 +1426,9 @@ function! s:ShowMedia(count)
   if tmpext ==# 'mono'
     let tmpext = 'pbm'
   endif
-  " mspaint‚ÍƒpƒX‹æØ‚è‚ª\‚Å‚È‚¢‚Æ‘Ê–Ú
+  " mspaintã¯ãƒ‘ã‚¹åŒºåˆ‡ã‚ŠãŒ\ã§ãªã„ã¨é§„ç›®
   let tmpfshell = tempname() . '.' . tmpext
-  " eblook“à‚Å‚ÍƒpƒX‹æØ‚è‚Í\‚Å‚Í‘Ê–Ú
+  " eblookå†…ã§ã¯ãƒ‘ã‚¹åŒºåˆ‡ã‚Šã¯\ã§ã¯é§„ç›®
   let tmpfeb = substitute(tmpfshell, '\\', '/', 'g')
 
   let dictlist = s:GetDictList(b:group)
@@ -1454,7 +1454,7 @@ function! s:ShowMedia(count)
   let res = system('"' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"')
   let ngmsg = matchstr(res, 'eblook> \zsNG: .*\ze\n')
   if v:shell_error || strlen(ngmsg) > 0
-    echomsg tmpext . 'ƒtƒ@ƒCƒ‹’Šo¸”s: ' . (v:shell_error ? res : ngmsg)
+    echomsg tmpext . 'ãƒ•ã‚¡ã‚¤ãƒ«æŠ½å‡ºå¤±æ•—: ' . (v:shell_error ? res : ngmsg)
     return
   endif
   if tmpext ==# 'pbm'
@@ -1468,7 +1468,7 @@ function! s:ShowMedia(count)
 
   let viewer = get(g:eblook_viewers, tmpext, '')
   if strlen(viewer) == 0
-    echomsg tmpext . '—pƒrƒ…[ƒA‚ªg:eblook_viewers‚Éİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ'
+    echomsg tmpext . 'ç”¨ãƒ“ãƒ¥ãƒ¼ã‚¢ãŒg:eblook_viewersã«è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“'
     return
   endif
   if match(viewer, '%s') >= 0
@@ -1476,23 +1476,23 @@ function! s:ShowMedia(count)
   else
     let cmdline = viewer . ' ' . shellescape(tmpfshell)
   endif
-  " hit-enter prompt‚ªo‚é‚Æ–Ê“|‚È‚Ì‚Åsilent
+  " hit-enter promptãŒå‡ºã‚‹ã¨é¢å€’ãªã®ã§silent
   execute 'silent !' . cmdline
 endfunction
 
-" ƒoƒbƒtƒ@‚ÌƒqƒXƒgƒŠ‚ğ‚½‚Ç‚éB
-" @param dir -1:ŒÃ‚¢•ûŒü‚Ö, 1:V‚µ‚¢•ûŒü‚Ö
+" ãƒãƒƒãƒ•ã‚¡ã®ãƒ’ã‚¹ãƒˆãƒªã‚’ãŸã©ã‚‹ã€‚
+" @param dir -1:å¤ã„æ–¹å‘ã¸, 1:æ–°ã—ã„æ–¹å‘ã¸
 function! s:History(dir)
   if a:dir > 0
     let ni = s:NextBufIndex()
     if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
-      echomsg 'eblook-vim: Ÿ‚Ìƒoƒbƒtƒ@‚Í‚ ‚è‚Ü‚¹‚ñ'
+      echomsg 'eblook-vim: æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã¯ã‚ã‚Šã¾ã›ã‚“'
       return
     endif
   else
     let ni = s:PrevBufIndex()
     if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
-      echomsg 'eblook-vim: ‘O‚Ìƒoƒbƒtƒ@‚Í‚ ‚è‚Ü‚¹‚ñ'
+      echomsg 'eblook-vim: å‰ã®ãƒãƒƒãƒ•ã‚¡ã¯ã‚ã‚Šã¾ã›ã‚“'
       return
     endif
   endif
@@ -1510,8 +1510,8 @@ function! s:History(dir)
   call s:GoWindow(1)
 endfunction
 
-" Ÿ‚Ìƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX”Ô†‚ğ•Ô‚·
-" @return Ÿ‚Ìƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX”Ô†
+" æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·ã‚’è¿”ã™
+" @return æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·
 function! s:NextBufIndex()
   let i = s:bufindex + 1
   if i > g:eblook_history_max
@@ -1520,8 +1520,8 @@ function! s:NextBufIndex()
   return i
 endfunction
 
-" ‘O‚Ìƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX”Ô†‚ğ•Ô‚·
-" @return ‘O‚Ìƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX”Ô†
+" å‰ã®ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·ã‚’è¿”ã™
+" @return å‰ã®ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·
 function! s:PrevBufIndex()
   let i = s:bufindex - 1
   if i < 1
@@ -1530,7 +1530,7 @@ function! s:PrevBufIndex()
   return i
 endfunction
 
-" entryƒEƒBƒ“ƒhƒE‚ÆcontentƒEƒBƒ“ƒhƒE‚ğ‰B‚·
+" entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’éš ã™
 function! s:Quit()
   if has("gui_running")
     unmenu PopUp.[eblook]\ Back
@@ -1547,8 +1547,8 @@ function! s:Quit()
   call delete(s:cmdfile)
 endfunction
 
-" entryƒEƒBƒ“ƒhƒE‚©‚çcontentƒEƒBƒ“ƒhƒE‚ğƒXƒNƒ[ƒ‹‚·‚éB
-" @param down 1‚Ìê‡‰º‚ÉA0‚Ìê‡ã‚ÉB
+" entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹ã‚‰contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ã€‚
+" @param down 1ã®å ´åˆä¸‹ã«ã€0ã®å ´åˆä¸Šã«ã€‚
 function! s:ScrollContent(down)
   if s:GoWindow(0) < 0
     return
@@ -1561,8 +1561,8 @@ function! s:ScrollContent(down)
   call s:GoWindow(1)
 endfunction
 
-" entryƒEƒBƒ“ƒhƒE/contentƒEƒBƒ“ƒhƒE‚ÉˆÚ“®‚·‚é
-" @param to_entry_buf 1:entryƒEƒBƒ“ƒhƒE‚ÉˆÚ“®, 0:contentƒEƒBƒ“ƒhƒE‚ÉˆÚ“®
+" entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦/contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ç§»å‹•ã™ã‚‹
+" @param to_entry_buf 1:entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ç§»å‹•, 0:contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ç§»å‹•
 function! s:GoWindow(to_entry_buf)
   if a:to_entry_buf
     let bufname = s:entrybufname . s:bufindex
@@ -1577,7 +1577,7 @@ function! s:GoWindow(to_entry_buf)
   return 0
 endfunction
 
-" entryƒEƒBƒ“ƒhƒEã‚©‚çAcontentƒEƒBƒ“ƒhƒE‚Ì‚‚³‚ğÅ‘å‰»‚·‚é
+" entryã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šã‹ã‚‰ã€contentã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é«˜ã•ã‚’æœ€å¤§åŒ–ã™ã‚‹
 function! s:MaximizeContentHeight()
   if s:GoWindow(0) < 0
     return
@@ -1586,9 +1586,9 @@ function! s:MaximizeContentHeight()
   call s:GoWindow(1)
 endfunction
 
-" title•¶š—ñ‚©‚ç«‘”Ô†‚ğ•Ô‚·
-" @param title «‘‚Ìtitle•¶š—ñ
-" @return «‘”Ô†
+" titleæ–‡å­—åˆ—ã‹ã‚‰è¾æ›¸ç•ªå·ã‚’è¿”ã™
+" @param title è¾æ›¸ã®titleæ–‡å­—åˆ—
+" @return è¾æ›¸ç•ªå·
 function! s:GetDictNumFromTitle(group, title)
   let dictlist = s:GetDictList(a:group)
   let i = 0
@@ -1601,13 +1601,13 @@ function! s:GetDictNumFromTitle(group, title)
   return -1
 endfunction
 
-" «‘ˆê——‚ğ•\¦‚·‚é
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
+" è¾æ›¸ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
 function! s:ListDict(group)
   let gr = s:ExpandDefaultGroup(a:group)
   let dictlist = s:GetDictList(gr)
-  echo '«‘ƒOƒ‹[ƒv: ' . gr
-  " EblookSkipDict“™‚Å‚Í«‘”Ô†‚ğw’è‚·‚é‚Ì‚ÅA«‘”Ô†•t‚«‚Å•\¦‚·‚é
+  echo 'è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—: ' . gr
+  " EblookSkipDictç­‰ã§ã¯è¾æ›¸ç•ªå·ã‚’æŒ‡å®šã™ã‚‹ã®ã§ã€è¾æ›¸ç•ªå·ä»˜ãã§è¡¨ç¤ºã™ã‚‹
   let i = 0
   while i < len(dictlist)
     let dict = dictlist[i]
@@ -1622,10 +1622,10 @@ function! s:ListDict(group)
   endwhile
 endfunction
 
-" «‘‚ğƒXƒLƒbƒv‚·‚é‚©‚Ç‚¤‚©‚ğˆê“I‚Éİ’è‚·‚éB
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
-" @param is_skip ƒXƒLƒbƒv‚·‚é‚©‚Ç‚¤‚©B1:ƒXƒLƒbƒv‚·‚é, 0:ƒXƒLƒbƒv‚µ‚È‚¢
-" @param ... «‘”Ô†‚ÌƒŠƒXƒg
+" è¾æ›¸ã‚’ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹ã‹ã©ã†ã‹ã‚’ä¸€æ™‚çš„ã«è¨­å®šã™ã‚‹ã€‚
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
+" @param is_skip ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹ã‹ã©ã†ã‹ã€‚1:ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹, 0:ã‚¹ã‚­ãƒƒãƒ—ã—ãªã„
+" @param ... è¾æ›¸ç•ªå·ã®ãƒªã‚¹ãƒˆ
 function! s:SetDictSkip(group, is_skip, ...)
   let dictlist = s:GetDictList(a:group)
   for dnum in a:000
@@ -1633,8 +1633,8 @@ function! s:SetDictSkip(group, is_skip, ...)
   endfor
 endfunction
 
-" «‘ƒOƒ‹[ƒv‚Ìˆê——‚ğ•\¦‚·‚é
-" @param {Number} max ƒ`ƒFƒbƒN‚·‚é«‘ƒOƒ‹[ƒv”Ô†‚ÌÅ‘å’l
+" è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ã®ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+" @param {Number} max ãƒã‚§ãƒƒã‚¯ã™ã‚‹è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·ã®æœ€å¤§å€¤
 function! s:ListGroup(max)
   let maxnum = a:max
   if maxnum == 0
@@ -1667,8 +1667,8 @@ function! s:ListGroup(max)
   endwhile
 endfunction
 
-" count‚ªw’è‚³‚ê‚Ä‚¢‚È‚¢‚ÉŒŸõ‘ÎÛ‚É‚·‚é«‘ƒOƒ‹[ƒv”Ô†‚ğİ’è‚·‚é
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
+" countãŒæŒ‡å®šã•ã‚Œã¦ã„ãªã„æ™‚ã«æ¤œç´¢å¯¾è±¡ã«ã™ã‚‹è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·ã‚’è¨­å®šã™ã‚‹
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
 function! s:SetDefaultGroup(group)
   if a:group == 0
     echomsg 'eblook-vim: g:eblook_group=' . g:eblook_group
@@ -1677,9 +1677,9 @@ function! s:SetDefaultGroup(group)
   endif
 endfunction
 
-" group”Ô†‚ª0(–¢w’è)‚Å‚ ‚ê‚ÎAg:eblook_group‚Ì’l‚ğ•Ô‚·B
-" (count‚ğw’è‚¹‚¸‚É‘€ì‚µ‚½‚ÉA‚Ç‚Ì«‘ƒOƒ‹[ƒv‚ªg‚í‚ê‚½‚©‚ªA
-" ƒ†[ƒU‚É‚í‚©‚é‚æ‚¤‚É‚·‚é‚½‚ß)
+" groupç•ªå·ãŒ0(æœªæŒ‡å®š)ã§ã‚ã‚Œã°ã€g:eblook_groupã®å€¤ã‚’è¿”ã™ã€‚
+" (countã‚’æŒ‡å®šã›ãšã«æ“ä½œã—ãŸæ™‚ã«ã€ã©ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ãŒä½¿ã‚ã‚ŒãŸã‹ãŒã€
+" ãƒ¦ãƒ¼ã‚¶ã«ã‚ã‹ã‚‹ã‚ˆã†ã«ã™ã‚‹ãŸã‚)
 function! s:ExpandDefaultGroup(group)
   if a:group == 0
     return g:eblook_group
@@ -1698,14 +1698,14 @@ function! s:SelectWindowByName(name)
   return num
 endfunction
 
-" V‚µ‚¢ƒEƒBƒ“ƒhƒE‚ğŠJ‚­
+" æ–°ã—ã„ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‹ã
 function! s:OpenWindow(cmd)
   if winheight(0) > 2
     silent execute a:cmd
     return winnr()
   else
-    " 'noequalalways'‚Ìê‡A‚‚³‚ª‘«‚è‚¸‚Ésplit‚ªE36ƒGƒ‰[‚É‚È‚éê‡‚ ‚é‚Ì‚ÅA
-    " ˆê”Ô‚‚³‚Ì‚ ‚éwindow‚ÅÄ“xsplit‚ğ‚İ‚é
+    " 'noequalalways'ã®å ´åˆã€é«˜ã•ãŒè¶³ã‚Šãšã«splitãŒE36ã‚¨ãƒ©ãƒ¼ã«ãªã‚‹å ´åˆã‚ã‚‹ã®ã§ã€
+    " ä¸€ç•ªé«˜ã•ã®ã‚ã‚‹windowã§å†åº¦splitã‚’è©¦ã¿ã‚‹
     let maxheight = 2
     let maxnr = 0
     for i in range(1, winnr('$'))
@@ -1721,19 +1721,19 @@ function! s:OpenWindow(cmd)
       return winnr()
     else
       redraw
-      echomsg 'eblook-vim: ‰æ–Êã‚Ì‹ó‚«‚ª‘«‚è‚È‚¢‚½‚ßV‹KƒEƒBƒ“ƒhƒE‚ğŠJ‚­‚Ì‚É¸”s‚µ‚Ü‚µ‚½BƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚Ä‹ó‚«‚ğì‚Á‚Ä‚­‚¾‚³‚¢(:' . a:cmd . ')'
+      echomsg 'eblook-vim: ç”»é¢ä¸Šã®ç©ºããŒè¶³ã‚Šãªã„ãŸã‚æ–°è¦ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‹ãã®ã«å¤±æ•—ã—ã¾ã—ãŸã€‚ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã¦ç©ºãã‚’ä½œã£ã¦ãã ã•ã„(:' . a:cmd . ')'
       return -1
     endif
   endif
 endfunction
 
-" ‹ó‚Ìƒoƒbƒtƒ@‚ğì‚é
+" ç©ºã®ãƒãƒƒãƒ•ã‚¡ã‚’ä½œã‚‹
 function! s:Empty_BufReadCmd()
 endfunction
 
-" eblook-vim-1.1.0‚©‚ç‚Ì«‘w’èŒ`®‚ğƒy[ƒXƒg‚·‚éB
-" eblook-vim-1.0.5‚©‚ç‚ÌŒ`®•ÏŠ·—pB
-" @param {Number} group ‘ÎÛ‚Ì«‘ƒOƒ‹[ƒv”Ô†
+" eblook-vim-1.1.0ã‹ã‚‰ã®è¾æ›¸æŒ‡å®šå½¢å¼ã‚’ãƒšãƒ¼ã‚¹ãƒˆã™ã‚‹ã€‚
+" eblook-vim-1.0.5ã‹ã‚‰ã®å½¢å¼å¤‰æ›ç”¨ã€‚
+" @param {Number} group å¯¾è±¡ã®è¾æ›¸ã‚°ãƒ«ãƒ¼ãƒ—ç•ªå·
 function! s:PasteDictList(group)
   let gr = s:ExpandDefaultGroup(a:group)
   let dictlist = s:GetDictList(gr)
