@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-15
+" Last Change: 2012-09-16
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -1104,14 +1104,14 @@ function! s:GetGaiji(gaijimap, key)
 endfunction
 
 " <unicode>４Ｅ２Ｆ</unicode>等を置換する
-" (LogoVistaの漢字源 改訂第四版以降で使用されている)
+" (LogoVistaの「漢字源 改訂第四版」以降で使用されている)
 function! s:ReplaceUnicode()
   if &encoding ==# 'utf-8'
     silent! g/<unicode>\([０-９Ａ-Ｆ]\+\)<\/unicode>/s//\=s:GetUnicode(submatch(1))/g
   else
     silent! g/<unicode>\([０-９Ａ-Ｆ]\+\)<\/unicode>/s//_/g
   endif
-  " 表の表示(もともとの用途。ロイヤル英文法で使用されている)
+  " 表の表示(もともとの用途。「ロイヤル英文法」で使用されている)
   silent! g/<\/\?unicode>/s///g
 endfunction
 
@@ -1328,8 +1328,10 @@ function! s:FormatLine(ind)
     else 
       let indcur = ''
     endif
-    silent! execute (first + 1) . ',' . last . 's/^' . indprev . '/' . indcur . '/'
-    call cursor(last, 1)
+    if indcur != indprev
+      silent! execute (first + 1) . ',' . last . 's/^' . indprev . '/' . indcur . '/'
+      call cursor(last, 1)
+    endif
   endif
   return last
 endfunction
