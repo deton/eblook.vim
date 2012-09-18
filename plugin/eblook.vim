@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-16
+" Last Change: 2012-09-18
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -849,6 +849,7 @@ endfunction
 function! s:GetContent(count)
   if (a:count > 0)
     silent! execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
+    call histdel('/', -1)
   endif
   let lnum = line('.')
   let str = getline(lnum)
@@ -1223,6 +1224,7 @@ function! s:FormatHeadIndent(indcur)
   while indnew != ''
     let ind = indnew
     s/^<ind=[0-9]>//
+    call histdel('/', -1)
     " ^<ind=1><ind=3>のような場合があるのでループしてチェック
     let indnew = matchstr(getline('.'), '^<ind=\zs[0-9]\ze>')
   endwhile
