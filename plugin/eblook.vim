@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-18
+" Last Change: 2012-09-19
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -642,6 +642,7 @@ function! s:Search(group, word, isstem)
 
   if a:isstem
     silent! execute "g/\t/s//\t[" . s:stemmedwords[0] . ' ->] /'
+    call histdel('/', -1)
   endif
 
   setlocal nomodifiable
@@ -848,8 +849,8 @@ endfunction
 " @return -1:content表示失敗, 0:表示成功
 function! s:GetContent(count)
   if (a:count > 0)
-    silent! execute 'normal! ' . a:count . 'G/\t' . "\<CR>"
-    call histdel('/', -1)
+    call cursor(a:count, 1)
+    call search("\t")
   endif
   let lnum = line('.')
   let str = getline(lnum)
