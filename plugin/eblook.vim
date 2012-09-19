@@ -639,6 +639,7 @@ function! s:Search(group, word, isstem)
   " (concealしてもカウントされるので、行が途中で折り返されていまいちなので)
   let b:refs = []
   silent! :g/^\(.\{-}\)\t *\d\+\. \(\x\+:\x\+\)\t\(.*\)/s//\=s:MakeEntryReferenceString(submatch(1), submatch(2), submatch(3))/
+  call histdel('/', -1)
 
   if a:isstem
     silent! execute "g/\t/s//\t[" . s:stemmedwords[0] . ' ->] /'
@@ -1231,6 +1232,7 @@ function! s:FormatHeadIndent(indcur)
   endwhile
   if ind > g:eblook_decorate_indmin
     s/^/\=printf('%*s', ind - g:eblook_decorate_indmin, '')/
+    call histdel('/', -1)
   endif
   return ind
 endfunction
@@ -1319,7 +1321,7 @@ endfunction
 function! s:FormatLine(ind)
   let first = line('.')
   let indprev = matchstr(getline('.'), '^ *')
-  normal! gqq
+  silent normal! gqq
   let last = line('.')
   if last == first
     return last
