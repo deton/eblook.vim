@@ -634,6 +634,7 @@ function! s:Search(group, word, isstem)
   call s:ReplaceUnicode()
   call s:FormatDecorate(1)
   silent! :g/^$/d _
+  call histdel('/', -1)
 
   " 各行のreference先を配列に格納して、バッファからは削除
   " (concealしてもカウントされるので、行が途中で折り返されていまいちなので)
