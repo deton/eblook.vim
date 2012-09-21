@@ -30,12 +30,12 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   アーカイブに含まれるファイルを次の場所に置いてください。
 
 *   ファイル            置く場所              ファイルの説明
-* plugin/eblook.vim     'runtimepath'/plugin  プラグインスクリプト本体
-* autoload/eblook/stem_en.vim  'runtimepath'/autoload/eblook  英語stemming用
-* autoload/eblook/stem_ja.vim  'runtimepath'/autoload/eblook  日本語語尾補正用
-* autoload/eblook/supsubmap_utf8.vim 'runtimepath'/autoload/eblook 上付き文字置換用
-* syntax/eblook.vim     'runtimepath'/syntax  eblook.vim用syntaxファイル
-* doc/eblook.txt        'runtimepath'/doc     スクリプトの説明書
+* plugin/eblook.vim     'runtimepath'/plugin/  プラグインスクリプト本体
+* autoload/eblook/stem_en.vim  'runtimepath'/autoload/eblook/  英語stemming用
+* autoload/eblook/stem_ja.vim  'runtimepath'/autoload/eblook/  日本語語尾補正用
+* autoload/eblook/supsubmap_utf8.vim 'runtimepath'/autoload/eblook/ 上付き文字置換用
+* syntax/eblook.vim     'runtimepath'/syntax/  eblook.vim用syntaxファイル
+* doc/eblook.txt        'runtimepath'/doc/     スクリプトの説明書
 
   'runtimepath'で示されるディレクトリは、Vim上で
   :echo &runtimepath を実行することで確認できます。
@@ -46,7 +46,7 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
-* 1.2.0 (2012-09-XXX)
+* 1.2.0 (2012-09-21)
   * eblook 1.6.1+mediaのdecorate-mode対応
         * content中のインデント指定`<ind=2>`等に基づいて、
           インデントを行う機能を追加。
@@ -62,6 +62,8 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
         * マウス操作対応
         * 前のreferenceに移動する`<S-Tab>`キーの追加
         * 一時ファイルが削除されない問題の修正
+
+![表示例](http://www1.interq.or.jp/~deton/eblook-vim/eblook-vim-gtk.png)
 
 * 1.1.1 (2012-04-22)
   * Vimの'hidden'オプションがonの場合、
