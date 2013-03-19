@@ -10,6 +10,7 @@ EPWING辞書検索プラグイン			*eblook*
 4. 操作法				|eblook-usage|
 5. オプション				|eblook-option|
 6. コマンド				|eblook-command|
+7. 問題点				|eblook-problem|
 
 {Vi does not have any of these features}
 
@@ -147,7 +148,7 @@ http://www1.interq.or.jp/~deton/eblook-vim/#appendix
 
 検索						*eblook-tutor-search*
 ----
-<Leader><C-Y>を押すと、検索語の入力プロンプト(eblook-vim: )が
+<Leader><C-Y>を押すと、検索語の入力プロンプト(1EblookSearch: )が
 コマンド行に表示されます。
 (<Leader>は|mapleader|で設定されたキーです。
  eblook.vimではデフォルトでCTRL-Kです。つまり、<Leader><C-Y>はCTRL-K CTRL-Y)
@@ -555,6 +556,13 @@ contentウィンドウやentryウィンドウの内容が<more point=5>のように終わっていて、
   旧形式の設定を読み込んだ後でこのコマンドを実行して、
   新形式へ変換するために使います。
   対象の辞書グループ番号をNで指定可能。
+
+==============================================================================
+7. 問題点					*eblook-problem*
+
+発音記号をUnicodeに置換して表示した際、アクセント位置等がずれることがあります。
+:se ambiwidth=single
+すると少しはましになることもあります。
 
 ==============================================================================
  vim:set ft=help:
