@@ -3,7 +3,7 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2012-09-19
+" Last Change: 2013-08-11
 " License: MIT License {{{
 " Copyright (c) 2012 KIHARA, Hideto
 "
@@ -1737,7 +1737,7 @@ endfunction
 " SelectWindowByName(name)
 "   Acitvate selected window by a:name.
 function! s:SelectWindowByName(name)
-  let num = bufwinnr('^' . a:name . '$')
+  let num = bufwinnr(a:name)
   if num > 0 && num != winnr()
     execute num . 'wincmd w'
   endif
