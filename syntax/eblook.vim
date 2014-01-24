@@ -2,7 +2,7 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2012-09-15
+" Last Change:  2014-01-24
 
 scriptencoding cp932
 
@@ -56,7 +56,10 @@ if has("conceal")
   syn region ebRefVisitedBold contained matchgroup=ebEmBeg start="<em>" matchgroup=ebEmEnd end="</em>" concealends
   syn region ebBold matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" contains=ebBoldItalic concealends
   syn region ebBold matchgroup=ebEmBeg start="<em>" matchgroup=ebEmEnd end="</em>" contains=ebBoldItalic concealends
+  syn region ebBoldItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" concealends
   syn region ebItalic matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" contains=ebItalicBold concealends
+  syn region ebItalicBold contained matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" concealends
+  syn region ebItalicBold contained matchgroup=ebEmBeg start="<em>" matchgroup=ebEmEnd end="</em>" concealends
   syn match ebItalicBeg "." contained conceal
   syn match ebBoldBeg "." contained conceal
   syn match ebFontEnd "." contained conceal
