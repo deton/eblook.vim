@@ -3,9 +3,9 @@
 " eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2013-08-11
+" Last Change: 2014-01-24
 " License: MIT License {{{
-" Copyright (c) 2012 KIHARA, Hideto
+" Copyright (c) 2012-2014 KIHARA, Hideto
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy of
 " this software and associated documentation files (the "Software"), to deal in
@@ -957,6 +957,9 @@ function! s:FormatDecorate(dropind)
       silent! :g/<font=bold>/s//<b>/g
       silent! :g/<font=italic>/s//<i>/g
       silent! :g/<\/font>/s//<\/f>/g
+      " OALD8だと<b><b>xxx</f></f>等があるが、syntaxで対応するのは面倒なので
+      silent! :%s/<b><b>\(\_.\{-}\)<\/f>/<b>\1/g
+      silent! :%s/<i><i>\(\_.\{-}\)<\/f>/<i>\1/g
       " 1文字ずつ<em>は無駄に長くて、concealすると表示との不一致が大きいので。
       " 「<em>単</em><em>語</em>」→「<em>単語</em>」
       silent! :g/<\/em><em>/s///g
