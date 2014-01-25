@@ -1,6 +1,6 @@
-scriptencoding cp932
+scriptencoding utf-8
 
-" ‰p’PŒê‚Ìstemming‚ğs‚¤
+" è‹±å˜èªã®stemmingã‚’è¡Œã†
 function! eblook#stem_en#Stem(word)
   let lword = tolower(a:word)
   let stemmed = []
@@ -23,9 +23,9 @@ function! eblook#stem_en#Stem(word)
   return sort(stemmed, 's:CompareLen')
 endfunction
 
-" ƒŠƒXƒg‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚È‚¯‚ê‚Î’Ç‰Á‚·‚é
-" @param lis ’Ç‰ÁæƒŠƒXƒg
-" @param x ’Ç‰Á‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚é—v‘f
+" ãƒªã‚¹ãƒˆã«å«ã¾ã‚Œã¦ã„ãªã‘ã‚Œã°è¿½åŠ ã™ã‚‹
+" @param lis è¿½åŠ å…ˆãƒªã‚¹ãƒˆ
+" @param x è¿½åŠ ã—ã‚ˆã†ã¨ã—ã¦ã„ã‚‹è¦ç´ 
 function! s:AddNew(lis, x)
   if index(a:lis, a:x) == -1
     return add(a:lis, a:x)
@@ -37,9 +37,9 @@ function! s:CompareLen(i1, i2)
   return len(a:i1) - len(a:i2)
 endfunction
 
-" “®Œ/Œ`—eŒ‚ÌŠˆ—pŒ`‚Æ–¼Œ‚Ì•¡”Œ`‚ÌŠˆ—pŒê”ö‚ğæ‚èœ‚­B
-" —^‚¦‚ç‚ê‚½Œê‚ÌŒ´Œ`‚Æ‚µ‚Ä‰Â”\«‚Ì‚ ‚éŒê‚ÌƒŠƒXƒg‚ğ•Ô‚·B
-" (lookup‚Ìstem-english.el‚Ìstem:extra‚©‚ç‚ÌˆÚA)
+" å‹•è©/å½¢å®¹è©ã®æ´»ç”¨å½¢ã¨åè©ã®è¤‡æ•°å½¢ã®æ´»ç”¨èªå°¾ã‚’å–ã‚Šé™¤ãã€‚
+" ä¸ãˆã‚‰ã‚ŒãŸèªã®åŸå½¢ã¨ã—ã¦å¯èƒ½æ€§ã®ã‚ã‚‹èªã®ãƒªã‚¹ãƒˆã‚’è¿”ã™ã€‚
+" (lookupã®stem-english.elã®stem:extraã‹ã‚‰ã®ç§»æ¤)
 function! s:StemHeuristics(word)
   let irr = get(g:eblook#stem_en#irregular_verb_alist, a:word)
   if type(irr) == type([])
@@ -62,11 +62,11 @@ function! s:StemHeuristics(word)
   return []
 endfunction
 
-" porter-stem.vim‚ğg‚Á‚½stemming
+" porter-stem.vimã‚’ä½¿ã£ãŸstemming
 function! s:StemPorter(word)
   function! s:GetPorterStemFuncs()
-    " porter-stem.vim<https://github.com/msbmsb/porter-stem.vim>‚Ì<SNR>”Ô†æ“¾
-    " :PorterStem‚Í<SID>‚ğg‚Á‚Ä‚È‚¢‚Ì‚Å:commandŒ‹‰Ê‚©‚ç‚Ìæ“¾‚Í•s‰Â
+    " porter-stem.vim<https://github.com/msbmsb/porter-stem.vim>ã®<SNR>ç•ªå·å–å¾—
+    " :PorterStemã¯<SID>ã‚’ä½¿ã£ã¦ãªã„ã®ã§:commandçµæœã‹ã‚‰ã®å–å¾—ã¯ä¸å¯
     " http://d.hatena.ne.jp/thinca/20111228
     silent! redir => sliststr
     silent! scriptnames
@@ -134,8 +134,8 @@ function! s:StemPorter(word)
   return newwords
 endfunction
 
-" s:StemHeuristics()‚Åg‚¤’uŠ·ƒ‹[ƒ‹
-" (lookup‚Ìstem-english.el‚Ìstem:extra‚©‚ç‚ÌˆÚA)
+" s:StemHeuristics()ã§ä½¿ã†ç½®æ›ãƒ«ãƒ¼ãƒ«
+" (lookupã®stem-english.elã®stem:extraã‹ã‚‰ã®ç§»æ¤)
 let g:eblook#stem_en#rules = [
   \['\([^aeiou]\)\1e\%(r\|st\)$', ['\1', '\1\1e']],
   \['\([^aeiou]\)ie\%(r\|st\)$', ['\1y', '\1ie']],
@@ -158,8 +158,8 @@ let g:eblook#stem_en#rules = [
   \['ing$', ['', 'e']],
 \]
 
-" •s‹K‘¥“®Œ‚ÆŒ´Œ`‚Ì˜A‘z”z—ñ"
-" (lookup‚Ìstem-english.el‚Ìstem:irregular-verb-alist‚©‚ç•ÏŠ·)
+" ä¸è¦å‰‡å‹•è©ã¨åŸå½¢ã®é€£æƒ³é…åˆ—"
+" (lookupã®stem-english.elã®stem:irregular-verb-alistã‹ã‚‰å¤‰æ›)
 let g:eblook#stem_en#irregular_verb_alist = {
   \"abode": ["abide"],
   \"abided": ["abide"],

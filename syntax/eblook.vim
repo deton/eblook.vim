@@ -2,9 +2,9 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2014-01-24
+" Last Change:  2014-01-25
 
-scriptencoding cp932
+scriptencoding utf-8
 
 if version < 600
   syntax clear
@@ -19,8 +19,8 @@ if has("conceal")
     syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefVisitedBold,ebRefVisitedItalic
     syn match ebRefBeg	"." contained
     syn match ebRefEnd	"." contained
-    syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeÅq" matchgroup=ebImgEnd end="År\zs>"
-    syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zeÅs" matchgroup=ebSndEnd end="Åt\zs>"
+    syn region ebImg matchgroup=ebImgBeg start="<\d\+\ze„Äà" matchgroup=ebImgEnd end="„Äâ\zs>"
+    syn region ebSnd matchgroup=ebSndBeg start="<\d\+\ze„Ää" matchgroup=ebSndEnd end="„Äã\zs>"
     syn match ebImgBeg	"." contained
     syn match ebImgEnd	"." contained
     syn match ebSndBeg	"." contained
@@ -30,8 +30,8 @@ if has("conceal")
     syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefVisitedBold,ebRefVisitedItalic concealends
     syn match ebRefBeg	"." contained conceal
     syn match ebRefEnd	"." contained conceal
-    syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeÅq" matchgroup=ebImgEnd end="År\zs>" concealends
-    syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zeÅs" matchgroup=ebSndEnd end="Åt\zs>" concealends
+    syn region ebImg matchgroup=ebImgBeg start="<\d\+\ze„Äà" matchgroup=ebImgEnd end="„Äâ\zs>" concealends
+    syn region ebSnd matchgroup=ebSndBeg start="<\d\+\ze„Ää" matchgroup=ebSndEnd end="„Äã\zs>" concealends
     syn match ebImgBeg	"." contained conceal
     syn match ebImgEnd	"." contained conceal
     syn match ebSndBeg	"." contained conceal
@@ -47,7 +47,7 @@ if has("conceal")
   syn match ebSubEnd	"." contained
 
   " cf. syntax/html.vim
-  " XXX: Ç∆ÇËÇ†Ç¶Ç∏RefLinkíÜÇ≈ÇÕ1íiäKÇÃitalicÇ∆boldÇÃÇ›ëŒâû
+  " XXX: „Å®„Çä„ÅÇ„Åà„ÅöRefLink‰∏≠„Åß„ÅØ1ÊÆµÈöé„ÅÆitalic„Å®bold„ÅÆ„ÅøÂØæÂøú
   syn region ebRefItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" concealends
   syn region ebRefVisitedItalic contained matchgroup=ebItalicBeg start="<i>" matchgroup=ebFontEnd end="</f>" concealends
   syn region ebRefBold contained matchgroup=ebBoldBeg start="<b>" matchgroup=ebFontEnd end="</f>" concealends
@@ -69,8 +69,8 @@ if has("conceal")
 else
   syn region ebRefLink matchgroup=ebRefBeg start="<\d\+|" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefItalic
   syn region ebRefLinkVisited matchgroup=ebRefBeg start="<\d\+!" matchgroup=ebRefEnd end="|>" contains=ebRefBold,ebRefVisitedItalic
-  syn region ebImg matchgroup=ebImgBeg start="<\d\+\zeÅq" matchgroup=ebImgEnd end="År\zs>"
-  syn region ebSnd matchgroup=ebSndBeg start="<\d\+\zeÅs" matchgroup=ebSndEnd end="Åt\zs>"
+  syn region ebImg matchgroup=ebImgBeg start="<\d\+\ze„Äà" matchgroup=ebImgEnd end="„Äâ\zs>"
+  syn region ebSnd matchgroup=ebSndBeg start="<\d\+\ze„Ää" matchgroup=ebSndEnd end="„Äã\zs>"
   syn region ebSup matchgroup=ebSupBeg start="\ze\^{" matchgroup=ebSupEnd end="}\zs"
   syn region ebSub matchgroup=ebSubBeg start="\ze_{" matchgroup=ebSubEnd end="}\zs"
   syn match ebRefBeg	"." contained
