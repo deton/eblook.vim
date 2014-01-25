@@ -1,0 +1,568 @@
+*eblook.jax*   EPWING辞書検索プラグイン
+
+			  eblook.vim説明書
+
+EPWING辞書検索プラグイン			*eblook*
+
+1. 概要					|eblook-overview|
+2. 準備					|eblook-setup|
+3. チュートリアル			|eblook-tutorial|
+4. 操作法				|eblook-usage|
+5. オプション				|eblook-option|
+6. コマンド				|eblook-command|
+7. 問題点				|eblook-problem|
+
+{Vi does not have any of these features}
+
+==============================================================================
+1. 概要						*eblook-overview*
+
+eblook.vimは、`eblook'プログラムを使って、
+EPWING/電子ブック辞書の検索を行うプラグインです。
+
+このプラグインを使うには、`eblook'プログラム
+http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
+とEPWING/電子ブック辞書が必要です。
+
+==============================================================================
+2. 準備						*eblook-setup*
+
+|eblook-setup-dict|	準備: 検索対象辞書の指定
+|eblook-setup-gaiji|	準備: 外字置換設定
+
+準備: 検索対象辞書の指定			*eblook-setup-dict*
+------------------------
+eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく必要があります。
+詳細は|eblook-option|を参照してください。
+
+設定する値を調べる方法は以下のようになります。
+(a) eblookプログラムを起動します:
+	% eblook
+	eblook> 
+
+(b) catalogsファイルのあるディレクトリを指定してbookコマンドを実行します:
+	eblook> book /usr/local/epwing/iwanami/koujien
+   パス中にスペースが含まれる場合は、パスを""でくくってください:
+	eblook> book "C:/Program Files/epwing/iwanami/koujien"
+
+(c) listコマンドを実行します:
+	eblook> list
+	 1. kojien      広辞苑第五版
+	 2. furoku      付属資料
+
+(d) vimrcの設定
+    以下のように各辞書用の|Dictionary|データを記述します。
+  (b)でbookコマンドの引数に指定したディレクトリを'book'キーに設定します。
+  (c)のlistコマンド実行時に表示されたsubbookを'name'キーに設定します。
+  (c)のlistコマンド実行時に表示された辞書タイトルを'title'キーに設定します。
+        \{
+          \'book': '/usr/local/epwing/iwanami/koujien',
+          \'name': 'kojien',
+          \'title': '広辞苑第五版',
+        \},
+
+(e) (b)-(d)を、使いたい辞書について繰り返して、
+    各辞書用の|Dictionary|データを記述し、
+    各Dictionaryデータを要素として持つ
+    eblook_dictlist1の|List|データを初期化します。
+
+    let eblook_dictlist1 = [
+      \{
+        \'book': '/usr/local/epwing/iwanami/koujien',
+        \'name': 'kojien',
+        \'title': '広辞苑第五版',
+      \},
+      \{
+        \'book': '/usr/local/epwing/kenkyush/chujisnd',
+        \'name': 'chujiten',
+        \'title': '研究社　新英和・和英中辞典',
+      \},
+      \{
+        \'book': '/usr/local/epwing/PLUS',
+        \'name': 'plus',
+        \'title': '研究社リーダーズ＋プラスＶ２',
+      \},
+    \]
+
+準備: 外字置換設定			*eblook-setup-gaiji*
+------------------
+発音記号などの外字をUnicode文字列へ置換するには、以下の設定をしてください。
+EBWin用の外字定義ファイルを使用します。
+http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
+
+(1)EBWinのアプリケーションディレクトリもしくは以下から外字定義ファイルを入手。
+http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji
+
+(2)bookで指定したディレクトリに、{nameの大文字}.mapファイルをコピー。
+  例:/usr/local/epwing/iwanami/koujien/に、KOJIEN.mapをコピー。
+なお、GENIUS_DAIEIWA.map、GENIUS4.map、KANJIGEN_EPW.mapはコピー後、
+ファイル名をGENIUS.map、GENIUS.map、KANJIGEN.mapに変更する必要があります。
+
+(3)可能であれば、Vimの|'encoding'|をutf-8にする。
+なお、Vimの&encodingがutf-8以外の場合は、Unicodeへの置換ではなく、
+mapファイルで指定される置換文字列への置換を行います。
+
+Windows環境でVimをUTF-8化するには以下を参照してください。
+http://sites.google.com/site/fudist/Home/vim-nihongo-ban
+ただし、eblookコマンドとして、以下で配布されているWin32用バイナリ
+eblook-1.6.1+media-20110801-ebu-4.4.3-20110801.exe
+http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
+を使う場合、|'eblookenc'|オプションをcp932に設定してください。
+  例: let eblookenc='cp932'
+(eblookコマンドの入出力エンコーディングとして-e utf8を指定しても効かない
+ ようなので、eblookコマンドとのやりとりをcp932で行うように設定)
+
+euc-jp環境で置換後の丸数字等が?@や?Aのように文字化けする場合は、
+mapファイルをnkf -eでeuc-jpに変換して、{nameの大文字}_{&encodingの値}.map
+というファイル名で上記(2)のディレクトリに置いてください。
+  例: nkf -e KOJIEN.map >KOJIEN_euc-jp.map
+      nkf -e KANJIGEN.map >KANJIGEN_euc-jp.map
+      nkf -e READERS2.map >READERS2_euc-jp.map
+(UNIX上のvimやiconvではエンコーディング変換に失敗するようなので、
+ nkfやWindows上のvimで変換してください)
+({&encodingの値}付きの名前のファイルがあれば、{&encodingの値}無しの.map
+ ファイルよりも優先して読み込みます。
+ それぞれを読む際のfileencodingは、&encodingとcp932です)
+
+
+EBライブラリ用のAppendixでの外字置換を無効にして、mapファイルによる
+外字置換を行いたい場合は、Appendixを指定しないようにしてください。
+ただし、Appendixによってstop codeを設定しないと内容が正しく表示されない辞書
+の場合(例:「新編英和活用大事典」)は、外字置換設定を削除したAppendixを
+指定する必要があります。(外字置換設定を削除するには、Appendix内の
+.appファイルのbegin narrow...endとbegin wide...endをコメントアウト後に
+ebappendixコマンドを使ってAppendixを作り直す)
+(なお、「ジーニアス英和大辞典」もAppendixが必須ですが、genius2-1.1には
+外字置換設定は含まれていません。)
+
+外字置換設定を削除したAppendix(colloc-2.0とplus-2.0)を以下に置いてあります。
+http://www1.interq.or.jp/~deton/eblook-vim/#appendix
+
+==============================================================================
+3. チュートリアル				*eblook-tutorial*
+
+|eblook-tutor-search|	検索
+|eblook-tutor-entry|	見出し一覧
+|eblook-tutor-content|	内容表示
+|eblook-tutor-quit|	終了
+
+検索						*eblook-tutor-search*
+----
+<Leader><C-Y>を押すと、検索語の入力プロンプト(1EblookSearch: )が
+コマンド行に表示されます。
+(<Leader>は|mapleader|で設定されたキーです。
+ eblook.vimではデフォルトでCTRL-Kです。つまり、<Leader><C-Y>はCTRL-K CTRL-Y)
+検索語を入力すると検索が行われます。
+検索結果はentryウィンドウとcontentウィンドウに表示されます。
+
+      テスト【test】
+       (1)試験。検査。特に、学力試験。「心理―」「読解力を―する」
+       (2)一般に、考えたことや試作品などを実際に試してみること。
+       「―‐ドライバー」
+       <1|⇒―‐ケース【test case】|>
+       <2|⇒―‐パイロット【test pilot】|>
+       <3|⇒―‐パターン【test pattern】|>
+       <4|⇒―‐ピース【test-piece】|>
+      ~
+      ==1Eblook content {テスト【test】}=======================================
+      広辞苑第五版    テスト【test】
+      研究社　新英和・和英中辞典      テスト
+      研究社リーダーズ＋プラスＶ２    　テスト <proof>
+      研究社リーダーズ＋プラスＶ２    　テスト <quiz>
+      ==1Eblook entry {test} [5]===============================================
+
+見出し一覧					*eblook-tutor-entry*
+----------
+検索で見つかった見出しの一覧がentryウィンドウに表示されます。
+最初の見出しの内容がcontentウィンドウに表示されます。
+
+entryウィンドウでj,kキーでカーソルを移動して、<CR>を押すと
+その行の見出しの内容をcontentウィンドウに表示します。
+<Space>,<BS>でcontentウィンドウのPageDown,PageUpができます。
+
+内容表示					*eblook-tutor-content*
+--------
+内容中に<n|...|>(nは1から始まる数字。reference番号として[count]で指定可能)
+がある場合は、contentウィンドウの<n|...|>のある行で<CR>を押すと、
+referenceの先の内容が表示されます。
+
+元の内容に戻るには、<C-P>を押して検索履歴を戻ります。
+
+終了						*eblook-tutor-quit*
+----
+検索結果を表示しているentryウィンドウとcontentウィンドウの両方を閉じるには、
+"q"を押します。
+
+==============================================================================
+4. 操作法					*eblook-usage*
+
+検索を行うには、次のキーを入力するか、|:EblookSearch|コマンドを実行します。
+
+<Leader><C-Y>       検索単語を入力して検索を行う。
+                    検索対象の辞書グループ番号を[count]で指定可能。
+<Leader>y           カーソル位置にある単語を検索する。
+                    Visual modeの場合は、選択した文字列を検索する。
+                    検索対象の辞書グループ番号を[count]で指定可能。
+
+検索結果は、{n}Eblook entryと{n}Eblook contentというウィンドウに
+表示されます。{n}は辞書グループ番号に対応する数字です。
+entryウィンドウには見出し一覧が表示されます。
+contentウィンドウには見出しに対応する内容が表示されます。
+
+<C-P>,<C-N>で検索履歴をたどることができます。
+reference先を表示した後で元の検索結果に戻りたい場合などに使ってください。
+検索履歴は過去のentryバッファを表示します。
+
+
+entryウィンドウでの操作				*eblook-usage-entry*
+-----------------------
+
+<CR>                カーソル行のentryに対応するcontentを表示する
+J                   カーソルを下の行に移動してcontentを表示する
+K                   カーソルを上の行に移動してcontentを表示する
+<Space>             contentウィンドウでPageDownを行う
+<BS>                contentウィンドウでPageUpを行う
+q                   entryウィンドウとcontentウィンドウを閉じる
+s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+                    検索対象の辞書グループ番号を[count]で指定可能
+S                   直前の検索語を[count]で指定する辞書グループで再検索する
+p                   contentウィンドウに移動する
+R                   reference一覧を表示する
+                    [count]でcontentウィンドウ内のreference番号を指定可能
+<C-P>               検索履歴中の一つ前のバッファを表示する
+<C-N>               検索履歴中の一つ次のバッファを表示する
+o                   contentウィンドウを最大化する
+O                   contentウィンドウ内の長い行を|gq|で整形する
+
+contentウィンドウでの操作			*eblook-usage-content*
+-------------------------
+
+<CR>                カーソル位置もしくは[count]で指定するreferenceを表示する
+<Space>             PageDownを行う
+<BS>                PageUpを行う
+<Tab>               次のreferenceにカーソルを移動する
+<S-Tab>             前のreferenceにカーソルを移動する
+q                   entryウィンドウとcontentウィンドウを閉じる
+s                   新しい単語を入力して検索する(<Leader><C-Y>と同じ)
+                    検索対象の辞書グループ番号を[count]で指定可能
+S                   直前の検索語を[count]で指定する辞書グループで再検索する
+p                   entryウィンドウに移動する
+R                   reference一覧を表示する
+                    [count]で対象のreference番号を指定可能
+<C-P>               検索履歴中の一つ前のバッファを表示する
+<C-N>               検索履歴中の一つ次のバッファを表示する
+o                   contentウィンドウを最大化する
+O                   contentウィンドウ内の長い行を|gq|で整形する
+x                   カーソル位置か[count]で指定する画像・音声・動画を表示・再生
+
+==============================================================================
+5. オプション					*eblook-option*
+
+						*'eblook_dictlist{n}'*
+EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ|Dictionary|データ
+を要素として持つ|List|データとして設定します。bookとnameは必須です。
+
+    let eblook_dictlist1 = [
+      \{
+        \'book': '/usr/local/epwing/iwanami/koujien',
+        \'name': 'kojien',
+        \'title': '広辞苑第五版',
+        \'skip': 0,
+      \},
+    \]
+
+'book'		辞書ディレクトリ。(eblookのbookコマンドの引数)
+'name'		辞書名。(eblookのselectコマンドの引数)
+'title' 	辞書識別子
+'appendix' 	Appendix
+'skip'		この辞書を検索対象にするかどうか
+'autoformat'	content表示時に長い行を|gq|で整形するかどうか
+
+'book'						*'eblook_dictlist{n}[m].book'*
+  辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
+  eblookプログラムの`book'コマンドに渡すパラメータです。
+  パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
+  例:
+    'book': '"C:/Program Files/epwing/iwanami/koujien"',
+
+'name'						*'eblook_dictlist{n}[m].name'*
+  辞書名を指定します。eblookプログラムの`select'コマンドに渡すパラメータです。
+  eblookプログラムのlistコマンドで調べてください。
+  例:
+    'name': 'kojien',
+
+'title'						*'eblook_dictlist{n}[m].title'*
+  辞書の識別子を指定します。デフォルトでは、
+  辞書番号とnameを組み合わせたものが設定されます。
+  entryウィンドウ内で辞書を識別するために使われます。
+  辞書を識別するのに使うだけなので、
+  eblookプログラムのlistコマンドで表示される文字列など、
+  他の辞書とぶつからない文字列を適当に指定します。
+  例:
+    'title': '広辞苑第五版',
+
+'appendix'				*'eblook_dictlist{n}[m].appendix'*
+  Appendixを使う場合は、Appendixディレクトリを指定します。
+  パスの途中にスペースが含まれる場合は、パス全体を""でくくってください。
+  例:
+    'appendix': '"C:/Program Files/epwing/appendix/plus-2.0"',
+
+'skip'						*'eblook_dictlist{n}[m].skip'*
+  0でない値を設定すると、この辞書は検索しません。
+  skipする設定にしている辞書は、:EblookNotSkipDictコマンドを使って
+  検索対象にすることができます。
+  例:
+    'skip': 1,
+
+'autoformat'				*'eblook_dictlist{n}[m].autoformat'*
+  content表示時に長い行を|gq|で整形するかどうか。
+
+
+'eblook_group'					*'eblook_group'*
+  |[count]|が指定されていない時に検索対象にする辞書グループ番号。省略値: 1
+
+'eblook_stemming'				*'eblook_stemming'*
+  指定文字列で何も見つからなかった時に、活用語尾などを取り除いた
+  文字列を使って検索し直すかどうか。省略値: 0
+  語尾補正をして検索し直す場合は以下のように設定してください。
+    let eblook_stemming = 1
+  https://github.com/msbmsb/porter-stem.vim がインストール済であれば、
+  porter-stem.vimも使用します。
+
+'eblook_decorate'				*'eblook_decorate'*
+  eblook 1.6.1+mediaのdecorate-modeを有効にすると出力される、
+  content中のインデント指定に基づいて、インデントを行うかどうか。
+  省略値: 1(eblook 1.6.1+mediaの場合), 0(それ以外の場合)
+
+'eblook_decorate_syntax'			*'eblook_decorate_syntax'*
+  decorate-mode有効時に、content中の指定に基づいて、
+  イタリック、ボールド表示を行うかどうか。
+  省略値: 0(syntax offの場合), 1(それ以外の場合)
+
+'eblook_decorate_supsub'			*'eblook_decorate_supsub'*
+  decorate-mode有効時に、上付き・下付き文字列を、
+  それぞれ^{上付き}・_{下付き}のように表示するかどうか。省略値: 0
+
+'eblook_decorate_indmin'			*'eblook_decorate_indmin'*
+  この値を越えたインデント量がcontent中で指定された場合に、
+  越えた文字数分のインデントを行う。省略値: 1
+
+'eblook_entrywin_height'			*'eblook_entrywin_height'*
+  entryウィンドウの行数(目安)。省略値: 4
+
+'eblook_history_max'				*'eblook_history_max'*
+  保持しておく過去の検索履歴バッファ数の上限。省略値: 10
+
+'eblook_visited_max'				*'eblook_visited_max'*
+  表示変更用に保持しておく訪問済リンク数の上限。省略値: 100
+
+'eblook_autoformat_default'			*'eblook_autoformat_default'*
+  contentウィンドウ内の長い行を|gq|で整形するかどうかのデフォルト値。
+  全辞書を常に整形したい場合向け(全辞書について'autoformat'プロパティ
+  を指定するのは面倒なので)。省略値: 0
+  全辞書を常に整形する場合は以下のように設定してください。
+    let eblook_autoformat_default = 1
+
+'eblook_show_refindex'				*'eblook_show_refindex'*
+  contentウィンドウ内のreference番号を表示するかどうか。省略値: 0
+  デフォルトでは、conceal syntaxを使って非表示にします。
+  Rキーやcontentウィンドウ内での<CR>キーにおいて、
+  [count]で対象reference番号を指定したい場合は、
+  以下のように設定してreference番号を表示するようにしてください。
+    let eblook_show_refindex = 1
+
+'eblook_statusline_entry'			*'eblook_statusline_entry'*
+  entryウィンドウ用の|statusline|。
+  省略値: %{b:group}Eblook entry {%{b:word}}%< [%L]
+  |'ruler'|を追加したい場合は以下のように設定してください
+  (参考:|statusline|のヘルプのExamples)。
+    let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}}%< [%L]%=%-14.(%l,%c%V%) %P'
+
+'eblook_statusline_content'			*'eblook_statusline_content'*
+  contentウィンドウ用の|statusline|。
+  省略値: %{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<
+  |'ruler'|を追加したい場合は以下のように設定してください。
+    let eblook_statusline_content = '%{b:group}Eblook content {%{b:caption}} %{b:dtitle}%<%=%-14.(%l,%c%V%) %P'
+
+'eblook_viewers'				*'eblook_viewers'*
+  画像や音声再生用の外部ビューアコマンド。
+
+  contentウィンドウで、画像や音声へのリンクの上でxキーを押すと、
+  画像や音声を一時ファイルに保存した後、この変数で指定された
+  外部ビューアコマンドを実行(|:!|)します。
+
+  外部ビューアコマンド文字列に%sが含まれる場合は、
+  |shellescape()|した一時ファイル名に置換します。
+  含まれない場合は、外部ビューアコマンド文字列の後に
+  スペースとshellescape()した一時ファイル名を追加します。
+
+    省略値(Windowsの場合):
+     {
+       \'jpeg': ' start ""',
+       \'bmp': ' start ""',
+       \'pbm': ' start ""',
+       \'wav': ' start ""',
+       \'mpg': ' start ""',
+     \}
+    省略値(Windows以外の場合):
+     {
+       \'jpeg': 'xdg-open %s &',
+       \'bmp': 'xdg-open %s &',
+       \'pbm': 'xdg-open %s &',
+       \'wav': 'xdg-open %s &',
+       \'mpg': 'xdg-open %s &',
+     \}
+    設定例1:
+     let eblook_viewers = {
+       \'jpeg': ' start ""',
+       \'bmp': 'start mspaint',
+       \'pbm': 'start "C:\Program Files\IrfanView\i_view32.exe"',
+       \'wav': 'start "C:\Program Files\foobar2000\foobar2000.exe"',
+       \'mpg': 'start "C:\Program Files\Windows Media Player\wmplayer.exe"',
+     \}
+    設定例2:
+     let eblook_viewers = {
+       \'jpeg': 'xli -quiet %s &',
+       \'bmp': 'xli -quiet %s &',
+       \'pbm': 'xli -quiet %s &',
+       \'wav': 'aplay -q %s &',
+       \'mpg': 'mplayer -really-quiet %s >/dev/null 2>&1 &',
+     \}
+
+'eblookprg'					*'eblookprg'*
+  スクリプトから呼び出すeblookプログラムの名前。省略値: "eblook"
+
+'eblookenc'					*'eblookenc'*
+  eblookプログラムの出力を読み込むときのエンコーディング。
+  設定可能な値は|'encoding'|参照。省略値: &encoding
+
+'<Plug>EblookInput'				*'<Plug>EblookInput'*
+  検索単語を入力して検索を行うためのキー。省略値: <Leader><C-Y>
+  <Leader><C-Y>を指定する場合の例:
+    map <Leader><C-Y> <Plug>EblookInput
+
+'<Plug>EblookSearch'				*'<Plug>EblookSearch'*
+  カーソル位置にある単語(nmap)/選択した文字列(vmap)を検索するためのキー。
+  省略値: <Leader>y
+  <Leader>yを指定する場合の例:
+    map <Leader>y <Plug>EblookSearch
+
+'mapleader'
+  キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
+  CTRL-Kを指定する場合の例:
+    let mapleader = "\<C-K>"
+
+'plugin_eblook_disable'				*'plugin_eblook_disable'*
+  このプラグインを読み込みたくない場合に次のように設定します。
+    let plugin_eblook_disable = 1
+
+
+設定例
+------
+辞書の設定例です。この例では、4つの辞書グループを設定しています。
+
+    let eblook_dictlist1 = [
+      \{ 'book': '/usr/local/epwing/iwanami/koujien',
+        \'name': 'kojien',
+        \'title': '広辞苑第五版',
+      \},
+      \{ 'book': '/usr/local/epwing/kenkyush/chujisnd',
+        \'name': 'chujiten',
+        \'title': '研究社　新英和・和英中辞典',
+      \},
+    \]
+
+    let eblook_dictlist2 = [
+      \{ 'book': '/usr/local/epwing/tougou99',
+        \'name': 'kanjigen',
+        \'title': '漢字源',
+      \},
+      \{ 'book': '/usr/local/epwing/tougou99',
+        \'name': 'gn99ep01',
+        \'title': '現代用語の基礎知識１９９９年版',
+        \'autoformat': 1,
+      \},
+      \{ 'book': '/usr/local/epwing/tougou99',
+        \'name': 'gn99ep02',
+        \'title': '最新日本語活用事典',
+      \},
+    \]
+
+    let eblook_dictlist3 = [
+      \{ 'book': '/usr/local/epwing/kenkyush/chujisnd',
+        \'name': 'chujiten',
+        \'title': '研究社　新英和・和英中辞典',
+      \},
+      \{ 'book': '/usr/local/epwing/PLUS',
+        \'appendix': '/usr/local/epwing/appendix/plus-2.0',
+        \'name': 'plus',
+        \'title': '研究社リーダーズ＋プラスＶ２',
+      \},
+    \]
+
+    let eblook_dictlist9 = [
+      \{ 'title': '理化学辞典第５版',
+        \'book': '/usr/local/epwing/RIKAGAKU',
+        \'name': 'rikagaku',
+        \'autoformat': 1, },
+    \]
+
+more point
+----------
+contentウィンドウやentryウィンドウの内容が<more point=5>のように終わっていて、
+全ての内容が表示されていない場合、eblookのmax-hitsの値(デフォルト256)を
+増やしてください(eblookのmax-textの値(デフォルト8192)も参考)。
+~/.eblookrcに以下のように記述します(0にすると無制限)。
+  set max-hits 512
+  set max-text 0
+
+==============================================================================
+6. コマンド					*eblook-command*
+
+:[N]EblookSearch {word}				*:EblookSearch* 
+  辞書グループ番号N内の辞書の検索を行います。
+  検索する文字列を引数に指定します。
+
+:[N]EblookListGroup [N]				*:EblookListGroup* 
+  辞書グループの一覧を表示します。
+  辞書グループ番号は連続していない可能性があるため、
+  'eblook_dictlist{m}'が存在するかどうか、mが1からNの範囲でチェックします。
+  デフォルトでは99までチェックします。
+
+:[N]EblookGroup [N]				*:EblookGroup* 
+  明示的に[count]や[N]で辞書グループ番号が指定されていない時に使う
+  デフォルトの辞書グループ番号'g:eblook_group'を設定します。
+  辞書グループ番号無しで実行した場合は、現在の値を表示します。
+
+:[N]EblookListDict [N]				*:EblookListDict*
+  辞書グループ番号Nに含まれる辞書の一覧を表示します。
+  'eblook_dictlistN'に設定されている内容を表示します。
+
+:[N]EblookSkipDict {m}				*:EblookSkipDict*
+  引数で指定した辞書番号の辞書を一時的に検索対象から外します。
+  'eblook_dictlistN[m].skip'を1に設定するのと同じです。
+  複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
+  対象の辞書グループ番号をNで指定可能(|:command-range|)。
+
+:[N]EblookNotSkipDict {m}			*:EblookNotSkipDict*
+  引数で指定した辞書番号の辞書を一時的に検索対象に入れます。
+  'eblook_dictlistN[m].skip'を0に設定するのと同じです。
+  複数の辞書番号を引数に指定する場合は、間にスペースを入れてください。
+  対象の辞書グループ番号をNで指定可能。
+
+:[N]EblookPasteDictList [N]			*:EblookPasteDictList*
+  辞書の設定内容を、~/.vimrcに記述可能な形式でペーストします。
+  eblook-vim-1.0.5からeblook-vim-1.1.0で辞書の設定形式が変更されたので、
+  旧形式の設定を読み込んだ後でこのコマンドを実行して、
+  新形式へ変換するために使います。
+  対象の辞書グループ番号をNで指定可能。
+
+==============================================================================
+7. 問題点					*eblook-problem*
+
+発音記号をUnicodeに置換して表示した際、アクセント位置等がずれることがあります。
+:se ambiwidth=single
+すると少しはましになることもあります。
+
+==============================================================================
+ vim:set ft=help:
