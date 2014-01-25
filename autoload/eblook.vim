@@ -120,6 +120,14 @@ if has_key(s:eblookenc2opt, eblookenc)
 endif
 unlet s:eblookenc2opt
 
+" Unicode表示可能かどうか。
+" (vimproc用に&enc=utf-8、&tenc=euc-jisx0213にしている場合はUnicode表示不可)
+if &encoding ==# 'utf-8' && (&termencoding == '' || &termencoding ==# 'utf-8')
+  let s:utf8display = 1
+else
+  let s:utf8display = 0
+endif
+
 " eblookにリダイレクトするコマンドを保持する一時ファイル名
 let s:cmdfile = tempname()
 " entryバッファ名のベース
@@ -535,9 +543,9 @@ endfunction
 function! s:ExecuteEblook()
   " ++encを指定しないとEUCでの短い出力をCP932と誤認識することがある
   silent execute 'read! ++enc=' . g:eblookenc . ' "' . g:eblookprg . '" ' . s:eblookopt . ' < "' . s:cmdfile . '"'
-  if &encoding !=# g:eblookenc
-    setlocal fileencoding=&encoding
-  endif
+  "if &encoding !=# g:eblookenc
+  "  let &fileencoding = &encoding
+  "endif
 
   silent! :g/^Warning: you should specify a book directory first$/d _
 endfunction
@@ -733,7 +741,7 @@ function! s:ReplaceTag()
   " <no-newline>削除後に<sub>を1つにする。
   " 例:<no-newline>(<sub>げ</sub></no-newline><sub>んす</sub><no-newline><sub>い</sub>), </no-newline>
   " を、「(_{げ}_{んす}_{い}), 」でなく「(_{げんすい}), 」にする。
-  if &encoding ==# 'utf-8' || g:eblook_decorate_supsub
+  if g:eblook_decorate_supsub
     silent! g/<\/sub><sub>/s///g
     silent! g/<\/sup><sup>/s///g
     silent! g/<sup>\([^<]*\)<\/sup>/s//\=s:GetReplaceTagStr('sup', submatch(1))/g
@@ -748,7 +756,7 @@ endfunction
 " @param str 元の文字列
 " @return 置換文字列
 function! s:GetReplaceTagStr(tag, str)
-  if &encoding ==# 'utf-8' && has_key(g:eblook#supsubmap_utf8#{a:tag}map, a:str)
+  if s:utf8display && has_key(g:eblook#supsubmap_utf8#{a:tag}map, a:str)
     return get(g:eblook#supsubmap_utf8#{a:tag}map, a:str, a:str)
   elseif g:eblook_decorate_supsub
     if a:tag == 'sup'
@@ -792,12 +800,15 @@ function! s:LoadGaijiMapFile(dict)
   let dir = matchstr(a:dict.book, '"\zs[^"]\+\ze"\|\S\+')
   " "{dir}/{NAME}_{encoding}.map"が無ければ"{dir}/{NAME}.map"をcp932で読み込み
   let mapfilebase = dir . '/' . toupper(name)
-  let encmapfile = mapfilebase . '_' . &encoding . '.map'
+  let enc = &termencoding
+  if enc == ''
+    let enc = &encoding
+  endif
+  let encmapfile = mapfilebase . '_' . enc . '.map'
   let mapfile = mapfilebase . '.map'
   let gaijimap = {}
   if filereadable(encmapfile)
     let mapfile = encmapfile
-    let enc = &encoding
   elseif filereadable(mapfile)
     let enc = 'cp932'
   else
@@ -845,7 +856,7 @@ function! s:GetGaiji(gaijimap, key)
     "return '_' . a:key . '_'     " DEBUG
   endif
   let gaiji = a:gaijimap[a:key]
-  if &encoding ==# 'utf-8'
+  if s:utf8display
     let res = gaiji[0]
     if res ==# 'null'
       return ''
@@ -865,7 +876,7 @@ endfunction
 " <unicode>４Ｅ２Ｆ</unicode>等を置換する
 " (LogoVistaの「漢字源 改訂第四版」以降で使用されている)
 function! s:ReplaceUnicode()
-  if &encoding ==# 'utf-8'
+  if s:utf8display
     silent! g/<unicode>\([０-９Ａ-Ｆ]\+\)<\/unicode>/s//\=s:GetUnicode(submatch(1))/g
   else
     silent! g/<unicode>\([０-９Ａ-Ｆ]\+\)<\/unicode>/s//_/g

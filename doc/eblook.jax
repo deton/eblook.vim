@@ -113,16 +113,20 @@ http://ikazuhiro.s206.xrea.com/staticpages/index.php/eblook
  ようなので、eblookコマンドとのやりとりをcp932で行うように設定)
 
 euc-jp環境で置換後の丸数字等が?@や?Aのように文字化けする場合は、
-mapファイルをnkf -eでeuc-jpに変換して、{nameの大文字}_{&encodingの値}.map
+mapファイルをnkf -eでeuc-jpに変換して、{nameの大文字}_{&termencodingの値}.map
 というファイル名で上記(2)のディレクトリに置いてください。
   例: nkf -e KOJIEN.map >KOJIEN_euc-jp.map
       nkf -e KANJIGEN.map >KANJIGEN_euc-jp.map
       nkf -e READERS2.map >READERS2_euc-jp.map
 (UNIX上のvimやiconvではエンコーディング変換に失敗するようなので、
  nkfやWindows上のvimで変換してください)
-({&encodingの値}付きの名前のファイルがあれば、{&encodingの値}無しの.map
+({&termencodingの値}付きの名前のファイルがあれば、{&termencodingの値}無しの.map
  ファイルよりも優先して読み込みます。
- それぞれを読む際のfileencodingは、&encodingとcp932です)
+ それぞれを読む際のfileencodingは、&termencodingとcp932です)
+({&termencodingの値}は、&termencodingが空の場合は&encodingの値を使用します)
+(vimproc用に&enc=utf-8,&tenc=euc-jpにしている環境の場合、丸数字が??に化けます。
+ &tenc=euc-jisx0213にすれば丸数字は表示可能ですが、U+2015(HORIZONTAL BAR)が
+ ??に化けます。&tenc=euc-jp-msにすれば両方表示可能)
 
 
 EBライブラリ用のAppendixでの外字置換を無効にして、mapファイルによる
@@ -300,6 +304,10 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ
   他の辞書とぶつからない文字列を適当に指定します。
   例:
     'title': '広辞苑第五版',
+
+  (vimproc用に&enc=utf-8,&tenc=euc-jpにすると、entryウィンドウの辞書titleが
+   文字化けする場合、eblook_dictlistを設定しているvimrcで、scriptencodingが
+   set encoding=utf-8の後に来ていることを確認してください)
 
 'appendix'				*'eblook_dictlist{n}[m].appendix'*
   Appendixを使う場合は、Appendixディレクトリを指定します。
