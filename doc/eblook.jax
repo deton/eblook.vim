@@ -447,6 +447,11 @@ EPWING/電子ブック辞書は、各辞書ごとに次の4つのキーを持つ
   <Leader>yを指定する場合の例:
     map <Leader>y <Plug>EblookSearch
 
+'eblook_no_default_key_mappings'	*'eblook_no_default_key_mappings'*
+  デフォルトのキーマッピング<Leader>yと<Leader><C-Y>を登録したくない場合
+  (自分で他のキーにmapしたい場合)は1に設定してください。
+    let eblook_no_default_key_mappings = 1
+
 'mapleader'
   キーマッピングのプレフィックス。|mapleader|を参照。省略値: CTRL-K
   CTRL-Kを指定する場合の例:

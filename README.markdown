@@ -30,22 +30,33 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
   アーカイブに含まれるファイルを次の場所に置いてください。
 
 *   ファイル            置く場所              ファイルの説明
-* plugin/eblook.vim     'runtimepath'/plugin/  プラグインスクリプト本体
+* plugin/eblook.vim     'runtimepath'/plugin/    コマンド、キー定義
+* autoload/eblook.vim   'runtimepath'/autoload/  スクリプト本体
 * autoload/eblook/stem_en.vim  'runtimepath'/autoload/eblook/  英語stemming用
 * autoload/eblook/stem_ja.vim  'runtimepath'/autoload/eblook/  日本語語尾補正用
 * autoload/eblook/supsubmap_utf8.vim 'runtimepath'/autoload/eblook/ 上付き文字置換用
 * syntax/eblook.vim     'runtimepath'/syntax/  eblook.vim用syntaxファイル
-* doc/eblook.txt        'runtimepath'/doc/     スクリプトの説明書
+* doc/eblook.jax        'runtimepath'/doc/     スクリプトの説明書
 
   'runtimepath'で示されるディレクトリは、Vim上で
   :echo &runtimepath を実行することで確認できます。
 
 使い方
 ======
-  doc/eblook.txt を参照してください。
+  doc/eblook.jax を参照してください。
 
 更新履歴
 ========
+* 1.2.1 (2014-01-XXX)
+  * イタリック表示中にボールド表示がある場合に`<b>`等がそのまま表示される
+    バグを修正。ボールド表示中のイタリック表示も同様。
+  * 'eblook_no_default_key_mappings'オプションを追加。
+    検索開始キーを`<Leader>y``<Leader><C-Y>`以外にしたい場合用。
+  * Macの端末内Vimで`__TcvimeHelp__`が生成され続ける問題を修正(issue#3)
+  * doc/eblook.txtをdoc/eblook.jaxにファイル名変更し、文字コードをUTF-8に変換。
+  * plugin/eblook.vimからコマンド、キー定義以外をautoload/eblook.vimに移動。
+    (vim起動高速化のため。起動時に読み込む量を減らして辞書検索時に読み込む)
+
 * 1.2.0 (2012-09-21)
   * eblook 1.6.1+mediaのdecorate-mode対応
         * content中のインデント指定`<ind=2>`等に基づいて、
