@@ -3,7 +3,7 @@
 " plugin/eblook.vim - lookup EPWING dictionary using `eblook' command.
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2014-01-25
+" Last Change: 2014-01-26
 
 scriptencoding utf-8
 
@@ -50,13 +50,13 @@ if !get(g:, 'eblook_no_default_key_mappings', 0)
     let s:set_mapleader = 1
   endif
   if !hasmapto('<Plug>EblookInput')
-    map <unique> <Leader><C-Y> <Plug>EblookInput
+    map <unique> <silent> <Leader><C-Y> <Plug>EblookInput
   endif
   if !hasmapto('<Plug>EblookSearch', 'n')
-    nmap <unique> <Leader>y <Plug>EblookSearch
+    nmap <unique> <silent> <Leader>y <Plug>EblookSearch
   endif
   if !hasmapto('<Plug>EblookSearch', 'v')
-    vmap <unique> <Leader>y <Plug>EblookSearch
+    vmap <unique> <silent> <Leader>y <Plug>EblookSearch
   endif
   if s:set_mapleader
     unlet g:mapleader
