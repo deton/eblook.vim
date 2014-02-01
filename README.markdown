@@ -50,13 +50,14 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 * 1.2.1 (2014-02-01)
   * イタリック表示中にボールド表示がある場合に`<b>`等がそのまま表示される
     バグを修正。ボールド表示中のイタリック表示も同様。
-  * Macの端末内Vimで`__TcvimeHelp__`が生成され続ける問題を修正(issue#3)
   * plugin/eblook.vimからコマンド、キー定義以外をautoload/eblook.vimに移動。
     (vim起動高速化のため。起動時に読み込む量を減らして辞書検索時に読み込む)
   * 'eblook_no_default_key_mappings'オプションを追加。
     検索開始キーを`<Leader>y``<Leader><C-Y>`以外にしたい場合用。
   * &encがutf-8でも、&tencがeuc-jp等の場合は、上付き数字等のUnicode文字は
     使用しないように修整。
+  * Mac OS Xの端末内Vimでcontent/entryウィンドウが生成され続ける可能性を修正
+    ([tcvimeのissue#3](https://github.com/deton/tcvime/issues/3))
   * doc/eblook.txtをdoc/eblook.jaxにファイル名変更し、文字コードをUTF-8に変換。
 
 * 1.2.0 (2012-09-21)
