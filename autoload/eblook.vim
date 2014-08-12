@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2014-01-25
+" Last Change: 2014-08-12
 " License: MIT License {{{
 " Copyright (c) 2012-2014 KIHARA, Hideto
 "
@@ -33,6 +33,10 @@ set cpo&vim
 " entryウィンドウの行数
 if !exists('eblook_entrywin_height')
   let eblook_entrywin_height = 4
+endif
+" contentウィンドウの行数
+if !exists('eblook_contentwin_height')
+  let eblook_contentwin_height = -1
 endif
 
 " 保持しておく過去の検索バッファ数の上限
@@ -566,6 +570,11 @@ function! s:NewBuffers(group)
     call s:Quit()
     let s:bufindex = oldindex
     return -1
+  endif
+  if g:eblook_contentwin_height == 0
+    execute 'wincmd _'
+  elseif g:eblook_contentwin_height > 0
+    execute g:eblook_contentwin_height . 'wincmd _'
   endif
   let b:group = a:group
   " eblook内でエラーが発生して、結果が無い状態でstatuslineを表示しようとして

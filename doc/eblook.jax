@@ -359,6 +359,11 @@ EPWING/電子ブック辞書は、各辞書ごとに次の6つのキーを持つ
 'eblook_entrywin_height'			*'eblook_entrywin_height'*
   entryウィンドウの行数(目安)。省略値: 4
 
+'eblook_contentwin_height'			*'eblook_contentwin_height'*
+  contentウィンドウの行数(目安)。|CTRL-W__|を指定された行数で実行。
+  0を指定した場合は、可能な限り高くする。
+  省略値: -1(ウィンドウ行数の設定はしない)
+
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
 
