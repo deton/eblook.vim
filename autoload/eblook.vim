@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2014-08-12
+" Last Change: 2014-08-13
 " License: MIT License {{{
 " Copyright (c) 2012-2014 KIHARA, Hideto
 "
@@ -464,7 +464,7 @@ endfunction
 " @param dictlist 対象の辞書グループ
 " @param {String} word 検索する単語
 function! s:RedirSearchCommand(dictlist, word)
-  if s:OpenWindow('new') < 0
+  if s:OpenWindow('1new') < 0
     return -1
   endif
   if s:IsEblookDecorate()
@@ -613,6 +613,45 @@ function! s:CreateBuffer(bufname, oldindex)
     silent %d _
   endif
   return 0
+endfunction
+
+" entryバッファとcontentバッファの高さを返す
+function! s:GetWinHeights()
+  let curbuf = bufnr('')
+
+  if s:GoWindow(0) < 0
+    let content_winheight = -1
+  else
+    let content_winheight = winheight(0)
+  endif
+
+  if s:GoWindow(1) < 0
+    let entry_winheight = -1
+  else
+    let entry_winheight = winheight(0)
+  endif
+
+  return [curbuf, content_winheight, entry_winheight]
+endfunction
+
+" entryバッファとcontentバッファの高さを復元する
+function! s:RestoreWinHeights(winheights)
+  let content_winheight = a:winheights[1]
+  if content_winheight > 0
+    if s:GoWindow(0) >= 0
+      execute 'resize' content_winheight
+    endif
+  endif
+
+  let entry_winheight = a:winheights[2]
+  if entry_winheight > 0
+    if s:GoWindow(1) >= 0
+      execute 'resize' entry_winheight
+    endif
+  endif
+
+  let curbuf = a:winheights[0]
+  execute bufwinnr(curbuf) . 'wincmd w'
 endfunction
 
 " entryバッファの指定行に対応する内容をcontentバッファに表示する
@@ -828,8 +867,8 @@ function! s:LoadGaijiMapFile(dict)
   " 現在のウィンドウ(entry/content)の高さが足りない場合、
   " OpenWindow()により、高さに余裕のあるウィンドウ上でsviewする可能性があるので
   " closeした後で元のウィンドウに明示的に切り替える必要あり
-  let curbuf = bufnr('')
-  if s:OpenWindow('sview ++enc=' . enc . ' ' . mapfile) < 0
+  let save_winheights = s:GetWinHeights() " ファイルOpen、Close後に高さを戻す
+  if s:OpenWindow('1sview ++enc=' . enc . ' ' . mapfile) < 0
     throw 'load-error'
   endif
   setlocal buftype=nowrite
@@ -851,7 +890,7 @@ function! s:LoadGaijiMapFile(dict)
     let gaijimap[gaiji] = [unicode, ascii]
   endfor
   bwipeout!
-  execute bufwinnr(curbuf) . 'wincmd w'
+  call s:RestoreWinHeights(save_winheights)
   return gaijimap
 endfunction
 
