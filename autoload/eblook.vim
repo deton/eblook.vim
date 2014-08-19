@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2014-08-13
+" Last Change: 2014-08-19
 " License: MIT License {{{
 " Copyright (c) 2012-2014 KIHARA, Hideto
 "
@@ -77,6 +77,10 @@ if !exists('eblook_statusline_content')
 endif
 if !exists('eblook_statusline_entry')
   let eblook_statusline_entry = '%{b:group}Eblook entry {%{b:word}}%< [%L]'
+endif
+
+if !exists('eblook_max_hits')
+  let eblook_max_hits = 0
 endif
 
 " eblookプログラムの名前
@@ -467,8 +471,9 @@ function! s:RedirSearchCommand(dictlist, word)
   if s:OpenWindow('1new') < 0
     return -1
   endif
+  execute 'normal! iset max-hits ' . g:eblook_max_hits . "\<Esc>"
   if s:IsEblookDecorate()
-    execute 'normal! iset decorate-mode on' . "\<Esc>"
+    execute 'normal! oset decorate-mode on' . "\<Esc>"
   endif
   setlocal nobuflisted
   let prev_book = ''
@@ -710,6 +715,7 @@ function! s:GetContentSub(doformat)
   let dictlist = s:GetDictList(b:group)
   let dict = dictlist[b:dictnum]
   execute 'redir! >' . s:cmdfile
+    silent echo 'set max-text 0'
     if s:IsEblookDecorate()
       silent echo 'set decorate-mode on'
     endif
