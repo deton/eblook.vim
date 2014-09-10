@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2014-08-19
+" Last Change: 2014-09-10
 " License: MIT License {{{
 " Copyright (c) 2012-2014 KIHARA, Hideto
 "
@@ -229,7 +229,8 @@ function! s:Entry_BufEnter()
   nnoremap <buffer> <silent> K k:call <SID>GetContent(0)<CR>
   nnoremap <buffer> <silent> <Space> :call <SID>ScrollContent(1)<CR>
   nnoremap <buffer> <silent> <BS> :call <SID>ScrollContent(0)<CR>
-  nnoremap <buffer> <silent> o :call <SID>MaximizeContentHeight()<CR>
+  nnoremap <buffer> <silent> o :call <SID>MaximizeContentHeight(1)<CR>
+  nnoremap <buffer> <silent> r :call <SID>LoadWinHeights(1)<CR>
   nnoremap <buffer> <silent> O :call <SID>GetAndFormatContent()<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(0)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
@@ -271,7 +272,8 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> <BS> <PageUp>
   nnoremap <buffer> <silent> <Tab> :call search('<\d\+[\|!]')<CR>
   nnoremap <buffer> <silent> <S-Tab> :call search('<\d\+[\|!]', 'b')<CR>
-  nnoremap <buffer> <silent> o :wincmd _<CR>
+  nnoremap <buffer> <silent> o :call <SID>MaximizeContentHeight(0)<CR>
+  nnoremap <buffer> <silent> r :call <SID>LoadWinHeights(0)<CR>
   nnoremap <buffer> <silent> O :call <SID>GetContentSub(1)<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
@@ -577,9 +579,9 @@ function! s:NewBuffers(group)
     return -1
   endif
   if g:eblook_contentwin_height == 0
-    execute 'wincmd _'
+    resize
   elseif g:eblook_contentwin_height > 0
-    execute g:eblook_contentwin_height . 'wincmd _'
+    execute 'resize' g:eblook_contentwin_height
   endif
   let b:group = a:group
   " eblook内でエラーが発生して、結果が無い状態でstatuslineを表示しようとして
@@ -591,7 +593,7 @@ function! s:NewBuffers(group)
     let s:bufindex = oldindex
     return -1
   endif
-  execute g:eblook_entrywin_height . 'wincmd _'
+  execute 'resize' g:eblook_entrywin_height
   return 0
 endfunction
 
@@ -1445,13 +1447,64 @@ function! s:GoWindow(to_entry_buf)
   return 0
 endfunction
 
-" entryウィンドウ上から、contentウィンドウの高さを最大化する
-function! s:MaximizeContentHeight()
+" contentウィンドウの高さを最大化する
+" @param on_entry_buf 1:entryウィンドウ上で実行, 0:contentウィンドウ上で実行
+function! s:MaximizeContentHeight(on_entry_buf)
+  if a:on_entry_buf == 0
+    call s:GoWindow(1)
+  endif
+  " entryウィンドウのwinheightを保存
+  if !exists('b:winheight')
+    let b:winheight = winheight(0)
+  endif
   if s:GoWindow(0) < 0
     return
   endif
-  wincmd _
-  call s:GoWindow(1)
+  " contentウィンドウのwinheightを保存
+  if !exists('b:winheight')
+    let b:winheight = winheight(0)
+  endif
+  resize
+  call s:GoWindow(a:on_entry_buf)
+endfunction
+
+" entryバッファとcontentバッファの高さを復元する
+" @param on_entry_buf 1:entryウィンドウ上で実行, 0:contentウィンドウ上で実行
+function! s:LoadWinHeights(on_entry_buf)
+  if a:on_entry_buf == 0 || s:GoWindow(0) >= 0
+    call s:LoadContentWinHeight()
+  endif
+  if s:GoWindow(1) >= 0
+    " LoadContentWinHeightでウィンドウ最大化の可能性があるので、その後で実行
+    call s:LoadEntryWinHeight()
+  endif
+  call s:GoWindow(a:on_entry_buf)
+endfunction
+
+" contentウィンドウの高さを復元する
+function! s:LoadContentWinHeight()
+  if exists('b:winheight')
+    let content_winheight = b:winheight
+    unlet b:winheight
+  else
+    let content_winheight = g:eblook_contentwin_height
+  endif
+  if content_winheight == 0
+    resize
+  elseif content_winheight > 0
+    execute 'resize' content_winheight
+  endif
+endfunction
+
+" entryウィンドウの高さを復元する
+function! s:LoadEntryWinHeight()
+  if exists('b:winheight')
+    let entry_winheight = b:winheight
+    unlet b:winheight
+  else
+    let entry_winheight = g:eblook_entrywin_height
+  endif
+  execute 'resize' entry_winheight
 endfunction
 
 " title文字列から辞書番号を返す

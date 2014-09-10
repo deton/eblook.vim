@@ -47,6 +47,8 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
+* 1.2.3 (2014-09-XXX)
+  * oキーで最大化したcontentウィンドウの高さを復元する機能を追加(rキー)
 * 1.2.2 (2014-09-07)
   * 'eblook_contentwin_height'オプションを追加。
   * eblook実行時に、max-hitsとmax-textを0にする処理を追加
