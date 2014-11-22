@@ -88,10 +88,10 @@ eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく�
 ------------------
 発音記号などの外字をUnicode文字列へ置換するには、以下の設定をしてください。
 EBWin用の外字定義ファイルを使用します。
-http://hishida.s271.xrea.com/manual/EBPocket/0_0_4_4.html
+http://ebstudio.info/manual/EBPocket/0_0_4_4.html
 
 (1)EBWinのアプリケーションディレクトリもしくは以下から外字定義ファイルを入手。
-http://www31.ocn.ne.jp/~h_ishida/EBPocket.html#download_gaiji
+http://ebstudio.info/home/EBPocket.html#download_gaiji
 
 (2)bookで指定したディレクトリに、{nameの大文字}.mapファイルをコピー。
   例:/usr/local/epwing/iwanami/koujien/に、KOJIEN.mapをコピー。
