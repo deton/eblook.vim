@@ -90,6 +90,9 @@ eblook.vimの使用前に、検索を行う辞書をvimrcで設定しておく�
 EBWin用の外字定義ファイルを使用します。
 http://ebstudio.info/manual/EBPocket/0_0_4_4.html
 
+なお、eblook-vimは、外字(eblookコマンドの<gaiji=ha158>のような出力)に
+対する置換文字が見つからない場合、外字を _ に置換して表示します。
+
 (1)EBWinのアプリケーションディレクトリもしくは以下から外字定義ファイルを入手。
 http://ebstudio.info/home/EBPocket.html#download_gaiji
 
