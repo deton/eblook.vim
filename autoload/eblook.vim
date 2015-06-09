@@ -496,7 +496,6 @@ function! s:RedirSearchCommand(dictlist, word)
       \ . 'search "' . a:word . '"' . "\<CR>\<Esc>"
     let i = i + 1
   endwhile
-  "let v:errmsg = ''
   try
     silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
   catch /^Vim\%((\a\+)\)\=:E513/
@@ -505,10 +504,6 @@ function! s:RedirSearchCommand(dictlist, word)
     return -1
   endtry
   bwipeout!
-  "if v:errmsg != ''
-  "  echomsg 'eblook-vim: eblook用コマンドファイル書き込み失敗: ' . v:errmsg
-  "  return -1
-  "endif
   return 0
 endfunction
 
