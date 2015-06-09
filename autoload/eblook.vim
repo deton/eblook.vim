@@ -3,9 +3,9 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2014-09-10
+" Last Change: 2015-06-09
 " License: MIT License {{{
-" Copyright (c) 2012-2014 KIHARA, Hideto
+" Copyright (c) 2012-2015 KIHARA, Hideto
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy of
 " this software and associated documentation files (the "Software"), to deal in
@@ -473,6 +473,7 @@ function! s:RedirSearchCommand(dictlist, word)
   if s:OpenWindow('1new') < 0
     return -1
   endif
+  setlocal noswapfile
   execute 'normal! iset max-hits ' . g:eblook_max_hits . "\<Esc>"
   if s:IsEblookDecorate()
     execute 'normal! oset decorate-mode on' . "\<Esc>"
@@ -495,9 +496,19 @@ function! s:RedirSearchCommand(dictlist, word)
       \ . 'search "' . a:word . '"' . "\<CR>\<Esc>"
     let i = i + 1
   endwhile
-  setlocal noswapfile
-  silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
+  "let v:errmsg = ''
+  try
+    silent execute 'write! ++enc=' . g:eblookenc . ' ' . s:cmdfile
+  catch /^Vim\%((\a\+)\)\=:E513/
+    echomsg 'eblook-vim: 検索語をeblookenc(' . g:eblookenc . ')に変換できないため中断: ' . a:word
+    bwipeout!
+    return -1
+  endtry
   bwipeout!
+  "if v:errmsg != ''
+  "  echomsg 'eblook-vim: eblook用コマンドファイル書き込み失敗: ' . v:errmsg
+  "  return -1
+  "endif
   return 0
 endfunction
 
