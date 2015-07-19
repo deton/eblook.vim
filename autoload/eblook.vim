@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2015-06-09
+" Last Change: 2015-07-19
 " License: MIT License {{{
 " Copyright (c) 2012-2015 KIHARA, Hideto
 "
@@ -214,7 +214,7 @@ function! s:Entry_BufEnter()
   set noswapfile
   set nobuflisted
   set nolist
-  setlocal noexpandtab
+  setlocal noexpandtab wrapmargin=0 textwidth=0
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
