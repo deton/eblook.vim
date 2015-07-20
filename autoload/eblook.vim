@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2015-07-19
+" Last Change: 2015-07-20
 " License: MIT License {{{
 " Copyright (c) 2012-2015 KIHARA, Hideto
 "
@@ -212,9 +212,12 @@ function! s:Entry_BufEnter()
   set buftype=nofile
   set bufhidden=hide
   set noswapfile
+  if has('persistent_undo')
+    setlocal noundofile
+  endif
   set nobuflisted
   set nolist
-  setlocal noexpandtab wrapmargin=0 textwidth=0
+  setlocal noexpandtab wrapmargin=0 textwidth=0 formatoptions-=a
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -253,10 +256,14 @@ function! s:Content_BufEnter()
   set buftype=nofile
   set bufhidden=hide
   set noswapfile
+  if has('persistent_undo')
+    setlocal noundofile
+  endif
   set nobuflisted
   set nolist
   " s:FormatLine()でgqqとindentまわりの処理を楽にするため
   setlocal expandtab autoindent nosmartindent
+  setlocal formatoptions-=a
   set filetype=eblook
   if has("conceal")
     setlocal conceallevel=2 concealcursor=nc
@@ -474,11 +481,15 @@ function! s:RedirSearchCommand(dictlist, word)
     return -1
   endif
   setlocal noswapfile
+  if has('persistent_undo')
+    setlocal noundofile
+  endif
+  setlocal nobuflisted
+  setlocal wrapmargin=0 textwidth=0 formatoptions-=a
   execute 'normal! iset max-hits ' . g:eblook_max_hits . "\<Esc>"
   if s:IsEblookDecorate()
     execute 'normal! oset decorate-mode on' . "\<Esc>"
   endif
-  setlocal nobuflisted
   let prev_book = ''
   let i = 0
   while i < len(a:dictlist)
