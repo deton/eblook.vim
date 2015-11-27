@@ -365,6 +365,9 @@ function! eblook#Search(group, word, isstem)
   if hasoldwin < 0
     let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
   endif
+  if hasoldwin >= 0 && !a:isstem " not save if recursion
+    let s:save_winheights = s:GetWinHeights()
+  endif
   if s:RedirSearchCommand(dictlist, a:word) < 0
     return -1
   endif
@@ -454,7 +457,9 @@ function! eblook#Search(group, word, isstem)
       "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . word . '>'
       let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', word)
       if strlen(str) == 0 || str ==# word
-        call s:LoadWinHeights(1)
+        if hasoldwin >= 0
+          call s:RestoreWinHeights(s:save_winheights)
+        endif
         return
       endif
       call eblook#Search(gr, str, 0)
@@ -656,6 +661,7 @@ function! s:GetWinHeights()
     let entry_winheight = winheight(0)
   endif
 
+  execute bufwinnr(curbuf) . 'wincmd w'
   return [curbuf, content_winheight, entry_winheight]
 endfunction
 
