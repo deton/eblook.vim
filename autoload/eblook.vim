@@ -3,7 +3,7 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2015-07-20
+" Last Change: 2015-11-27
 " License: MIT License {{{
 " Copyright (c) 2012-2015 KIHARA, Hideto
 "
@@ -454,7 +454,8 @@ function! eblook#Search(group, word, isstem)
       "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . word . '>'
       let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', word)
       if strlen(str) == 0 || str ==# word
-	return
+        call s:LoadWinHeights(1)
+        return
       endif
       call eblook#Search(gr, str, 0)
     endif
