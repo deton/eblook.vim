@@ -2,7 +2,7 @@
 " Language:     eblook.vim
 " Maintainer:   KIHARA Hideto <deton@m1.interq.or.jp>
 " Original Maintainer:   KATO Noriaki <katono123@gmail.com>
-" Last Change:  2014-01-25
+" Last Change:  2015-11-30
 
 scriptencoding utf-8
 
@@ -141,6 +141,7 @@ function! s:GetHi(name)
   silent! redir => hidef
   silent! execute 'hi ' . a:name
   silent! redir END
+  let hidef = substitute(hidef, "\n", ' ', 'g')
   let link = matchstr(hidef, ' links to \zs.*')
   if link == ''
     return hidef
