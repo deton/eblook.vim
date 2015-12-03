@@ -456,10 +456,10 @@ function! eblook#Search(group, word, isstem)
       endif
       "redraw | echomsg 'eblook-vim(' . gr . '): 何も見つかりませんでした: <' . word . '>'
       let str = input(':' . gr . 'EblookSearch(何も見つかりませんでした) ', word)
+      if hasoldwin >= 0
+	call s:RestoreWinHeights(s:save_winheights)
+      endif
       if strlen(str) == 0 || str ==# word
-        if hasoldwin >= 0
-          call s:RestoreWinHeights(s:save_winheights)
-        endif
         return
       endif
       call eblook#Search(gr, str, 0)
