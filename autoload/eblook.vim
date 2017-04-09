@@ -3,9 +3,9 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2015-11-27
+" Last Change: 2017-04-09
 " License: MIT License {{{
-" Copyright (c) 2012-2015 KIHARA, Hideto
+" Copyright (c) 2012-2015,2017 KIHARA, Hideto
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy of
 " this software and associated documentation files (the "Software"), to deal in
@@ -42,6 +42,11 @@ endif
 " 保持しておく過去の検索バッファ数の上限
 if !exists('eblook_history_max')
   let eblook_history_max = 10
+endif
+
+" contentウインドウ内でリンクをたどった際に、entryウィンドウ内容を更新するか
+if !exists('eblook_update_entrywin_by_contentwin_link')
+  let eblook_update_entrywin_by_contentwin_link = 1
 endif
 
 " 表示変更用に保持しておく訪問済リンク数の上限
@@ -145,7 +150,8 @@ let s:entrybufname = substitute(s:entrybufname, '\\', '/', 'g')
 let s:contentbufname = fnamemodify(s:cmdfile, ':p:h') . '/_eblook_content_'
 let s:contentbufname = substitute(s:contentbufname, '\\', '/', 'g')
 " バッファヒストリ中の現在位置
-let s:bufindex = 0
+let s:entrybufindex = 0
+let s:contentbufindex = 0
 " 直前に検索した文字列
 let s:lastword = ''
 " 表示済referenceアドレスリスト(訪問済リンクの表示変更用)
@@ -284,7 +290,7 @@ function! s:Content_BufEnter()
   nnoremap <buffer> <silent> O :call <SID>GetContentSub(1)<CR>
   nnoremap <buffer> <silent> p :call <SID>GoWindow(1)<CR>
   nnoremap <buffer> <silent> q :call <SID>Quit()<CR>
-  nnoremap <buffer> <silent> R :<C-U>call <SID>FollowReference(v:count)<CR>
+  nnoremap <buffer> <silent> R :<C-U>call <SID>FollowReference(v:count, 1)<CR>
   nnoremap <buffer> <silent> s :<C-U>call eblook#SearchInput(v:count, b:group, 0)<CR>
   nnoremap <buffer> <silent> S :<C-U>call <SID>SearchOtherGroup(v:count, b:group)<CR>
   nnoremap <buffer> <silent> <C-P> :call <SID>History(-1)<CR>:call <SID>GoWindow(0)<CR>
@@ -361,9 +367,9 @@ function! eblook#Search(group, word, isstem)
     echomsg 'eblook-vim: 辞書グループ(g:eblook_dictlist' . gr . ')には辞書がありません'
     return -1
   endif
-  let hasoldwin = bufwinnr(s:entrybufname . s:bufindex)
+  let hasoldwin = bufwinnr(s:entrybufname . s:entrybufindex)
   if hasoldwin < 0
-    let hasoldwin = bufwinnr(s:contentbufname . s:bufindex)
+    let hasoldwin = bufwinnr(s:contentbufname . s:contentbufindex)
   endif
   if hasoldwin >= 0 && !a:isstem " not save if recursion
     let s:save_winheights = s:GetWinHeights()
@@ -371,7 +377,7 @@ function! eblook#Search(group, word, isstem)
   if s:RedirSearchCommand(dictlist, a:word) < 0
     return -1
   endif
-  if s:NewBuffers(gr) < 0
+  if s:NewBuffers(gr, 1) < 0
     return -1
   endif
   let b:word = a:word
@@ -586,19 +592,26 @@ endfunction
 
 " 新しく検索を行うために、entryバッファとcontentバッファを作る。
 " @param {Number} group 対象の辞書グループ番号
-function! s:NewBuffers(group)
+" @param {Number} withentrybuf entryバッファを作るかどうか
+function! s:NewBuffers(group, withentrybuf)
+  " eblook_update_entrywin_by_contentwin_linkが1の場合は、
   " entryバッファとcontentバッファは一対で扱う。
-  let oldindex = s:bufindex
-  let s:bufindex = s:NextBufIndex()
-  if s:CreateBuffer(s:entrybufname, oldindex) < 0
-    let s:bufindex = oldindex
-    return -1
+  let oldindexe = s:entrybufindex
+  if a:withentrybuf
+    let s:entrybufindex = s:NextBufIndex(s:entrybufindex)
+    if s:CreateBuffer(s:entrybufname, oldindexe, s:entrybufindex) < 0
+      let s:entrybufindex = oldindexe
+      return -1
+    endif
+    let b:group = a:group
+    let b:word = ''
   endif
-  let b:group = a:group
-  let b:word = ''
-  if s:CreateBuffer(s:contentbufname, oldindex) < 0
+  let oldindexc = s:contentbufindex
+  let s:contentbufindex = s:NextBufIndex(s:contentbufindex)
+  if s:CreateBuffer(s:contentbufname, oldindexc, s:contentbufindex) < 0
     call s:Quit()
-    let s:bufindex = oldindex
+    let s:entrybufindex = oldindexe
+    let s:contentbufindex = oldindexc
     return -1
   endif
   if g:eblook_contentwin_height == 0
@@ -613,7 +626,8 @@ function! s:NewBuffers(group)
   let b:dtitle = ''
   if s:GoWindow(1) < 0
     call s:Quit()
-    let s:bufindex = oldindex
+    let s:entrybufindex = oldindexe
+    let s:contentbufindex = oldindexc
     return -1
   endif
   execute 'resize' g:eblook_entrywin_height
@@ -623,9 +637,10 @@ endfunction
 " entryバッファかcontentバッファのいずれかを作る
 " @param bufname s:entrybufnameかs:contentbufnameのいずれか
 " @param oldindex 現在のentry,contentバッファのインデックス番号
-function! s:CreateBuffer(bufname, oldindex)
+" @param newindex 作成するentry,contentバッファのインデックス番号
+function! s:CreateBuffer(bufname, oldindex, newindex)
   let oldbufname = a:bufname . a:oldindex
-  let newbufname = a:bufname . s:bufindex
+  let newbufname = a:bufname . a:newindex
   if bufexists(newbufname)
     let bufexists = 1
   else
@@ -689,7 +704,7 @@ endfunction
 " @param count 対象の行番号。0の場合は現在行
 " @return -1:content表示失敗, 0:表示成功
 function! s:GetContent(count)
-  if (a:count > 0)
+  if a:count > 0
     call cursor(a:count, 1)
     call search("\t")
   endif
@@ -1205,7 +1220,7 @@ function! s:SelectReference(count)
       return
     endif
   endif
-  call s:FollowReference(index)
+  call s:FollowReference(index, g:eblook_update_entrywin_by_contentwin_link)
 endfunction
 
 " contentバッファ中のカーソル位置付近のrefpatを抽出して、
@@ -1259,38 +1274,66 @@ function! s:ListReferences(count)
   if s:GetContent(0) < 0
     return -1
   endif
-  call s:FollowReference(a:count)
+  call s:FollowReference(a:count, 1)
 endfunction
 
 " referenceをリストアップしてentryバッファに表示し、
 " 指定されたreferenceの内容をcontentバッファに表示する。
 " @param count [count]で指定された、表示対象のreferenceのindex番号
-function! s:FollowReference(count)
+" @param {Number} withentrybuf entryバッファを作るかどうか
+function! s:FollowReference(count, withentrybuf)
+  let on_contentbuf = exists('b:dtitle')
   if s:GoWindow(0) < 0
     return
   endif
   let dnum = b:dictnum
   let contentrefs = b:contentrefs
   let contentcaption = b:caption
+  let title = b:dtitle
 
-  if s:NewBuffers(b:group) < 0
+  if s:NewBuffers(b:group, a:withentrybuf) < 0
     return -1
   endif
-  let dictlist = s:GetDictList(b:group)
-  let title = dictlist[dnum].title
-  let j = 0
-  while j < len(contentrefs)
-    let refstr = '<' . (j + 1) . s:Visited(title, contentrefs[j][0]) . contentrefs[j][1] . '|>'
-    execute 'normal! o' . title . "\<C-V>\<Tab>" . refstr . "\<Esc>"
-    let j = j + 1
-  endwhile
-  let b:refs = contentrefs
-  let b:word = contentcaption
-  silent! :g/^$/d _
-  setlocal nomodifiable
+  if a:withentrybuf
+    " contentバッファ内のreferenceリストを、entryバッファに表示
+    let j = 0
+    while j < len(contentrefs)
+      let refstr = '<' . (j + 1) . s:Visited(title, contentrefs[j][0]) . contentrefs[j][1] . '|>'
+      execute 'normal! o' . title . "\<C-V>\<Tab>" . refstr . "\<Esc>"
+      let j = j + 1
+    endwhile
+    let b:refs = contentrefs
+    let b:word = contentcaption
+    silent! :g/^$/d _
+    setlocal nomodifiable
+    normal! gg
+    if a:count > 0
+      call cursor(a:count, 1)
+      call search("\t")
+    endif
+  endif
 
-  normal! gg
-  call s:GetContent(a:count)
+  " content取得事前準備としてb:変数を設定。s:GetContent()と同様
+  if s:GoWindow(0) < 0
+    return -1
+  endif
+  let b:dictnum = dnum
+  let b:dtitle = title
+  let i = a:count
+  if i < 1
+    let i = 1
+  endif
+  let ref = get(contentrefs, i - 1)
+  if type(ref) != type([])
+    return -1
+  endif
+  let b:refid = ref[0]
+  let b:caption = ref[1]
+
+  call s:GetContentSub(0)
+  if a:withentrybuf || !on_contentbuf
+    call s:GoWindow(1)
+  endif
 endfunction
 
 " contentバッファ中のカーソル位置付近のimg等を抽出して、
@@ -1377,47 +1420,86 @@ endfunction
 " バッファのヒストリをたどる。
 " @param dir -1:古い方向へ, 1:新しい方向へ
 function! s:History(dir)
-  if a:dir > 0
-    let ni = s:NextBufIndex()
-    if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
-      echomsg 'eblook-vim: 次のバッファはありません'
-      return
+  " eblook_update_entrywin_by_contentwin_linkが1の場合は、
+  " entryバッファとcontentバッファは一対で扱う。
+  if g:eblook_update_entrywin_by_contentwin_link
+    if a:dir > 0
+      let ni = s:NextBufIndex(s:entrybufindex)
+      if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
+        echomsg 'eblook-vim: 次のバッファはありません'
+        return
+      endif
+    else
+      let ni = s:PrevBufIndex(s:entrybufindex)
+      if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
+        echomsg 'eblook-vim: 前のバッファはありません'
+        return
+      endif
+    endif
+    let ni = s:HistoryBuf(a:dir, s:entrybufname, s:entrybufindex)
+    if ni >= 0
+      let s:entrybufindex = ni
+    endif
+    let ni = s:HistoryBuf(a:dir, s:contentbufname, s:contentbufindex)
+    if ni >= 0
+      let s:contentbufindex = ni
+    endif
+    call s:GoWindow(1)
+    return
+  endif
+  if exists('b:dtitle') " contentbuf?
+    let ni = s:HistoryBuf(a:dir, s:contentbufname, s:contentbufindex)
+    if ni >= 0
+      let s:contentbufindex = ni
     endif
   else
-    let ni = s:PrevBufIndex()
-    if !bufexists(s:entrybufname . ni) || !bufexists(s:contentbufname . ni)
-      echomsg 'eblook-vim: 前のバッファはありません'
-      return
+    let ni = s:HistoryBuf(a:dir, s:entrybufname, s:entrybufindex)
+    if ni >= 0
+      let s:entrybufindex = ni
     endif
   endif
-  if s:SelectWindowByName(s:entrybufname . s:bufindex) < 0
-    call s:OpenWindow('split ' . s:entrybufname . ni)
-  else
-    silent execute "edit " . s:entrybufname . ni
-  endif
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) < 0
-    call s:OpenWindow('split ' . s:contentbufname . ni)
-  else
-    silent execute "edit " . s:contentbufname . ni
-  endif
-  let s:bufindex = ni
-  call s:GoWindow(1)
 endfunction
 
-" 次のバッファのインデックス番号を返す
-" @return 次のバッファのインデックス番号
-function! s:NextBufIndex()
-  let i = s:bufindex + 1
+" entrybuf/contentbufのヒストリをたどる。
+" @param dir -1:古い方向へ, 1:新しい方向へ
+function! s:HistoryBuf(dir, bufname, bufindex)
+  if a:dir > 0
+    let ni = s:NextBufIndex(a:bufindex)
+    if !bufexists(a:bufname . ni)
+      echomsg 'eblook-vim: 次のバッファはありません'
+      return -1
+    endif
+  else
+    let ni = s:PrevBufIndex(a:bufindex)
+    if !bufexists(a:bufname . ni)
+      echomsg 'eblook-vim: 前のバッファはありません'
+      return -1
+    endif
+  endif
+  if s:SelectWindowByName(a:bufname . a:bufindex) < 0
+    call s:OpenWindow('split ' . a:bufname . ni)
+  else
+    silent execute "edit " . a:bufname . ni
+  endif
+  return ni
+endfunction
+
+" バッファの次のインデックス番号を返す
+" @param oldbufindex 現在のインデックス番号
+" @return バッファの次のインデックス番号
+function! s:NextBufIndex(oldbufindex)
+  let i = a:oldbufindex + 1
   if i > g:eblook_history_max
     let i = 1
   endif
   return i
 endfunction
 
-" 前のバッファのインデックス番号を返す
-" @return 前のバッファのインデックス番号
-function! s:PrevBufIndex()
-  let i = s:bufindex - 1
+" バッファの前のインデックス番号を返す
+" @param oldbufindex 現在のインデックス番号
+" @return バッファの前のインデックス番号
+function! s:PrevBufIndex(oldbufindex)
+  let i = a:oldbufindex - 1
   if i < 1
     let i = g:eblook_history_max
   endif
@@ -1432,10 +1514,10 @@ function! s:Quit()
     unmenu PopUp.[eblook]\ SearchVisual
     unmenu PopUp.-SEP_EBLOOK-
   endif
-  if s:SelectWindowByName(s:contentbufname . s:bufindex) >= 0
+  if s:SelectWindowByName(s:contentbufname . s:contentbufindex) >= 0
     hide
   endif
-  if s:SelectWindowByName(s:entrybufname . s:bufindex) >= 0
+  if s:SelectWindowByName(s:entrybufname . s:entrybufindex) >= 0
     hide
   endif
   call delete(s:cmdfile)
@@ -1459,9 +1541,9 @@ endfunction
 " @param to_entry_buf 1:entryウィンドウに移動, 0:contentウィンドウに移動
 function! s:GoWindow(to_entry_buf)
   if a:to_entry_buf
-    let bufname = s:entrybufname . s:bufindex
+    let bufname = s:entrybufname . s:entrybufindex
   else
-    let bufname = s:contentbufname . s:bufindex
+    let bufname = s:contentbufname . s:contentbufindex
   endif
   if s:SelectWindowByName(bufname) < 0
     if s:OpenWindow('split ' . bufname) < 0

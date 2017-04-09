@@ -47,7 +47,10 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 
 更新履歴
 ========
-* 1.2.3 (2015-11-XXX)
+* 1.3.0 (2017-04-XXX)
+  * contentウインドウ内でリンクをたどった際に、entryウィンドウ内容を更新しない
+    動作を可能にする、'eblook_update_entrywin_by_contentwin_link'オプション
+* 1.2.3 (2015-12-04)
   * oキーで最大化したcontentウィンドウの高さを復元する機能を追加(rキー)
   * 'wrapmargin'や'textwidth'により、entryウィンドウで長い行が折り返されると、
     contentウィンドウの表示が行われない場合があるバグを修正。
