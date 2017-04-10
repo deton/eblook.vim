@@ -193,6 +193,7 @@ entryウィンドウでj,kキーでカーソルを移動して、<CR>を押す�
 がある場合は、contentウィンドウの<n|...|>のある行で<CR>を押すと、
 referenceの先の内容が表示されます。
 このとき、entryウィンドウには、元の内容内のreference一覧が表示されます。
+('eblook_update_entrywin_by_contentwin_link'が1の場合)
 
 元の内容に戻るには、<C-P>を押して検索履歴を戻ります。
 
@@ -372,6 +373,13 @@ EPWING/電子ブック辞書は、各辞書ごとに次の6つのキーを持つ
 
 'eblook_history_max'				*'eblook_history_max'*
   保持しておく過去の検索履歴バッファ数の上限。省略値: 10
+
+'eblook_update_entrywin_by_contentwin_link'	*'eblook_update_entrywin_by_contentwin_link'*
+  contentウインドウ内でリンクをたどった際に、entryウィンドウ内容を
+  更新するかどうか。省略値: 1
+  なお、0に設定した場合、<C-P>,<C-N>による検索履歴の表示において、
+  entryバッファとcontentバッファの連動表示もされなくなります。
+  (それぞれのバッファで独立して検索履歴を表示)
 
 'eblook_visited_max'				*'eblook_visited_max'*
   表示変更用に保持しておく訪問済リンク数の上限。省略値: 100
