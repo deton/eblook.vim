@@ -3,9 +3,9 @@
 " autoload/eblook.vim - functions for plugin/eblook.vim
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2017-04-09
+" Last Change: 2020-04-18
 " License: MIT License {{{
-" Copyright (c) 2012-2015,2017 KIHARA, Hideto
+" Copyright (c) 2012-2015,2017,2020 KIHARA, Hideto
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy of
 " this software and associated documentation files (the "Software"), to deal in
@@ -1403,10 +1403,13 @@ function! s:ShowMedia(count)
     redir END
   endif
 
-  let viewer = get(g:eblook_viewers, tmpext, '')
+  let viewer = get(dict, 'viewer_' . tmpext, '')
   if strlen(viewer) == 0
-    echomsg tmpext . '用ビューアがg:eblook_viewersに設定されていません'
-    return
+    let viewer = get(g:eblook_viewers, tmpext, '')
+    if strlen(viewer) == 0
+      echomsg tmpext . '用ビューアがg:eblook_viewersに設定されていません'
+      return
+    endif
   endif
   if match(viewer, '%s') >= 0
     let cmdline = substitute(viewer, '%s', shellescape(tmpfshell), '')

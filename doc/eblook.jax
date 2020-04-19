@@ -270,7 +270,7 @@ x                   カーソル位置か[count]で指定する画像・音声�
 5. オプション					*eblook-option*
 
 						*'eblook_dictlist{n}'*
-EPWING/電子ブック辞書は、各辞書ごとに次の6つのキーを持つ|Dictionary|データ
+EPWING/電子ブック辞書は、各辞書ごとに次の11個のキーを持つ|Dictionary|データ
 を要素として持つ|List|データとして設定します。bookとnameは必須です。
 
     let eblook_dictlist1 = [
@@ -288,6 +288,11 @@ EPWING/電子ブック辞書は、各辞書ごとに次の6つのキーを持つ
 'appendix' 	Appendix
 'skip'		この辞書を検索対象にするかどうか
 'autoformat'	content表示時に長い行を|gq|で整形するかどうか
+'viewer_wav'	この辞書用の音声再生用の外部ビューアコマンド
+'viewer_jpeg'	この辞書用のjpeg画像表示用の外部ビューアコマンド
+'viewer_bmp'	この辞書用のbmp画像表示用の外部ビューアコマンド
+'viewer_pbm'	この辞書用のpbm画像表示用の外部ビューアコマンド
+'viewer_mpg'	この辞書用の動画再生用の外部ビューアコマンド
 
 'book'						*'eblook_dictlist{n}[m].book'*
   辞書のあるディレクトリ(catalogsファイルのあるディレクトリ)を指定します。
@@ -332,6 +337,47 @@ EPWING/電子ブック辞書は、各辞書ごとに次の6つのキーを持つ
 'autoformat'				*'eblook_dictlist{n}[m].autoformat'*
   content表示時に長い行を|gq|で整形するかどうか。
   全辞書を対象とするデフォルト値|'eblook_autoformat_default'|に対し、
+  個々の辞書の設定値を変えたい場合用。
+
+'viewer_wav'				*'eblook_dictlist{n}[m].viewer_wav'*
+  この辞書用の音声再生用の外部ビューアコマンド。
+  全辞書を対象とする値|'eblook_viewers'|に対し、
+  個々の辞書の設定値を変えたい場合用。
+  音声データが(wavヘッダを付けた)mp3で収録されている場合に、ファイル名を
+  wavからmp3に変えて再生するスクリプトを設定するため。
+    例:
+      let eblook_dictlist2 = [
+        \{ 'title': 'ロングマン現代英英辞典　５訂版',
+          \'book': '/home/deton/lib/epwing/LDOCE5',
+          \'name': 'ldoce5',
+          \'viewer_wav': 'sh ~/bin/wav_mp3.sh %s &',
+        \},
+    例(wav_mp3.sh):
+      #!/bin/sh
+      # rename .wav to .mp3 and play
+      file=$1
+      filemp3=$(echo "$file" | sed -e s/\.wav/.mp3/)
+      mv "$file" "$filemp3"
+      afplay "$filemp3"
+
+'viewer_jpeg'				*'eblook_dictlist{n}[m].viewer_jpeg'*
+  この辞書用のjpeg画像表示用の外部ビューアコマンド
+  全辞書を対象とする値|'eblook_viewers'|に対し、
+  個々の辞書の設定値を変えたい場合用。
+
+'viewer_bmp'				*'eblook_dictlist{n}[m].viewer_bmp'*
+  この辞書用のbmp画像表示用の外部ビューアコマンド
+  全辞書を対象とする値|'eblook_viewers'|に対し、
+  個々の辞書の設定値を変えたい場合用。
+
+'viewer_pbm'				*'eblook_dictlist{n}[m].viewer_pbm'*
+  この辞書用のpbm画像表示用の外部ビューアコマンド
+  全辞書を対象とする値|'eblook_viewers'|に対し、
+  個々の辞書の設定値を変えたい場合用。
+
+'viewer_mpg'				*'eblook_dictlist{n}[m].viewer_mpg'*
+  この辞書用の動画再生用の外部ビューアコマンド
+  全辞書を対象とする値|'eblook_viewers'|に対し、
   個々の辞書の設定値を変えたい場合用。
 
 'eblook_group'					*'eblook_group'*
