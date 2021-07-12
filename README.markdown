@@ -45,6 +45,50 @@ eblook.vim - EPWING/電子ブック辞書検索プラグインスクリプト
 ======
   doc/eblook.jax を参照してください。
 
+外字置換関連ファイル
+====================
+
+### EBライブラリでの外字置換をコメントアウトしたAppendix
+colloc-2.0とplus-2.0に関して外字置換設定をコメントアウトして作成した
+Appendixを以下に置いてあります。
+
+* https://github.com/deton/eblook.vim/releases/download/v1.4.0/colloc-2.0-nogaiji.tar.gz
+* https://github.com/deton/eblook.vim/releases/download/v1.4.0/plus-2.0-nogaiji.tar.gz
+
+#### 説明
+eblook-vimの外字置換機能を使う場合は、
+Appendixを指定しないようにする必要があります。
+([EBライブラリ用のAppendix](http://www.mistys-internet.website/eb/appendix.html)での外字置換はしない。)
+
+ただし、Appendixによってstop codeを設定する必要のある辞書の場合は、
+(例:「新編英和活用大事典」。stop code設定が無い場合、内容が正しく表示されない)
+外字置換設定を削除したAppendixを指定する必要があります。
+ここにあるのは、そのためのファイルです。
+
+(作り方: 外字置換設定を削除するには、Appendix内の.appファイルの
+begin narrow...endとbegin wide...endをコメントアウト後に
+ebappendixコマンドを使ってAppendixを作り直す)
+
+(なお、「ジーニアス英和大辞典」もAppendixが必須ですが、genius2-1.1には
+外字置換設定は含まれていないので、そのまま使えます。)
+
+### 外字定義ファイル
+eblook-vimの外字置換機能([EBWin用の外字定義ファイル](http://ebstudio.info/home/EBPocket.html#download_gaiji)を使って、
+発音記号などの外字をUnicode文字列へ置換する機能)用の、
+外字定義ファイルです。
+(使い方は、eblook-vimのヘルプファイルdoc/eblook.jaxの、`|eblook-setup-gaiji|`参照)
+
+https://github.com/deton/eblook.vim/releases/download/v1.4.0/LDOCE-gaijimap.zip
+
+* LDOCE5.map(ロングマン現代英英辞典5訂版用):
+  [ldoce5-fpw-20120906](https://takadepo.web.fc2.com/)
+  に含まれるebwin.plで生成したもの。
+  (LDOCE5.mapのライセンスは、ldoce5-fpw-20120906と同じGPL 2です。
+  gaijitbl.plにある外字定義テーブルから生成されたものなので)
+* LDOCE4.map:
+  [ldoce4conv103](http://hp.vector.co.jp/authors/VA005784/longman4/)
+  に含まれるLDOCE4GaijiMap.xmlから変換したもの。
+
 更新履歴
 ========
 * 1.4.0 (2020-04-19)
